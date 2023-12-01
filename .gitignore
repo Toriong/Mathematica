@@ -8,6 +8,8 @@ node_modules/
 dist/
 web-build/
 
+testingQs.json
+
 # Native
 *.orig.*
 *.jks
