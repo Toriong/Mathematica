@@ -5,6 +5,7 @@ export const useQuestionsStore = create<IQuestionsForObj>(set => ({
     task: "",
     questions: [],
     setQuestions: (questions: IQuestion[]) => set(() => ({ questions: questions })),
+    setTask: (task: string) => set(() => ({ task: task }))
 }));
 export const useErrorsStore = create(set => ({
     didAnErrorOccurInGettingQs: false,
@@ -12,4 +13,10 @@ export const useErrorsStore = create(set => ({
     setDidAnErrorOccurInGettingQs: (didAnErrorOccurInGettingQs: boolean) => set(() => ({
         didAnErrorOccurInGettingQs: didAnErrorOccurInGettingQs
     }))
+}));
+export const useIsGettingReqStore = create(set => ({
+    isGettingQs: false,
+    updateState: (isGettingsQs: boolean, stateNameStr: string) => set(() => ({
+        [stateNameStr]: isGettingsQs
+    })) 
 })) 

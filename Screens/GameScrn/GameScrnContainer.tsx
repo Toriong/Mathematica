@@ -23,8 +23,9 @@ async function getQuestions(handleSuccessfulResponse?: (args?: any[] | any) => v
 }
 
 const GameScrnContainer = () => {
-  const questions = useQuestionsStore(state => (state as IQuestionsForObj).questions);
   const setQuestions = useQuestionsStore(state => state.setQuestions);
+  // const setTask = useQuestionsStore(state => state.set);
+
  
   function handleGetQuestionsSuccessfulResponse(questionsFromResponse: IQuestion[] | IQuestionsForObj) {
     if ((questionsFromResponse as IQuestionsForObj) && (questionsFromResponse as IQuestionsForObj).task) {
@@ -46,10 +47,6 @@ const GameScrnContainer = () => {
       }
     })();
   }, []);
-
-  useEffect(() => {
-    console.log("questions yo there: ", questions);
-  }, [questions]);
 
   return <GameScrnPresentation />;
 };
