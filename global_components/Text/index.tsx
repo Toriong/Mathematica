@@ -6,9 +6,9 @@ const FONT_FAMILY_MAIN = "San Francisco"
 
 type TProps = {
     children: ReactNode,
-    fontSize: number,
+    fontSize?: number,
     txtColor?: string,
-    style: { [key: string]: string | number },
+    style?: { [key: string]: string | number },
     testID?: string,
 }
 

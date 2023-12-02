@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { View } from 'react-native';
+import { PTxt } from '../../global_components/Text';
 
 
 // brain dump notes: 
@@ -19,6 +20,7 @@ const GameScrnPresentation = () => {
   return (
     // will have the following layout: 
     <View>
+      <PTxt>Hi</PTxt>
         {/* CASE: translate the proposition into symbolic propositional logic */}
         {/* SECTION 1: */}
         {/* display what the user must do with the text: Example: "Translate the proposition into symbolic logic." */}
