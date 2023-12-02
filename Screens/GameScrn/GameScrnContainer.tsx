@@ -24,6 +24,7 @@ async function getQuestions(handleSuccessfulResponse?: (args?: any[] | any) => v
 
 const GameScrnContainer = () => {
   const setQuestions = useQuestionsStore(state => state.setQuestions);
+  
   // const setTask = useQuestionsStore(state => state.set);
 
  

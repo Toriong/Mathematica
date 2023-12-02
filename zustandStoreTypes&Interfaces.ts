@@ -1,3 +1,14 @@
+export interface IIsGettingReqStoreState {
+    isGettingQs: boolean
+    isGettingUserInfo: boolean
+}
+
+export interface IIsGettingReqStoreActions {
+    updateState: (newState: boolean, fieldName: string) => void 
+}
+
+export type TIsGettingReqStore = IIsGettingReqStoreState & IIsGettingReqStoreActions;
+
 export interface IChoice {
     value: string
     letter: string
@@ -5,14 +16,20 @@ export interface IChoice {
 
 export interface IQuestion {
     _id: string
-    sentence: string,
+    sentence: string
     answer: string[]
     task?: string
     choices?: IChoice[]
 }
 
-export interface IQuestionsForObj {
+export interface IQuestionObjActions {
+    setQuestions: (questions: IQuestion[]) => void
+    setTask: (task: string) => void
+}
+
+export interface IQuestionsStates {
     task: string,
     questions: IQuestion[],
-    setQuestions: (questions: IQuestion[]) => void;
 }
+
+export type IQuestionsForObj = IQuestionObjActions & IQuestionsStates

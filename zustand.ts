@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IQuestion, IQuestionsForObj } from './zustandStoreTypes&Interfaces';
+import { IQuestion, IQuestionsForObj, TIsGettingReqStore } from './zustandStoreTypes&Interfaces';
 
 export const useQuestionsStore = create<IQuestionsForObj>(set => ({
     task: "",
@@ -7,6 +7,7 @@ export const useQuestionsStore = create<IQuestionsForObj>(set => ({
     setQuestions: (questions: IQuestion[]) => set(() => ({ questions: questions })),
     setTask: (task: string) => set(() => ({ task: task }))
 }));
+
 export const useErrorsStore = create(set => ({
     didAnErrorOccurInGettingQs: false,
     didAnErrorOccurInUserAuth: false,
@@ -14,9 +15,11 @@ export const useErrorsStore = create(set => ({
         didAnErrorOccurInGettingQs: didAnErrorOccurInGettingQs
     }))
 }));
-export const useIsGettingReqStore = create(set => ({
+
+export const useIsGettingReqStore = create<TIsGettingReqStore>(set => ({
     isGettingQs: false,
-    updateState: (isGettingsQs: boolean, stateNameStr: string) => set(() => ({
-        [stateNameStr]: isGettingsQs
-    })) 
-})) 
+    isGettingUserInfo: false,
+    updateState: (newState: boolean, fieldName: string) => set(() => ({ [fieldName]: newState }))
+}));
+
+

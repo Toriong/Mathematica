@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { PTxt } from '../../global_components/Text';
+import { useIsGettingReqStore, useQuestionsStore } from '../../zustand';
 
 
 // brain dump notes: 
@@ -17,31 +18,48 @@ import { PTxt } from '../../global_components/Text';
 // FOR THE UI, for the choices, if there is no choices array, then get all of the letters from the answer array.
 
 const GameScrnPresentation = () => {
+  const questions = useQuestionsStore(state => state.questions);
+  const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
+  // const isGettingQs = useIsGettingReqStore(state => state.)
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const question = questions[questionIndex];
+
+  useEffect(() => {
+    console.log("question yo there: ", question);
+  });
+
+  function handleEnterBtnPress() {
+
+  };
+
+  function getIsAnswerCorrect() {
+
+  }
+
   return (
-    // will have the following layout: 
-    <View>
+    <View style={{ backgroundColor: 'red', flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <PTxt>Hi</PTxt>
-        {/* CASE: translate the proposition into symbolic propositional logic */}
-        {/* SECTION 1: */}
-        {/* display what the user must do with the text: Example: "Translate the proposition into symbolic logic." */}
-        {/* END OF SECTION 1 */}
+      {/* CASE: translate the proposition into symbolic propositional logic */}
+      {/* SECTION 1: */}
+      {/* display what the user must do with the text: Example: "Translate the proposition into symbolic logic." */}
+      {/* END OF SECTION 1 */}
 
-        {/* SECTION 2: */}
-        {/* display the proposition here.*/}
-        {/* END OF SECTION 2 */}
-        
-        {/* SECTION 3: */}
-        {/* display the definition for each of the terms. For example: "P (one of the terms in the proposition)" */}
-        {/* END OF SECTION 3 */}
+      {/* SECTION 2: */}
+      {/* display the proposition here.*/}
+      {/* END OF SECTION 2 */}
+
+      {/* SECTION 3: */}
+      {/* display the definition for each of the terms. For example: "P (one of the terms in the proposition)" */}
+      {/* END OF SECTION 3 */}
 
 
-        {/* SECTION 4: */}
-        {/* display placement of the tiles */}
-        {/* END OF SECTION 4 */}
+      {/* SECTION 4: */}
+      {/* display placement of the tiles */}
+      {/* END OF SECTION 4 */}
 
-        {/* SECTION 5: */}
-        {/* display the choices to the user */}
-        {/* END OF SECTION 5 */}
+      {/* SECTION 5: */}
+      {/* display the choices to the user */}
+      {/* END OF SECTION 5 */}
 
 
     </View>
