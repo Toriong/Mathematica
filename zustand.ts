@@ -25,13 +25,13 @@ export const useIsGettingReqStore = create<TIsGettingReqStore>(set => ({
 
 type TCurrentTheme = "dark" | "light";
 interface IColorStore {
-    themes: IThemeColors,
+    themesObj: IThemeColors,
     currentTheme: TCurrentTheme
     setCurrentTheme: (theme: TCurrentTheme) => () => void
 }
 
-export const useColorStore = create<IColorStore>(set => ({
-    themes: {
+export const useColorStore = create<IColorStore>(set => ( {
+    themesObj: {
         dark: {
             first: '#343541',
             second: '#6B7280',
