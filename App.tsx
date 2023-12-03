@@ -1,13 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import GameScrnContainer from './Screens/GameScrn/GameScrnContainer';
+import LogicGameAppNavigation from './Navigation';
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <GameScrnContainer />
-    </View>
-  );
+  return <LogicGameAppNavigation />
 }
 
 const styles = StyleSheet.create({
