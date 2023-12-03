@@ -19,13 +19,15 @@ import { useIsGettingReqStore, useQuestionsStore } from '../../zustand';
 
 const GameScrnPresentation = () => {
   const questions = useQuestionsStore(state => state.questions);
+  const task = useQuestionsStore(state => state.task);
   const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
-  // const isGettingQs = useIsGettingReqStore(state => state.)
   const [questionIndex, setQuestionIndex] = useState(0);
   const question = questions[questionIndex];
 
   useEffect(() => {
+    console.log("isGettingQs: ", isGettingQs)
     console.log("question yo there: ", question);
+    console.log("task name: ", task);
   });
 
   function handleEnterBtnPress() {
@@ -37,7 +39,7 @@ const GameScrnPresentation = () => {
   }
 
   return (
-    <View style={{ backgroundColor: 'red', flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <View style={{ backgroundColor: '#343541', flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <PTxt>Hi</PTxt>
       {/* CASE: translate the proposition into symbolic propositional logic */}
       {/* SECTION 1: */}

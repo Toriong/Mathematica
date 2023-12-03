@@ -4,7 +4,7 @@ export interface IIsGettingReqStoreState {
 }
 
 export interface IIsGettingReqStoreActions {
-    updateState: (newState: boolean, fieldName: string) => void 
+    updateState: (newState: boolean, fieldName: keyof IIsGettingReqStoreState) => void 
 }
 
 export type TIsGettingReqStore = IIsGettingReqStoreState & IIsGettingReqStoreActions;

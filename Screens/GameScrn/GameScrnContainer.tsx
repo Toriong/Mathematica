@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import GameScrnPresentation from './GameScrnPresentation';
 import { IS_TESTING } from '../../globalVars';
 import testingQs from '../../testingQs.json';
-import { useQuestionsStore } from '../../zustand';
+import { useIsGettingReqStore, useQuestionsStore } from '../../zustand';
 import { IQuestion, IQuestionsForObj } from '../../zustandStoreTypes&Interfaces';
 
 async function getQuestions(handleSuccessfulResponse?: (args?: any[] | any) => void, handleErrorResponse?: (args?: any[] | any) => void) {
@@ -24,6 +24,8 @@ async function getQuestions(handleSuccessfulResponse?: (args?: any[] | any) => v
 
 const GameScrnContainer = () => {
   const setQuestions = useQuestionsStore(state => state.setQuestions);
+  const setTasks = useQuestionsStore(state => state.setTask);
+  const updateIsGettingReqState = useIsGettingReqStore(state => state.updateState);
   
   // const setTask = useQuestionsStore(state => state.set);
 
@@ -35,6 +37,8 @@ const GameScrnContainer = () => {
 
     if(IS_TESTING){
       setQuestions(questionsFromResponse as IQuestion[]);
+      setTasks("Translate each proposition into symbolic logic.")
+      updateIsGettingReqState(false, 'isGettingQs')
       return;
     };
   }

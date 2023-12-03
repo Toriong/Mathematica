@@ -17,9 +17,15 @@ export const useErrorsStore = create(set => ({
 }));
 
 export const useIsGettingReqStore = create<TIsGettingReqStore>(set => ({
-    isGettingQs: false,
+    isGettingQs: true,
     isGettingUserInfo: false,
-    updateState: (newState: boolean, fieldName: string) => set(() => ({ [fieldName]: newState }))
+    updateState: (newState: boolean, fieldName: keyof TIsGettingReqStore) => set(() => ({ [fieldName]: newState }))
 }));
 
 
+export const useColorStor = create(set => ({
+    lightTheme: {},
+    darkTheme: {},
+    currentTheme: "dark",
+    // setCurrentTheme: (theme: string) => () => set()
+}))
