@@ -1,9 +1,14 @@
 
 import React, { useEffect, useState } from 'react';
+import Layout from '../../global_components/Layout';
 import { View } from 'react-native';
 import { PTxt } from '../../global_components/Text';
 import { useIsGettingReqStore, useQuestionsStore } from '../../zustand';
-import Layout from '../../global_components/Layout';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+
+
+
 
 
 // brain dump notes: 
@@ -44,7 +49,35 @@ const GameScrnPresentation = () => {
       }}
       backgroundColor="#343541"
     >
-      <PTxt style={{ width: "75%", textAlign: 'center', transform: [{ translateY: 20 }] }}>{task}</PTxt>
+      <View style={{ width: "100%", display: 'flex' }}>
+        {/* this View container will contain the following: */}
+
+        {/* START OF row 1 (flex, row) */}
+        {/* view */}
+        {/* back arrow */}
+        {/* view */}
+
+        {/* view (flex, flex-column)*/}
+        {/* right (number) | wrong (number) */}
+        {/* timer */}
+        {/* view */}
+        {/* END OF row 1 */}
+
+        {/* START of row 2 */}
+        {/* Score: (tracker for the score, number) */}
+        {/* END of row 2 */}
+        <View style={{ display: 'flex', width: "100%" }}>
+          <View>
+            <FontAwesomeIcon icon={faArrowLeft} size={24} />
+          </View>
+        </View>
+      </View>
+      <PTxt
+        fontSize={22}
+        style={{ width: "75%", textAlign: 'center', transform: [{ translateY: 20 }] }}
+      >
+        {task}
+      </PTxt>
       {/* CASE: translate the proposition into symbolic propositional logic */}
       {/* SECTION 1: */}
       {/* display what the user must do with the text: Example: "Translate the proposition into symbolic logic." */}

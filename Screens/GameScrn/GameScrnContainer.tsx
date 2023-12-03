@@ -26,10 +26,7 @@ const GameScrnContainer = () => {
   const setQuestions = useQuestionsStore(state => state.setQuestions);
   const setTasks = useQuestionsStore(state => state.setTask);
   const updateIsGettingReqState = useIsGettingReqStore(state => state.updateState);
-  
-  // const setTask = useQuestionsStore(state => state.set);
-
- 
+   
   function handleGetQuestionsSuccessfulResponse(questionsFromResponse: IQuestion[] | IQuestionsForObj) {
     if ((questionsFromResponse as IQuestionsForObj) && (questionsFromResponse as IQuestionsForObj).task) {
       return;
