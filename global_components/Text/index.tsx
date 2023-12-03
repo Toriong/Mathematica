@@ -1,41 +1,66 @@
-import { ReactNode } from 'react';
-import { StyleSheet, Text } from "react-native";
+import { Text } from "react-native";
+import { IComponentProps, TTxtProps } from '../../globalTypes&Interfaces';
 
+interface IIdsObj {
+    id: string | undefined
+    testID: string | undefined
+}
+type TTxt = Omit<IComponentProps, "style">
 
 const FONT_FAMILY_MAIN = "San Francisco"
 
-type TProps = {
-    children: ReactNode,
-    fontSize?: number,
-    txtColor?: string,
-    style?: { [key: string]: string | number },
-    testID?: string,
+function getIdsObj(id: string | undefined, testID: string | undefined): IIdsObj | {} {
+    let _ids = {};
+
+    if (id) {
+        _ids = { id: id }
+    };
+
+    if (testID) {
+        _ids = { ..._ids, testID: testID }
+    }
+
+    return _ids;
 }
+
+
 
 export const PTxt = ({
     children,
-    fontSize = 18,
     style,
-    testID = "",
+    id,
+    testID,
     txtColor = 'white',
-}: TProps) => {
+    fontSize = 18,
+}: TTxtProps & TTxt) => {
+    const _idsObj = getIdsObj(id, testID);
+
     return (
-        <Text testID={testID} style={{ ...style, fontFamily: FONT_FAMILY_MAIN, fontSize: fontSize, color: txtColor }}>
+        <Text
+            {..._idsObj}
+            style={{ ...style, fontFamily: FONT_FAMILY_MAIN, fontSize: fontSize, color: txtColor }}
+        >
             {children}
         </Text>
-    )
+    );
 }
 
 export const HeadingTxt = ({
     children,
     style,
+    id,
+    testID,
     fontSize = 22,
     txtColor = 'white',
-    testID = ""
-}: TProps) => {
+}: TTxtProps & TTxt) => {
+    const _idsObj = getIdsObj(id, testID);
+
     return (
-        <Text testID={testID} style={{ ...style, fontFamily: FONT_FAMILY_MAIN, fontSize: fontSize, color: txtColor }}>
+        <Text
+            {..._idsObj}
+            style={{ ...style, fontFamily: FONT_FAMILY_MAIN, fontSize: fontSize, color: txtColor }}
+        >
             {children}
         </Text>
-    )
+    );
 }

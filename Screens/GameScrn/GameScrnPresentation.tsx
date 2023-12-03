@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { PTxt } from '../../global_components/Text';
 import { useIsGettingReqStore, useQuestionsStore } from '../../zustand';
+import Layout from '../../global_components/Layout';
 
 
 // brain dump notes: 
@@ -24,23 +25,26 @@ const GameScrnPresentation = () => {
   const [questionIndex, setQuestionIndex] = useState(0);
   const question = questions[questionIndex];
 
-  useEffect(() => {
-    console.log("isGettingQs: ", isGettingQs)
-    console.log("question yo there: ", question);
-    console.log("task name: ", task);
-  });
-
   function handleEnterBtnPress() {
 
   };
 
   function getIsAnswerCorrect() {
 
-  }
+  };
 
   return (
-    <View style={{ backgroundColor: '#343541', flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <PTxt>Hi</PTxt>
+    <Layout
+      style={{
+        flex: 1,
+        width: "100%",
+        height: "100%",
+        display: 'flex',
+        alignItems: 'center',
+      }}
+      backgroundColor="#343541"
+    >
+      <PTxt style={{ width: "75%", textAlign: 'center', transform: [{ translateY: 20 }] }}>{task}</PTxt>
       {/* CASE: translate the proposition into symbolic propositional logic */}
       {/* SECTION 1: */}
       {/* display what the user must do with the text: Example: "Translate the proposition into symbolic logic." */}
@@ -64,7 +68,7 @@ const GameScrnPresentation = () => {
       {/* END OF SECTION 5 */}
 
 
-    </View>
+    </Layout>
   );
 };
 
