@@ -3,7 +3,8 @@ import { ViewStyle, TextStyle } from 'react-native'
 
 type TFirstColor = "#343541"; 
 type TSecondColor = "#6B7280";
-type TThirdColor = "#FFFFFF"
+type TThirdColor = "#FFFFFF";
+
 export type TTxtProps = {
     children: ReactNode,
     fontSize?: number,

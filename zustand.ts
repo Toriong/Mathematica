@@ -25,10 +25,23 @@ export const useIsGettingReqStore = create<TIsGettingReqStore>(set => ({
 
 type TCurrentTheme = "dark" | "light";
 interface IColorStore {
-    themesObj: IThemeColors,
+    themesObj: IThemeColors
     currentTheme: TCurrentTheme
     setCurrentTheme: (theme: TCurrentTheme) => () => void
 }
+
+// NOTES: 
+// do I need to store the timer into a global state? 
+// when the timer is done, end the game
+// store it locally in the GameScrnTab component
+
+// this store will have the following: 
+// right: number
+// wrong: number
+// score: number
+
+
+export const useGameScrnTabStore = create()
 
 export const useColorStore = create<IColorStore>(set => ( {
     themesObj: {
