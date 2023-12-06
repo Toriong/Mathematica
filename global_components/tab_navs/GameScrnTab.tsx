@@ -1,11 +1,12 @@
 import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
-import { View, SafeAreaView, GestureResponderEvent } from 'react-native';
+import { View, SafeAreaView, GestureResponderEvent, Text } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useColorStore } from "../../zustand";
 import Button from "../Button";
+import { PTxt } from "../text";
 
-
+const FONT_SIZE = 21;
 
 const GameScrnTab = (props: MaterialTopTabBarProps) => {
     // notes: 
@@ -20,7 +21,7 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
     }
 
     return (
-        <SafeAreaView style={{ width: "100%", display: 'flex', backgroundColor: currentThemeObj.first, flex: .13 }}>
+        <SafeAreaView style={{ width: "100%", display: 'flex', backgroundColor: currentThemeObj.first, flex: .13, }}>
             {/* this View container will contain the following: */}
 
             {/* START OF row 1 (flex, row) */}
@@ -37,7 +38,7 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
             {/* START of row 2 */}
             {/* Score: (tracker for the score, number) */}
             {/* END of row 2 */}
-            <View style={{ display: 'flex', flexDirection: 'row',width: "100%" }}>
+            <View style={{ display: 'flex', flexDirection: 'row', width: "100%", paddingTop: "3%" }}>
                 <View style={{ height: '100%', width: "30%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <Button handleOnPress={handleBtnPress}>
                         <View style={{ borderWidth: 3, borderColor: currentThemeObj.second, borderRadius: 50, padding: 8 }}>
@@ -45,8 +46,20 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
                         </View>
                     </Button>
                 </View>
-                <View style={{ width: "70%", height: "100%" }}>
-
+                <View style={{ width: "70%", display: 'flex', alignItems: 'center', paddingTop: 7 }}>
+                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', width: "100%" }}>
+                        <PTxt txtColor="green" fontSize={FONT_SIZE} style={{ textAlign: 'left', minWidth: 120 }}>
+                            Right: 0
+                        </PTxt>
+                        <PTxt txtColor="red" fontSize={FONT_SIZE} style={{ textAlign: 'left', minWidth: 120 }}>
+                            Wrong: 0
+                        </PTxt>
+                    </View>
+                    <View style={{ width: '100%', marginTop: 15, paddingRight: "16%", display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+                        <PTxt style={{ width: "auto" }} fontSize={FONT_SIZE} >
+                            TIME: 1:59
+                        </PTxt>
+                    </View>
                 </View>
             </View>
         </SafeAreaView>
