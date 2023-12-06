@@ -1,5 +1,5 @@
 import { Text } from "react-native";
-import { IComponentProps, TTxtProps } from '../../globalTypes&Interfaces';
+import { DEFAULT_THIRD_COLOR, IComponentProps, TTxtProps } from '../../globalTypes&Interfaces';
 
 interface IIdsObj {
     id: string | undefined
@@ -30,7 +30,7 @@ export const PTxt = ({
     style,
     id,
     testID,
-    txtColor = 'white',
+    txtColor = DEFAULT_THIRD_COLOR,
     fontSize = 18,
     fontStyle = 'normal'
 }: TTxtProps & TTxt) => {

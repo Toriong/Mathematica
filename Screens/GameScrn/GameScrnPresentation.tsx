@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Layout from '../../global_components/Layout';
 import { View } from 'react-native';
 import { PTxt } from '../../global_components/text';
-import { useIsGettingReqStore, useQuestionsStore } from '../../zustand';
+import { useColorStore, useIsGettingReqStore, useQuestionsStore } from '../../zustand';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
@@ -23,12 +23,19 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 // FOR THE UI, for the choices, if there is no choices array, then get all of the letters from the answer array.
 
+const TXT_FONT_SIZE = 20;
+
 const GameScrnPresentation = () => {
+  const currentThemeStr = useColorStore(state => state.currentTheme);
+  const colorThemesObj = useColorStore(state => state.themesObj);
+  const currentColorsThemeObj = colorThemesObj[currentThemeStr];
   const questions = useQuestionsStore(state => state.questions);
   const task = useQuestionsStore(state => state.task);
   const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
   const [questionIndex, setQuestionIndex] = useState(0);
   const question = questions[questionIndex];
+
+  console.log("question: ", question)
 
   function handleEnterBtnPress() {
 
@@ -46,32 +53,53 @@ const GameScrnPresentation = () => {
         height: "100%",
         display: 'flex',
         alignItems: 'center',
+        flexDirection: 'column'
       }}
       backgroundColor="#343541"
     >
-      <PTxt
-        fontSize={22}
-        style={{ width: "75%", textAlign: 'center', transform: [{ translateY: 20 }] }}
-      >
-        {task}
-      </PTxt>
-      {/* CASE: translate the proposition into symbolic propositional logic */}
-      {/* SECTION 1: */}
-      {/* display what the user must do with the text: Example: "Translate the proposition into symbolic logic." */}
-      {/* END OF SECTION 1 */}
+      <View style={{ flex: 1.5, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        {/* CASE: translate the proposition into symbolic propositional logic */}
+        {/* SECTION 1: */}
+        {/* display what the user must do with the text: Example: "Translate the proposition into symbolic logic." */}
+        {/* END OF SECTION 1 */}
+        <PTxt fontSize={TXT_FONT_SIZE}>TASK: </PTxt>
+        <PTxt
+          fontSize={TXT_FONT_SIZE}
+          style={{ textAlign: 'center', transform: [{ translateY: 20 }], paddingHorizontal: 11 }}
+        >
+          {task}
+        </PTxt>
+      </View>
+      <View style={{ flex: 1.8, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        {/* SECTION 3: */}
+        {/* display the proposition here */}
+        {/* END OF SECTION 3 */}
+        <PTxt
+          fontSize={TXT_FONT_SIZE}
+          style={{ textAlign: 'center' }}
+          fontStyle='italic'
+        >
+          {question.sentence}
+        </PTxt>
+      </View>
+      <View style={{ flex: 1, width: "100%", display: 'flex', alignItems: 'center' }}>
+        {/* display the input field here.*/}
+        <View style={{ width: "93%", height: 80, backgroundColor: currentColorsThemeObj.second, borderTopRightRadius: 5, borderTopLeftRadius: 5 }}>
 
-      {/* SECTION 2: */}
-      {/* display the proposition here.*/}
-      {/* END OF SECTION 2 */}
-
-      {/* SECTION 3: */}
-      {/* display the definition for each of the terms. For example: "P (one of the terms in the proposition)" */}
-      {/* END OF SECTION 3 */}
-
-
-      {/* SECTION 4: */}
-      {/* display placement of the tiles */}
-      {/* END OF SECTION 4 */}
+        </View>
+      </View>
+      <View style={{ flex: 1, width: "100%" }}>
+        {/* display the definitions of the choices */}
+        <PTxt>yo</PTxt>
+      </View>
+      <View style={{ flex: 1, width: "100%" }}>
+        {/* display placement of the tiles/choices */}
+        <PTxt>yo</PTxt>
+      </View>
+      <View style={{ flex: 1, width: "100%" }}>
+        {/* display the respone buttons here */}
+        <PTxt>yo</PTxt>
+      </View>
 
       {/* SECTION 5: */}
       {/* display the choices to the user */}

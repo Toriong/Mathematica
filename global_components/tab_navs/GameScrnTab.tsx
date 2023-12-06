@@ -23,7 +23,7 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
     }
 
     return (
-        <SafeAreaView style={{ width: "100%", display: 'flex', backgroundColor: currentThemeObj.first }}>
+        <SafeAreaView style={{ width: "100%", display: 'flex', backgroundColor: currentThemeObj.first, borderBottomColor: currentThemeObj.second, borderWidth: 1 }}>
             {/* this View container will contain the following: */}
 
             {/* START OF row 1 (flex, row) */}
@@ -64,7 +64,7 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
                     </View>
                 </View>
             </View>
-            <View style={{ marginTop: "3%" }}>
+            <View style={{ marginTop: "3%", paddingBottom: 10 }}>
                 <View style={{ width: "37%", display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
                     <PTxt fontSize={FONT_SIZE_SCORE_TXT} fontStyle="italic">Score: </PTxt>
                     <PTxt fontSize={FONT_SIZE_SCORE_TXT}>{rightNum}</PTxt>
