@@ -1,5 +1,6 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { GestureResponderEvent } from 'react-native'
 import Layout from '../../global_components/Layout';
 import { View } from 'react-native';
 import { PTxt } from '../../global_components/text';
@@ -7,6 +8,7 @@ import { useColorStore, useIsGettingReqStore, useQuestionsStore } from '../../zu
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ENGLISH_ALPHABET, SYMBOLS } from '../../globalVars';
+import Button, { OnPressAction } from '../../global_components/Button';
 
 
 
@@ -36,7 +38,7 @@ const GameScrnPresentation = () => {
   const [questionIndex, setQuestionIndex] = useState(0);
   const question = questions[16];
   const { choices, answer } = question ?? {};
-  const letters = choices?.length ? choices.map(({ letter }) => letter) : answer.filter(choice => ENGLISH_ALPHABET.includes(choice))
+  const letters = choices?.length ? choices.map(({ letter }) => letter) : (answer?.length ? answer.filter(choice => ENGLISH_ALPHABET.includes(choice)) : []);
 
   // if the choices array does not exist, then get the letters from 'answer' array
 
@@ -48,6 +50,14 @@ const GameScrnPresentation = () => {
   };
 
   function getIsAnswerCorrect() {
+
+  };
+
+  function handleClearBtnPress(event: GestureResponderEvent) {
+
+  };
+
+  function handleSubmitBtnPress(event: GestureResponderEvent) {
 
   };
 
@@ -76,7 +86,7 @@ const GameScrnPresentation = () => {
           {task}
         </PTxt>
       </View>
-      <View style={{ flex: 1, width: "100%", display: 'flex', paddingTop: 7,justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, width: "100%", display: 'flex', paddingTop: 7, justifyContent: 'center', alignItems: 'center' }}>
         {/* SECTION 3: */}
         {/* display the proposition here */}
         {/* END OF SECTION 3 */}
@@ -108,30 +118,29 @@ const GameScrnPresentation = () => {
 
         </View>
       </View>
-      <View style={{ flex: 1, width: "100%", display: 'flex', flexDirection: 'row',justifyContent: 'center', alignItems: 'center', borderWidth: 1 }}>
+      <View style={{ flex: 1, width: "100%", display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
         {/* display placement of the tiles/choices */}
-        <View style={{ display: 'flex', width: "80%",flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
-        {[...SYMBOLS, ...letters].map(symbol => (
-          <View style={{ borderRadius: 10, backgroundColor: currentColorsThemeObj.second, width: 55, height: 55, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <PTxt
-              fontSize={24}
-              style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        <View style={{ display: 'flex', width: "80%", flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
+          {[...SYMBOLS, ...letters].map((symbol, index) => (
+            <View key={index} style={{ borderRadius: 10, backgroundColor: currentColorsThemeObj.second, width: 55, height: 55, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <PTxt
+                fontSize={24}
+                style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
               >
-              {symbol}
-            </PTxt>
-          </View>
-        ))}
+                {symbol}
+              </PTxt>
+            </View>
+          ))}
         </View>
       </View>
-      <View style={{ flex: 1, width: "100%" }}>
-      {/* display the Submit and Clear button here */}
+      <View style={{ flex: 1, width: "100%", marginTop: "5%", display: 'flex', flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: 'center' }}>
+        <Button handleOnPress={handleClearBtnPress} backgroundColor='#FFC12F' dynamicStyles={{ padding: 17, borderRadius: 15 }}>
+          <PTxt>CLEAR</PTxt>
+        </Button>
+        <Button handleOnPress={handleSubmitBtnPress} backgroundColor='#4287FF' dynamicStyles={{ padding: 17, borderRadius: 15 }}>
+          <PTxt>SUBMIT</PTxt>
+        </Button>
       </View>
-
-      {/* SECTION 5: */}
-      {/* display the choices to the user */}
-      {/* END OF SECTION 5 */}
-
-
     </Layout>
   );
 };

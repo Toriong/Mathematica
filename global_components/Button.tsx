@@ -1,12 +1,17 @@
-import { GestureResponderEvent, TouchableOpacity } from "react-native"
+import { GestureResponderEvent, TouchableOpacity, StyleProp, ViewStyle } from "react-native"
 import { IComponentProps } from "../globalTypes&Interfaces"
 
-type OnPressAction = (event: GestureResponderEvent) => void
-type ButtonProps = { handleOnPress: OnPressAction } & IComponentProps;
+export type OnPressAction = (event: GestureResponderEvent) => void
+interface IButton extends ViewStyle{
+    dynamicStyles?: ViewStyle,
+    backgroundColor: Pick<ViewStyle, 'backgroundColor'>['backgroundColor']
+}
+type ButtonCompProps = Omit<IComponentProps, "backgroundColor">
+type ButtonProps = { handleOnPress: OnPressAction } & IButton & ButtonCompProps;
 
-const Button = ({ children, handleOnPress }: ButtonProps) => {
+const Button = ({ children, handleOnPress, dynamicStyles = {}, backgroundColor = 'none'  }: ButtonProps) => {
     return (
-        <TouchableOpacity onPress={handleOnPress}>
+        <TouchableOpacity style={{ ...dynamicStyles, backgroundColor: backgroundColor }} onPress={handleOnPress}>
             {children}
         </TouchableOpacity>
     );
