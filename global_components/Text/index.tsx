@@ -32,13 +32,16 @@ export const PTxt = ({
     testID,
     txtColor = 'white',
     fontSize = 18,
+    fontStyle = 'normal'
 }: TTxtProps & TTxt) => {
     const _idsObj = getIdsObj(id, testID);
+
+
 
     return (
         <Text
             {..._idsObj}
-            style={{ ...style, fontFamily: FONT_FAMILY_MAIN, fontSize: fontSize, color: txtColor }}
+            style={{ ...style, fontFamily: FONT_FAMILY_MAIN, fontSize: fontSize, color: txtColor, fontStyle: fontStyle }}
         >
             {children}
         </Text>

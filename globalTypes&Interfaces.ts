@@ -8,7 +8,8 @@ export type TTxtProps = {
     children: ReactNode,
     fontSize?: number,
     txtColor?: string,
-    style?: TextStyle
+    style?: TextStyle,
+    fontStyle?: Pick<TextStyle, "fontStyle">['fontStyle']
 }
 
 export interface IAppColor {
