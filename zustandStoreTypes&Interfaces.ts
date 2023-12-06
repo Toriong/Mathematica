@@ -3,11 +3,18 @@ export interface IIsGettingReqStoreState {
     isGettingUserInfo: boolean
 }
 
-export interface IIsGettingReqStoreActions {
-    updateState: (newState: boolean, fieldName: keyof IIsGettingReqStoreState) => void 
+export type TUpdateStoreState<TNewState, TFieldName> = {
+    updateState: (newState: TNewState, fieldName: TFieldName) => void
 }
 
-export type TIsGettingReqStore = IIsGettingReqStoreState & IIsGettingReqStoreActions;
+interface IGameScrnTabStoreState {
+    right: number
+    wrong: number
+}
+
+export type TGameScrnTabStore = IGameScrnTabStoreState & TUpdateStoreState<number, keyof IGameScrnTabStoreState> 
+
+export type TIsGettingReqStore = IIsGettingReqStoreState & TUpdateStoreState<boolean, keyof IIsGettingReqStoreState>;
 
 export interface IChoice {
     value: string

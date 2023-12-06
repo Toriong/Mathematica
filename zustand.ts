@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IQuestion, IQuestionsForObj, TIsGettingReqStore } from './zustandStoreTypes&Interfaces';
+import { IQuestion, IQuestionsForObj, TGameScrnTabStore, TIsGettingReqStore } from './zustandStoreTypes&Interfaces';
 import { IThemeColors } from './globalTypes&Interfaces';
 
 export const useQuestionsStore = create<IQuestionsForObj>(set => ({
@@ -41,9 +41,13 @@ interface IColorStore {
 // score: number
 
 
-export const useGameScrnTabStore = create()
+export const useGameScrnTabStore = create<TGameScrnTabStore>(set => ({
+    right: 0,
+    wrong: 0,
+    updateState: (newState, fieldName) => () => set(() => ({ [fieldName]: newState }))
+}))
 
-export const useColorStore = create<IColorStore>(set => ( {
+export const useColorStore = create<IColorStore>(set => ({
     themesObj: {
         dark: {
             first: '#343541',

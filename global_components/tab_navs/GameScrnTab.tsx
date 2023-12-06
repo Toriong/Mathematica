@@ -2,19 +2,20 @@ import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import { View, SafeAreaView, GestureResponderEvent, Text } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import { useColorStore } from "../../zustand";
+import { useColorStore, useGameScrnTabStore } from "../../zustand";
 import Button from "../Button";
 import { PTxt } from "../text";
+import { useState } from "react";
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
 
 const GameScrnTab = (props: MaterialTopTabBarProps) => {
-    // notes: 
-    // get the currentTheme
-    // after getting the current themem, get the themesObj and query hte object using the string from currentTheme
     const currentTheme = useColorStore(state => state.currentTheme);
     const colorThemesObj = useColorStore(state => state.themesObj);
+    const rightNum = useGameScrnTabStore(state => state.right);
+    const wrongNum = useGameScrnTabStore(state => state.wrong);
+    const [timer, setTimer] = useState(60);
     const currentThemeObj = colorThemesObj[currentTheme];
 
     function handleBtnPress(event: GestureResponderEvent) {
@@ -50,15 +51,15 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
                 <View style={{ width: "70%", display: 'flex', alignItems: 'center', paddingTop: 7 }}>
                     <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', width: "100%" }}>
                         <PTxt txtColor="green" fontSize={FONT_SIZE_NON_SCORE_TXT} style={{ textAlign: 'left', minWidth: 120 }}>
-                            Right: 0
+                            Right: {rightNum}
                         </PTxt>
                         <PTxt txtColor="red" fontSize={FONT_SIZE_NON_SCORE_TXT} style={{ textAlign: 'left', minWidth: 120 }}>
-                            Wrong: 0
+                            Wrong: {wrongNum}
                         </PTxt>
                     </View>
                     <View style={{ width: '100%', marginTop: 15, paddingRight: "16%", display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
                         <PTxt style={{ width: "auto" }} fontSize={FONT_SIZE_NON_SCORE_TXT} >
-                            TIME: 1:59
+                            TIME: {timer}
                         </PTxt>
                     </View>
                 </View>
@@ -66,7 +67,7 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
             <View style={{ marginTop: "3%" }}>
                 <View style={{ width: "37%", display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
                     <PTxt fontSize={FONT_SIZE_SCORE_TXT} fontStyle="italic">Score: </PTxt>
-                    <PTxt fontSize={FONT_SIZE_SCORE_TXT}>11</PTxt>
+                    <PTxt fontSize={FONT_SIZE_SCORE_TXT}>{rightNum}</PTxt>
                 </View>
             </View>
         </SafeAreaView>
