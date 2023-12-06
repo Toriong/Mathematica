@@ -24,6 +24,16 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 // FOR THE UI, for the choices, if there is no choices array, then get all of the letters from the answer array.
 
 const TXT_FONT_SIZE = 20;
+const TESTING_DEFINITIONS = [
+  {
+    letter: "A",
+    value: "Apples"
+  },
+  {
+    letter: "B",
+    value: "Bannas"
+  }
+]
 
 const GameScrnPresentation = () => {
   const currentThemeStr = useColorStore(state => state.currentTheme);
@@ -34,6 +44,9 @@ const GameScrnPresentation = () => {
   const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
   const [questionIndex, setQuestionIndex] = useState(0);
   const question = questions[questionIndex];
+  const { choices, answer } = question ?? {};
+
+  // if the choices array does not exist, then get the letters from 'answer' array
 
   console.log("question: ", question)
 
@@ -79,18 +92,30 @@ const GameScrnPresentation = () => {
           style={{ textAlign: 'center' }}
           fontStyle='italic'
         >
-          {question.sentence}
+          {question?.sentence}
         </PTxt>
       </View>
       <View style={{ flex: 1, width: "100%", display: 'flex', alignItems: 'center' }}>
         {/* display the input field here.*/}
+        {/* the user must drag the letters and the operators here */}
         <View style={{ width: "93%", height: 80, backgroundColor: currentColorsThemeObj.second, borderTopRightRadius: 5, borderTopLeftRadius: 5 }}>
 
         </View>
       </View>
-      <View style={{ flex: 1, width: "100%" }}>
+      <View style={{ flex: 1, width: "100%", flexWrap: 'wrap', paddingVertical: 10, paddingHorizontal: 18 }}>
         {/* display the definitions of the choices */}
-        <PTxt>yo</PTxt>
+        {!choices?.length ?
+          TESTING_DEFINITIONS.map(testingDefintionObj =>  (
+            <View style={{ display: 'flex', flexDirection: 'row' }}>
+                <PTxt fontSize={TXT_FONT_SIZE}>{testingDefintionObj.letter} = </PTxt>
+                <PTxt>{testingDefintionObj.value}</PTxt>
+            </View>
+          ))
+          :
+          <View>
+
+          </View>
+        }
       </View>
       <View style={{ flex: 1, width: "100%" }}>
         {/* display placement of the tiles/choices */}
