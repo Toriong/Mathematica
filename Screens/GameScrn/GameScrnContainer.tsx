@@ -33,6 +33,7 @@ const GameScrnContainer = () => {
     }
 
     if(IS_TESTING){
+      console.log("questionsFromResponse yo there: ", questionsFromResponse)
       setQuestions(questionsFromResponse as IQuestion[]);
       setTasks("Translate each proposition into symbolic logic.")
       updateIsGettingReqState(false, 'isGettingQs')

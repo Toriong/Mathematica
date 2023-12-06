@@ -34,7 +34,7 @@ const GameScrnPresentation = () => {
   const task = useQuestionsStore(state => state.task);
   const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const question = questions[questionIndex];
+  const question = questions[16];
   const { choices, answer } = question ?? {};
   const letters = choices?.length ? choices.map(({ letter }) => letter) : answer.filter(choice => ENGLISH_ALPHABET.includes(choice))
 
@@ -63,7 +63,7 @@ const GameScrnPresentation = () => {
       }}
       backgroundColor="#343541"
     >
-      <View style={{ flex: 1.5, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         {/* CASE: translate the proposition into symbolic propositional logic */}
         {/* SECTION 1: */}
         {/* display what the user must do with the text: Example: "Translate the proposition into symbolic logic." */}
@@ -76,25 +76,25 @@ const GameScrnPresentation = () => {
           {task}
         </PTxt>
       </View>
-      <View style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, width: "100%", display: 'flex', paddingTop: 7,justifyContent: 'center', alignItems: 'center' }}>
         {/* SECTION 3: */}
         {/* display the proposition here */}
         {/* END OF SECTION 3 */}
         <PTxt
           fontSize={TXT_FONT_SIZE}
-          style={{ textAlign: 'center' }}
+          style={{ textAlign: 'center', paddingHorizontal: 7 }}
           fontStyle='italic'
         >
           {question?.sentence}
         </PTxt>
       </View>
       {choices?.length && (
-        <View style={{ flex: .8, width: "100%", alignItems: 'center', display: 'flex', justifyContent: 'center', paddingVertical: 10, paddingHorizontal: 18 }}>
-          <View style={{ flexWrap: 'wrap', gap: 5 }}>
-            {choices.map(choice => (
+        <View style={{ flex: .8, width: "100%", alignItems: 'center', display: 'flex', justifyContent: 'center', paddingHorizontal: 18 }}>
+          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 5, width: "70%" }}>
+            {choices.map((choice, index, self) => (
               <View style={{ display: 'flex', flexDirection: 'row', }}>
                 <PTxt fontSize={TXT_FONT_SIZE}>{choice.letter} = </PTxt>
-                <PTxt fontSize={TXT_FONT_SIZE} >{choice.value}</PTxt>
+                <PTxt fontSize={TXT_FONT_SIZE} >{choice.value}{(index !== (self.length - 1)) ? ',' : ''}</PTxt>
               </View>
             ))
             }
@@ -104,17 +104,17 @@ const GameScrnPresentation = () => {
       <View style={{ flex: 1, width: "100%", display: 'flex', alignItems: 'center' }}>
         {/* display the input field here.*/}
         {/* the user must drag the letters and the operators here */}
-        <View style={{ width: "93%", height: 80, borderBottomWidth: 1, borderBottomColor: currentColorsThemeObj.second }}>
+        <View style={{ width: "93%", height: 70, borderBottomWidth: 1, borderBottomColor: currentColorsThemeObj.second }}>
 
         </View>
       </View>
-      <View style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center',paddingHorizontal: 17 }}>
+      <View style={{ flex: 1, width: "100%", display: 'flex', flexDirection: 'row',justifyContent: 'center', alignItems: 'center', borderWidth: 1 }}>
         {/* display placement of the tiles/choices */}
-        <View style={{ flex: 1, display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'center', alignItems: 'center' }}>
-        {SYMBOLS.map(symbol => (
-          <View style={{ borderRadius: 10, backgroundColor: currentColorsThemeObj.second, width: 60, height: 60, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ display: 'flex', width: "80%",flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
+        {[...SYMBOLS, ...letters].map(symbol => (
+          <View style={{ borderRadius: 10, backgroundColor: currentColorsThemeObj.second, width: 55, height: 55, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <PTxt
-              fontSize={TXT_FONT_SIZE}
+              fontSize={24}
               style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
               >
               {symbol}
@@ -124,8 +124,7 @@ const GameScrnPresentation = () => {
         </View>
       </View>
       <View style={{ flex: 1, width: "100%" }}>
-        {/* display the respone buttons here */}
-        {/* <PTxt>yo</PTxt> */}
+      {/* display the Submit and Clear button here */}
       </View>
 
       {/* SECTION 5: */}
