@@ -38,30 +38,26 @@ const GameScrnPresentation = () => {
   const task = useQuestionsStore(state => state.task);
   const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [inputLayoutPtCoordinates, setInputLayoutPtCoordinates] = useState({
-    pt1: { x: 0, y: 0 },
-    pt2: { x: 0, y: 0 },
-    pt3: { x: 0, y: 0 },
-    pt4: { x: 0, y: 0 }
-  })
+ const [pt1Coordinates, setPt1Coordinates] = useState({ x: 0, y: 0 });
+ const [pt2Coordinates, setPt2Coordinates] = useState({ x: 0, y: 0 });
+ const pt1Ref = useRef(null);
   const question = questions[16];
   const { choices, answer } = question ?? {};
   const letters = choices?.length ? choices.map(({ letter }) => letter) : (answer?.length ? answer.filter(choice => ENGLISH_ALPHABET.includes(choice)) : []);
 
 
   useEffect(() => {
-    console.log("`inputLayoutPtCoordinates: `", inputLayoutPtCoordinates)
+    setTimeout(() => {
+      (pt1Ref.current as any).measure((x: number,y: number) => {
+        console.log('x: ', x);
+        console.log('y: ', y)
+      })
+    }, 2000);
   })
-  // if the choices array does not exist, then get the letters from 'answer' array
-
-  function handleOnLayout(event: LayoutChangeEvent, ptFieldName: string) {
-    setInputLayoutPtCoordinates(ptCoordinatesObj => ({
-      ...ptCoordinatesObj,
-      [ptFieldName]: {
-        x: event?.nativeEvent?.layout?.x,
-        y: event?.nativeEvent?.layout?.y
-      }
-    }))
+  // setPtCoordinates: React.Dispatch<React.SetStateAction<{ x: number, y: number }>>
+  function handleOnLayout(event: LayoutChangeEvent) {
+    console.log("pt1Ref.current: ", )
+    // setPtCoordinates({ x: event?.nativeEvent?.layout?.x, y: event?.nativeEvent?.layout?.y  })
   }
 
   console.log("question: ", question);
@@ -87,6 +83,11 @@ const GameScrnPresentation = () => {
   useEffect(() => {
 
   })
+
+  // BRAIN DUMP NOTES: 
+  // when the user drags the element over the input field and releases the drag, perform the following: 
+  // get the coordinates where the user releases the element
+  // if it is in the input section field, then add that the element into the input section array
 
   return (
     <Layout
@@ -143,18 +144,16 @@ const GameScrnPresentation = () => {
         {/* the user must drag the letters and the operators here */}
 
         {/* the user can switch the tiles around when a tile is inserted */}
-        <View style={{
+        <View 
+        style={{
           width: "93%",
           height: 70,
           borderBottomWidth: 1,
           borderBottomColor: currentColorsThemeObj.second,
-          position: 'relative'
+          position: 'relative',
         }}
         >
-          <View id='pt1' onLayout={event => handleOnLayout(event, "pt1")} style={{ top: 0, left: "50%", right: "50%", borderRadius: 50, height: 10, width: 1 }} />
-          <View id='pt2' onLayout={event => handleOnLayout(event, "pt2")} style={{ bottom: 0, left: "50%", right: "50%", borderRadius: 50, position: 'absolute', height: 10, width: 1 }} />
-          <View id='pt3' onLayout={event => handleOnLayout(event, "pt3")} style={{ bottom: "50%", top: "50%", right: 0, borderRadius: 50, position: 'absolute', height: 10, width: 1 }} />
-          <View id='pt4' onLayout={event => handleOnLayout(event, "pt4")} style={{ bottom: "50%", top: "50%", left: 0, borderRadius: 50, position: 'absolute', height: 10, width: 1 }} />
+          <View ref={pt1Ref} onLayout={handleOnLayout} style={{ top: 0, left: "50%", position: 'absolute', backgroundColor: 'pink' }} />
         </View>
       </View>
       <View style={{ flex: 1, width: "100%", display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
