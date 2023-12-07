@@ -3,9 +3,9 @@ import { ViewStyle, TextStyle } from 'react-native'
 
 export const DEFAULT_THIRD_COLOR = "#FFFFFF";
 
-type TFirstColor = "#343541"; 
-type TSecondColor = "#6B7280";
-type TThirdColor = typeof DEFAULT_THIRD_COLOR;
+export type TFirstColor = "#343541"; 
+export type TSecondColor = "#6B7280";
+export type TThirdColor = typeof DEFAULT_THIRD_COLOR;
 
 export type TTxtProps = {
     children: ReactNode,

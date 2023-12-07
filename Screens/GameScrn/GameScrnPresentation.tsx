@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ENGLISH_ALPHABET, SYMBOLS } from '../../globalVars';
 import Button, { OnPressAction } from '../../global_components/Button';
+import LogicSymbol from './components/LogicSymbol';
 
 
 
@@ -114,22 +115,29 @@ const GameScrnPresentation = () => {
       <View style={{ flex: 1, width: "100%", display: 'flex', alignItems: 'center' }}>
         {/* display the input field here.*/}
         {/* the user must drag the letters and the operators here */}
-        <View style={{ width: "93%", height: 70, borderBottomWidth: 1, borderBottomColor: currentColorsThemeObj.second }}>
 
+        {/* the user can switch the tiles around when a tile is inserted */}
+        <View style={{
+          width: "93%",
+          height: 70,
+          borderBottomWidth: 1,
+          borderBottomColor: currentColorsThemeObj.second,
+          position: 'relative'
+        }}
+        >
+          <View style={{ top: 0, left: "50%", right: "50%", borderRadius: 50, height: 10, backgroundColor: 'pink', width: 1 }} />
+          <View style={{ bottom: 0, left: "50%", right: "50%", borderRadius: 50, position: 'absolute',height: 10, width: 1 }} />
+          <View style={{ bottom: "50%", top: "50%", right: 0, borderRadius: 50, position: 'absolute',height: 10, width: 1 }} />
+          <View style={{ bottom: "50%", top: "50%", left: 0, borderRadius: 50, position: 'absolute',height: 10, width: 1 }} />
         </View>
       </View>
       <View style={{ flex: 1, width: "100%", display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
         {/* display placement of the tiles/choices */}
         <View style={{ display: 'flex', width: "80%", flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
           {[...SYMBOLS, ...letters].map((symbol, index) => (
-            <View key={index} style={{ borderRadius: 10, backgroundColor: currentColorsThemeObj.second, width: 55, height: 55, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <PTxt
-                fontSize={24}
-                style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-              >
-                {symbol}
-              </PTxt>
-            </View>
+            <LogicSymbol width={55} height={55} key={index} backgroundColor={currentColorsThemeObj.second}>
+              {symbol}
+            </LogicSymbol>
           ))}
         </View>
       </View>
