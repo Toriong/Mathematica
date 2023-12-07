@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { GestureResponderEvent } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react';
+import { GestureResponderEvent, LayoutChangeEvent } from 'react-native'
 import Layout from '../../global_components/Layout';
 import { View } from 'react-native';
 import { PTxt } from '../../global_components/text';
@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ENGLISH_ALPHABET, SYMBOLS } from '../../globalVars';
 import Button, { OnPressAction } from '../../global_components/Button';
+import uuid from 'react-native-uuid';
 import LogicSymbol from './components/LogicSymbol';
 
 
@@ -37,11 +38,31 @@ const GameScrnPresentation = () => {
   const task = useQuestionsStore(state => state.task);
   const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
   const [questionIndex, setQuestionIndex] = useState(0);
+  const [inputLayoutPtCoordinates, setInputLayoutPtCoordinates] = useState({
+    pt1: { x: 0, y: 0 },
+    pt2: { x: 0, y: 0 },
+    pt3: { x: 0, y: 0 },
+    pt4: { x: 0, y: 0 }
+  })
   const question = questions[16];
   const { choices, answer } = question ?? {};
   const letters = choices?.length ? choices.map(({ letter }) => letter) : (answer?.length ? answer.filter(choice => ENGLISH_ALPHABET.includes(choice)) : []);
 
+
+  useEffect(() => {
+    console.log("`inputLayoutPtCoordinates: `", inputLayoutPtCoordinates)
+  })
   // if the choices array does not exist, then get the letters from 'answer' array
+
+  function handleOnLayout(event: LayoutChangeEvent, ptFieldName: string) {
+    setInputLayoutPtCoordinates(ptCoordinatesObj => ({
+      ...ptCoordinatesObj,
+      [ptFieldName]: {
+        x: event?.nativeEvent?.layout?.x,
+        y: event?.nativeEvent?.layout?.y
+      }
+    }))
+  }
 
   console.log("question: ", question);
   console.log("letters: ", letters)
@@ -49,6 +70,7 @@ const GameScrnPresentation = () => {
   function handleEnterBtnPress() {
 
   };
+
 
   function getIsAnswerCorrect() {
 
@@ -61,6 +83,10 @@ const GameScrnPresentation = () => {
   function handleSubmitBtnPress(event: GestureResponderEvent) {
 
   };
+
+  useEffect(() => {
+
+  })
 
   return (
     <Layout
@@ -125,10 +151,10 @@ const GameScrnPresentation = () => {
           position: 'relative'
         }}
         >
-          <View style={{ top: 0, left: "50%", right: "50%", borderRadius: 50, height: 10, backgroundColor: 'pink', width: 1 }} />
-          <View style={{ bottom: 0, left: "50%", right: "50%", borderRadius: 50, position: 'absolute',height: 10, width: 1 }} />
-          <View style={{ bottom: "50%", top: "50%", right: 0, borderRadius: 50, position: 'absolute',height: 10, width: 1 }} />
-          <View style={{ bottom: "50%", top: "50%", left: 0, borderRadius: 50, position: 'absolute',height: 10, width: 1 }} />
+          <View id='pt1' onLayout={event => handleOnLayout(event, "pt1")} style={{ top: 0, left: "50%", right: "50%", borderRadius: 50, height: 10, width: 1 }} />
+          <View id='pt2' onLayout={event => handleOnLayout(event, "pt2")} style={{ bottom: 0, left: "50%", right: "50%", borderRadius: 50, position: 'absolute', height: 10, width: 1 }} />
+          <View id='pt3' onLayout={event => handleOnLayout(event, "pt3")} style={{ bottom: "50%", top: "50%", right: 0, borderRadius: 50, position: 'absolute', height: 10, width: 1 }} />
+          <View id='pt4' onLayout={event => handleOnLayout(event, "pt4")} style={{ bottom: "50%", top: "50%", left: 0, borderRadius: 50, position: 'absolute', height: 10, width: 1 }} />
         </View>
       </View>
       <View style={{ flex: 1, width: "100%", display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
