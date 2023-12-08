@@ -9,6 +9,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ENGLISH_ALPHABET, LETTERS, SYMBOLS } from '../../globalVars';
 import Button, { OnPressAction } from '../../global_components/Button';
+import DraggableFlatList, {
+  ScaleDecorator,
+} from "react-native-draggable-flatlist";
 import uuid from 'react-native-uuid';
 import LogicSymbol from './components/LogicSymbol';
 import SelectedLogicSymbol from './components/SelectedLogicSymbol';

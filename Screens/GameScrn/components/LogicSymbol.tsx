@@ -2,10 +2,12 @@ import { IAppColor, IComponentProps, TFirstColor, TSecondColor, TThirdColor } fr
 import { View, Animated, PanResponder, GestureResponderEvent } from 'react-native';
 import { PTxt } from "../../../global_components/text";
 
+
 interface ISymbol {
     width: number
     height: number
-    backgroundColor: TFirstColor | TSecondColor | TThirdColor,
+    backgroundColor: TFirstColor | TSecondColor | TThirdColor
+    opacity?: number
 }
 
 // GOAL: when the user is dragging the element and is over the input field, implement:
