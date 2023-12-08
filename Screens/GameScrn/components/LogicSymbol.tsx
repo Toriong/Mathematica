@@ -1,6 +1,8 @@
 import { IAppColor, IComponentProps, TFirstColor, TSecondColor, TThirdColor } from "../../../globalTypes&Interfaces"
-import { View, Animated, PanResponder, GestureResponderEvent } from 'react-native';
+import { View, Animated, PanResponder, GestureResponderEvent, TouchableOpacity } from 'react-native';
 import { PTxt } from "../../../global_components/text";
+import { ScaleDecorator } from "react-native-draggable-flatlist";
+import Button from "../../../global_components/Button";
 
 
 interface ISymbol {
@@ -39,25 +41,31 @@ const LogicSymbol = ({
     // -create a top point and a bottom point of the input section
     // -check if the drag in between those points 
 
+    function handleBtnPress(event: GestureResponderEvent){
+
+    }
+
     return (
-        <View
-            style={{
-                borderRadius: 10,
-                backgroundColor: backgroundColor,
-                width: width,
-                height: height,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}
-        >
-            <PTxt
-                fontSize={24}
-                style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-            >
-                {children}
-            </PTxt>
-        </View>
+            <Button backgroundColor='none' handleOnPress={handleBtnPress}>
+                <View
+                    style={{
+                        borderRadius: 10,
+                        backgroundColor: backgroundColor,
+                        width: width,
+                        height: height,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <PTxt
+                        fontSize={24}
+                        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                    >
+                        {children}
+                    </PTxt>
+                </View>
+            </Button>
     )
 };
 
