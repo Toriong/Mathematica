@@ -1,6 +1,5 @@
 import { IAppColor, IComponentProps, TFirstColor, TSecondColor, TThirdColor } from "../../../globalTypes&Interfaces"
 import { View, Animated, PanResponder, GestureResponderEvent } from 'react-native';
-import { useEffect, useRef } from 'react'
 import { PTxt } from "../../../global_components/text";
 
 interface ISymbol {
@@ -22,25 +21,7 @@ interface ISymbol {
 // -to the right of an element
 // -to the lefof of an element
 
-const LogicSymbol = ({ children, backgroundColor, width = 55, height = 55 }: Omit<IComponentProps, 'backgroundColor'> & ISymbol) => {
-    const pan = useRef(new Animated.ValueXY()).current;
-    const panResponder = useRef(
-        PanResponder.create({
-            onMoveShouldSetPanResponder: () => true,
-            onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }]),
-            onPanResponderRelease: () => {
-                pan.extractOffset();
-            },
-        }),
-    ).current;
-
-    useEffect(() => {
-        // console.log("panResponder: ", panResponder)
-    })
-
-    function handleOnResponderRelase(event: GestureResponderEvent) {
-        // console.log('event: ', event);
-    }
+const LogicSymbol = ({ children, backgroundColor = '#6B7280', width = 55, height = 55 }: Omit<IComponentProps, 'backgroundColor'> & ISymbol) => {
 
     // GOAL: drag the element onto the Input field. 
 
@@ -52,22 +33,24 @@ const LogicSymbol = ({ children, backgroundColor, width = 55, height = 55 }: Omi
     // -check if the drag in between those points 
 
     return (
-        <Animated.View
-            onResponderRelease={handleOnResponderRelase}
+        <View
             style={{
-                transform: [{ translateX: pan.x }, { translateY: pan.y }],
+                borderRadius: 10,
+                backgroundColor: backgroundColor,
+                width: width,
+                height: height,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
             }}
-            {...panResponder.panHandlers}
         >
-            <View style={{ borderRadius: 10, backgroundColor: backgroundColor, width: width, height: height, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <PTxt
-                    fontSize={24}
-                    style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-                >
-                    {children}
-                </PTxt>
-            </View>
-        </Animated.View>
+            <PTxt
+                fontSize={24}
+                style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            >
+                {children}
+            </PTxt>
+        </View>
     )
 };
 

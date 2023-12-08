@@ -7,10 +7,11 @@ import { PTxt } from '../../global_components/text';
 import { useColorStore, useIsGettingReqStore, useQuestionsStore } from '../../zustand';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import { ENGLISH_ALPHABET, SYMBOLS } from '../../globalVars';
+import { ENGLISH_ALPHABET, LETTERS, SYMBOLS } from '../../globalVars';
 import Button, { OnPressAction } from '../../global_components/Button';
 import uuid from 'react-native-uuid';
 import LogicSymbol from './components/LogicSymbol';
+import SelectedLogicSymbol from './components/SelectedLogicSymbol';
 
 
 
@@ -29,6 +30,11 @@ import LogicSymbol from './components/LogicSymbol';
 // FOR THE UI, for the choices, if there is no choices array, then get all of the letters from the answer array.
 
 const TXT_FONT_SIZE = 20;
+type TSelectedSymbol = typeof SYMBOLS[number] | typeof LETTERS[number]
+interface ISelectedLogicSymbol {
+  symbol: TSelectedSymbol
+  _id: ReturnType<typeof uuid.v4>
+}
 
 const GameScrnPresentation = () => {
   const currentThemeStr = useColorStore(state => state.currentTheme);
@@ -38,25 +44,24 @@ const GameScrnPresentation = () => {
   const task = useQuestionsStore(state => state.task);
   const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
   const [questionIndex, setQuestionIndex] = useState(0);
- const [pt1Coordinates, setPt1Coordinates] = useState({ x: 0, y: 0 });
- const [pt2Coordinates, setPt2Coordinates] = useState({ x: 0, y: 0 });
- const pt1Ref = useRef(null);
+  const [pt1Coordinates, setPt1Coordinates] = useState({ x: 0, y: 0 });
+  const [pt2Coordinates, setPt2Coordinates] = useState({ x: 0, y: 0 });
+  const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([
+    { symbol: "A", _id: uuid.v4() },
+    { symbol: "->", _id: uuid.v4() },
+    { symbol: "B", _id: uuid.v4() },
+  ]);
+
+  // CASE: there are only three elements on the UI. The user takes the first element, and releases it
+  // in between the second and third element. 
+  
   const question = questions[16];
   const { choices, answer } = question ?? {};
   const letters = choices?.length ? choices.map(({ letter }) => letter) : (answer?.length ? answer.filter(choice => ENGLISH_ALPHABET.includes(choice)) : []);
 
-
-  useEffect(() => {
-    setTimeout(() => {
-      (pt1Ref.current as any).measure((x: number,y: number) => {
-        console.log('x: ', x);
-        console.log('y: ', y)
-      })
-    }, 2000);
-  })
   // setPtCoordinates: React.Dispatch<React.SetStateAction<{ x: number, y: number }>>
   function handleOnLayout(event: LayoutChangeEvent) {
-    console.log("pt1Ref.current: ", )
+    console.log("pt1Ref.current: ",)
     // setPtCoordinates({ x: event?.nativeEvent?.layout?.x, y: event?.nativeEvent?.layout?.y  })
   }
 
@@ -142,18 +147,22 @@ const GameScrnPresentation = () => {
       <View style={{ flex: 1, width: "100%", display: 'flex', alignItems: 'center' }}>
         {/* display the input field here.*/}
         {/* the user must drag the letters and the operators here */}
-
         {/* the user can switch the tiles around when a tile is inserted */}
-        <View 
-        style={{
-          width: "93%",
-          height: 70,
-          borderBottomWidth: 1,
-          borderBottomColor: currentColorsThemeObj.second,
-          position: 'relative',
-        }}
+        <View
+          style={{
+            width: "93%",
+            height: 70,
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 10,
+            borderBottomWidth: 1,
+            borderBottomColor: currentColorsThemeObj.second,
+            position: 'relative',
+          }}
         >
-          <View ref={pt1Ref} onLayout={handleOnLayout} style={{ top: 0, left: "50%", position: 'absolute', backgroundColor: 'pink' }} />
+          {selectedLogicSymbols.length && selectedLogicSymbols.map(symbol => <SelectedLogicSymbol>{symbol.symbol}</SelectedLogicSymbol>)}
         </View>
       </View>
       <View style={{ flex: 1, width: "100%", display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
