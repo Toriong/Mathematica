@@ -5,7 +5,7 @@ import { PTxt } from "../../../global_components/text";
 interface ISymbol {
     width: number
     height: number
-    backgroundColor: TFirstColor | TSecondColor | TThirdColor
+    backgroundColor: TFirstColor | TSecondColor | TThirdColor,
 }
 
 // GOAL: when the user is dragging the element and is over the input field, implement:
@@ -21,7 +21,12 @@ interface ISymbol {
 // -to the right of an element
 // -to the lefof of an element
 
-const LogicSymbol = ({ children, backgroundColor = '#6B7280', width = 55, height = 55 }: Omit<IComponentProps, 'backgroundColor'> & ISymbol) => {
+const LogicSymbol = ({
+    children,
+    backgroundColor = '#6B7280',
+    width = 55,
+    height = 55
+}: Omit<IComponentProps, 'backgroundColor'> & ISymbol) => {
 
     // GOAL: drag the element onto the Input field. 
 
@@ -41,7 +46,7 @@ const LogicSymbol = ({ children, backgroundColor = '#6B7280', width = 55, height
                 height: height,
                 display: 'flex',
                 justifyContent: 'center',
-                alignItems: 'center'
+                alignItems: 'center',
             }}
         >
             <PTxt

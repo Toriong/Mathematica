@@ -54,7 +54,7 @@ const GameScrnPresentation = () => {
 
   // CASE: there are only three elements on the UI. The user takes the first element, and releases it
   // in between the second and third element. 
-  
+
   const question = questions[16];
   const { choices, answer } = question ?? {};
   const letters = choices?.length ? choices.map(({ letter }) => letter) : (answer?.length ? answer.filter(choice => ENGLISH_ALPHABET.includes(choice)) : []);
@@ -85,9 +85,6 @@ const GameScrnPresentation = () => {
 
   };
 
-  useEffect(() => {
-
-  })
 
   // BRAIN DUMP NOTES: 
   // when the user drags the element over the input field and releases the drag, perform the following: 

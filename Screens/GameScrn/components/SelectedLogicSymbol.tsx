@@ -17,22 +17,20 @@ import Button from "../../../global_components/Button";
 
 const SelectedLogicSymbol = ({ children }: IComponentProps) => {
 
-    function handleBtnPress(event: GestureResponderEvent){
-        
-    }                              
+    function handleBtnPress(event: GestureResponderEvent) {
+
+    }
 
     return (
-        <Draggable>
-            <Button backgroundColor='none' handleOnPress={handleBtnPress}>
-                <LogicSymbol
-                    backgroundColor="#6B7280"
-                    width={55}
-                    height={55}
-                >
-                    {children}
-                </LogicSymbol>
-            </Button>
-        </Draggable>
+        <Button backgroundColor='none' handleOnPress={handleBtnPress}>
+            <LogicSymbol
+                backgroundColor="#6B7280"
+                width={55}
+                height={55}
+            >
+                {children}
+            </LogicSymbol>
+        </Button>
     )
 };
 

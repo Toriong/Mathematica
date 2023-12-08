@@ -1,6 +1,6 @@
 import { IComponentProps } from "../globalTypes&Interfaces";
 import { useEffect, useRef, useState } from 'react';
-import { Animated, View,PanResponder, GestureResponderEvent } from 'react-native';
+import { Animated, View, PanResponder, GestureResponderEvent } from 'react-native';
 
 
 const Draggable = ({ children }: Pick<IComponentProps, 'children'>) => {
@@ -41,10 +41,11 @@ const Draggable = ({ children }: Pick<IComponentProps, 'children'>) => {
 
     return (
         <Animated.View
-        onLayout={event => {
-            console.log('event yo there: ', event.nativeEvent.layout.x);
-            // setCoordinates({ x: event.nativeEvent.layout.,  })
-        }}
+            
+            onLayout={event => {
+                console.log('event yo there: ', event.nativeEvent.layout.x);
+                // setCoordinates({ x: event.nativeEvent.layout.,  })
+            }}
             onResponderRelease={handleOnResponderRelease}
             style={{
                 transform: [{ translateX: pan.x }, { translateY: pan.y }],
