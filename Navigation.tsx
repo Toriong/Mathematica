@@ -13,9 +13,9 @@ const LogicGameAppNavigation = () => {
             <Tab.Navigator tabBar={props => {
                 const state = props.navigation.getState();
                 const { name: currentRouteName } = state.routes[state.index];
-                const { comp: TabComp } = navTabs.find(({ name }) => name === currentRouteName) ?? {};
+                const { comp: TabBar } = navTabs.find(({ name }) => name === currentRouteName) ?? {};
 
-                if (!TabComp) {
+                if (!TabBar) {
                     return (
                         <View style={{ backgroundColor: "pink", height: 100 }}>
 
@@ -25,7 +25,7 @@ const LogicGameAppNavigation = () => {
 
                 // create an array that will hold all of the Tab views that will be rendered onto the DOM
 
-                return <TabComp {...props} />
+                return <TabBar {...props} />
             }}>
                 <Tab.Screen name="GameScreen" component={GameScrnContainer} />
             </Tab.Navigator>

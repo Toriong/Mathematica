@@ -10,6 +10,7 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ENGLISH_ALPHABET, LETTERS, SYMBOLS } from '../../globalVars';
 import Button, { OnPressAction } from '../../global_components/Button';
 import DraggableFlatList, {
+  NestableScrollContainer,
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
 import uuid from 'react-native-uuid';
@@ -162,7 +163,9 @@ const GameScrnPresentation = () => {
             position: 'relative',
           }}
         >
+          {/* <NestableScrollContainer style={{ display: 'flex', flexDirection: 'row' }}> */}
           {selectedLogicSymbols.length && selectedLogicSymbols.map(symbol => <SelectedLogicSymbol>{symbol.symbol}</SelectedLogicSymbol>)}
+          {/* </NestableScrollContainer> */}
         </View>
       </View>
       <View style={{ flex: 1, width: "100%", display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
