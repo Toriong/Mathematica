@@ -1,6 +1,6 @@
 
-import React, { useEffect, useRef, useState } from 'react';
-import { GestureResponderEvent, LayoutChangeEvent } from 'react-native'
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { GestureResponderEvent, LayoutChangeEvent, TouchableOpacity } from 'react-native'
 import Layout from '../../global_components/Layout';
 import { View } from 'react-native';
 import { PTxt } from '../../global_components/text';
@@ -16,19 +16,21 @@ import DraggableFlatList, {
 import uuid from 'react-native-uuid';
 import LogicSymbol from './components/LogicSymbol';
 import SelectedLogicSymbol from './components/SelectedLogicSymbol';
+import { NativeTouchEvent } from 'react-native';
 
 
 const SELECTED_LOGIC_SYMBOLS_TESTING_DATA = [
-  { symbol: "A", _id: uuid.v4().toString() },
-  { symbol: "->", _id: uuid.v4().toString() },
-  { symbol: "B", _id: uuid.v4().toString() },
+  { symbol: "A", _id: uuid.v4() },
+  { symbol: "->", _id: uuid.v4() },
+  { symbol: "B", _id: uuid.v4() },
 ]
 
 const TXT_FONT_SIZE = 20;
 type TSelectedSymbol = typeof SYMBOLS[number] | typeof LETTERS[number]
 interface ISelectedLogicSymbol {
   symbol: TSelectedSymbol
-  _id: ReturnType<typeof uuid.v4.toString>
+  _id: ReturnType<typeof uuid.v4>
+  wasPressed?: boolean
 }
 
 const GameScrnPresentation = () => {
@@ -39,25 +41,63 @@ const GameScrnPresentation = () => {
   const task = useQuestionsStore(state => state.task);
   const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [pt1Coordinates, setPt1Coordinates] = useState({ x: 0, y: 0 });
-  const [pt2Coordinates, setPt2Coordinates] = useState({ x: 0, y: 0 });
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
-
-  // CASE: there are only three elements on the UI. The user takes the first element, and releases it
-  // in between the second and third element. 
-
-  const question = questions[16];
+  const question = questions[questionIndex];
   const { choices, answer } = question ?? {};
   const letters = choices?.length ? choices.map(({ letter }) => letter) : (answer?.length ? answer.filter(choice => ENGLISH_ALPHABET.includes(choice)) : []);
+  const symbolOptions: ISelectedLogicSymbol[] = useMemo(() => [...SYMBOLS, ...letters].map(symbol => ({
+    symbol: symbol,
+    _id: uuid.v4()
+  })), []);
 
-  // setPtCoordinates: React.Dispatch<React.SetStateAction<{ x: number, y: number }>>
-  function handleOnLayout(event: LayoutChangeEvent) {
-    console.log("pt1Ref.current: ",)
-    // setPtCoordinates({ x: event?.nativeEvent?.layout?.x, y: event?.nativeEvent?.layout?.y  })
+  function handleSymbolOptPress(selectedLogicSymbol: ISelectedLogicSymbol) {
+    console.log("hey there: ")
+    setSelectedLogicSymbols(prevState => [...prevState, { symbol: selectedLogicSymbol.symbol, _id: selectedLogicSymbol._id }])
+  };
+
+  function handleSelectedLogicSymbol(selectedLogicSymbol: ISelectedLogicSymbol) {
+    // CASE: this was the first time that the SelectedLogicSymbol was clicked
+    // GOAL: make its opacity .4 
+    // the selected logic symbol's opacity has been changed to .4
+    // the symbol that is not the target is returned unchanged
+    // the target symbol was returned 
+    // using the id of the pressed symbol, if the id matches with the id of the selectedSymbol, when the target symbol has been reached, change wasPressed to true
+    // map through the state of selectedSymbols
+    // wasPressed is false
+    // check if wasPressed is false
+    // the target symbol was retrieved
+    // check if the target symbol was pressed by retrieving it from the state of selectedLoigcSymbols by using the id
+    // get the id of the pressed symbol 
+    // the user clicks on a symbol
+    try {
+      const targetSymbol = selectedLogicSymbols.find(({ _id }) => _id === selectedLogicSymbol._id);
+
+      if (!targetSymbol) {
+        throw new Error("Something went wrong couldn't retrieve the target symbol.")
+      };
+
+      if (!targetSymbol?.wasPressed) {
+        const selectedLogicSymbolsUpdated = selectedLogicSymbols.map(symbol => {
+          if (symbol._id === selectedLogicSymbol._id) {
+            return {
+              ...symbol,
+              wasPressed: true
+            }
+          }
+
+          return symbol;
+        });
+
+        setSelectedLogicSymbols(selectedLogicSymbolsUpdated);
+        return;
+      };
+
+      setSelectedLogicSymbols(symbols => symbols.filter(({ _id }) => _id !== selectedLogicSymbol._id));
+    } catch (error) {
+      console.error("An error has occurred: ", error)
+    }
+    // const targetSymbol = selectedLogicSymbols.find(({ _id }) => )
   }
-
-  console.log("question: ", question);
-  console.log("letters: ", letters)
 
   function handleEnterBtnPress() {
 
@@ -95,10 +135,6 @@ const GameScrnPresentation = () => {
       backgroundColor="#343541"
     >
       <View style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        {/* CASE: translate the proposition into symbolic propositional logic */}
-        {/* SECTION 1: */}
-        {/* display what the user must do with the text: Example: "Translate the proposition into symbolic logic." */}
-        {/* END OF SECTION 1 */}
         <PTxt fontSize={TXT_FONT_SIZE}>TASK: </PTxt>
         <PTxt
           fontSize={TXT_FONT_SIZE}
@@ -108,9 +144,6 @@ const GameScrnPresentation = () => {
         </PTxt>
       </View>
       <View style={{ flex: 1, width: "100%", display: 'flex', paddingTop: 7, justifyContent: 'center', alignItems: 'center' }}>
-        {/* SECTION 3: */}
-        {/* display the proposition here */}
-        {/* END OF SECTION 3 */}
         <PTxt
           fontSize={TXT_FONT_SIZE}
           style={{ textAlign: 'center', paddingHorizontal: 7 }}
@@ -147,16 +180,40 @@ const GameScrnPresentation = () => {
             position: 'relative',
           }}
         >
-          {!!selectedLogicSymbols.length && selectedLogicSymbols.map(symbol => <SelectedLogicSymbol key={symbol._id}>{symbol.symbol}</SelectedLogicSymbol>)}
+          {!!selectedLogicSymbols.length && selectedLogicSymbols.map(symbol => {
+            const _id = symbol._id.toString();
+
+            return (
+              <TouchableOpacity
+                id={_id}
+                onPress={() => handleSelectedLogicSymbol(symbol)}
+                key={_id}
+              >
+                <LogicSymbol
+                  width={55}
+                  height={55}
+                  backgroundColor={currentColorsThemeObj.second}
+                >
+                  {symbol.symbol}
+                </LogicSymbol>
+              </TouchableOpacity>
+            )
+          }
+          )}
         </View>
       </View>
       <View style={{ flex: 1, width: "100%", display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
         {/* display placement of the tiles/choices */}
         <View style={{ display: 'flex', width: "80%", flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
-          {[...SYMBOLS, ...letters].map((symbol, index) => (
-            <LogicSymbol width={55} height={55} key={index} backgroundColor={currentColorsThemeObj.second}>
-              {symbol}
-            </LogicSymbol>
+          {symbolOptions.map(symbolOpt => (
+            <TouchableOpacity
+              key={symbolOpt._id.toString()}
+              onPress={() => handleSymbolOptPress(symbolOpt)}
+            >
+              <LogicSymbol width={55} height={55} backgroundColor={currentColorsThemeObj.second}>
+                {symbolOpt.symbol}
+              </LogicSymbol>
+            </TouchableOpacity>
           ))}
         </View>
       </View>

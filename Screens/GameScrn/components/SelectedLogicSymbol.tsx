@@ -18,7 +18,6 @@ const SelectedLogicSymbol = ({ children }: IComponentProps) => {
     }
 
     return (
-        <Button backgroundColor='none' handleOnPress={handleBtnPress}>
             <LogicSymbol
                 backgroundColor="#6B7280"
                 width={55}
@@ -26,7 +25,6 @@ const SelectedLogicSymbol = ({ children }: IComponentProps) => {
             >
                 {children}
             </LogicSymbol>
-        </Button>
     )
 };
 
