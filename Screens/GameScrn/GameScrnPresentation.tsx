@@ -18,26 +18,17 @@ import LogicSymbol from './components/LogicSymbol';
 import SelectedLogicSymbol from './components/SelectedLogicSymbol';
 
 
-
-
-
-// brain dump notes: 
-// -venn diagram
-// -propositions into symbolic logic 
-// -propositions into extential/universal quantifier logic
-
-
-// GAMES TO PLAY: 
-// MAKE THE ARGUMENT VALID
-// reduction ad absurdum problem? 
-
-// FOR THE UI, for the choices, if there is no choices array, then get all of the letters from the answer array.
+const SELECTED_LOGIC_SYMBOLS_TESTING_DATA = [
+  { symbol: "A", _id: uuid.v4().toString() },
+  { symbol: "->", _id: uuid.v4().toString() },
+  { symbol: "B", _id: uuid.v4().toString() },
+]
 
 const TXT_FONT_SIZE = 20;
 type TSelectedSymbol = typeof SYMBOLS[number] | typeof LETTERS[number]
 interface ISelectedLogicSymbol {
   symbol: TSelectedSymbol
-  _id: ReturnType<typeof uuid.v4>
+  _id: ReturnType<typeof uuid.v4.toString>
 }
 
 const GameScrnPresentation = () => {
@@ -50,11 +41,7 @@ const GameScrnPresentation = () => {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [pt1Coordinates, setPt1Coordinates] = useState({ x: 0, y: 0 });
   const [pt2Coordinates, setPt2Coordinates] = useState({ x: 0, y: 0 });
-  const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([
-    { symbol: "A", _id: uuid.v4() },
-    { symbol: "->", _id: uuid.v4() },
-    { symbol: "B", _id: uuid.v4() },
-  ]);
+  const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
 
   // CASE: there are only three elements on the UI. The user takes the first element, and releases it
   // in between the second and third element. 
@@ -146,9 +133,6 @@ const GameScrnPresentation = () => {
         </View>
       )}
       <View style={{ flex: 1, width: "100%", display: 'flex', alignItems: 'center' }}>
-        {/* display the input field here.*/}
-        {/* the user must drag the letters and the operators here */}
-        {/* the user can switch the tiles around when a tile is inserted */}
         <View
           style={{
             width: "93%",
@@ -163,9 +147,7 @@ const GameScrnPresentation = () => {
             position: 'relative',
           }}
         >
-          {/* <NestableScrollContainer style={{ display: 'flex', flexDirection: 'row' }}> */}
-          {selectedLogicSymbols.length && selectedLogicSymbols.map(symbol => <SelectedLogicSymbol>{symbol.symbol}</SelectedLogicSymbol>)}
-          {/* </NestableScrollContainer> */}
+          {!!selectedLogicSymbols.length && selectedLogicSymbols.map(symbol => <SelectedLogicSymbol key={symbol._id}>{symbol.symbol}</SelectedLogicSymbol>)}
         </View>
       </View>
       <View style={{ flex: 1, width: "100%", display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>

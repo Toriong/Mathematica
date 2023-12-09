@@ -31,41 +31,25 @@ const LogicSymbol = ({
     width = 55,
     height = 55
 }: Omit<IComponentProps, 'backgroundColor'> & ISymbol) => {
-
-    // GOAL: drag the element onto the Input field. 
-
-    // NOTES: 
-    // -check if the user's drag has entered into input field when the user release their finger 
-    // -when the user releases their finger, then get the coordinates
-    // -when the user clicks on the symbol, have it displayed onto the input section
-    // -create a top point and a bottom point of the input section
-    // -check if the drag in between those points 
-
-    function handleBtnPress(event: GestureResponderEvent){
-
-    }
-
     return (
-            <Button backgroundColor='none' handleOnPress={handleBtnPress}>
-                <View
-                    style={{
-                        borderRadius: 10,
-                        backgroundColor: backgroundColor,
-                        width: width,
-                        height: height,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}
-                >
-                    <PTxt
-                        fontSize={24}
-                        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-                    >
-                        {children}
-                    </PTxt>
-                </View>
-            </Button>
+        <View
+            style={{
+                borderRadius: 10,
+                backgroundColor: backgroundColor,
+                width: width,
+                height: height,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}
+        >
+            <PTxt
+                fontSize={24}
+                style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            >
+                {children}
+            </PTxt>
+        </View>
     )
 };
 
