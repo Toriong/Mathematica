@@ -155,6 +155,14 @@ const GameScrnPresentation = () => {
         position:'relative'
       }}
       backgroundColor="#343541"
+      layoutStyle={{ position: 'relative', width: '100%', height: '100%' }}
+      OverlayComp={
+        <View 
+          style={{ width: '100%', height: '100%', backgroundColor: 'black', position: 'absolute', zIndex: 1, opacity: .5 }}
+        >
+
+        </View>
+      }
     >
       <View style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <PTxt fontSize={TXT_FONT_SIZE}>TASK: </PTxt>

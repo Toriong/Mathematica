@@ -23,26 +23,10 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
     }
 
     return (
-        <SafeAreaView style={{ width: "100%", display: 'flex', backgroundColor: currentThemeObj.first, borderBottomColor: currentThemeObj.second, borderWidth: 1 }}>
-            {/* this View container will contain the following: */}
-
-            {/* START OF row 1 (flex, row) */}
-            {/* view */}
-            {/* back arrow */}
-            {/* view */}
-
-            {/* START of view (flex, flex-column)*/}
-            {/* right (number) | wrong (number) */}
-            {/* timer */}
-            {/* END of view */}
-            {/* END OF row 1 */}
-
-            {/* START of row 2 */}
-            {/* Score: (tracker for the score, number) */}
-            {/* END of row 2 */}
+        <SafeAreaView style={{ width: "100%", position: 'relative', display: 'flex', backgroundColor: currentThemeObj.first, borderBottomColor: currentThemeObj.second, borderWidth: 1 }}>
             <View style={{ display: 'flex', flexDirection: 'row', width: "100%", paddingTop: "3%" }}>
                 <View style={{ width: "30%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Button handleOnPress={handleBtnPress}>
+                    <Button backgroundColor='none' handleOnPress={handleBtnPress}>
                         <View style={{ borderWidth: 3, borderColor: currentThemeObj.second, borderRadius: 50, padding: 8 }}>
                             <FontAwesomeIcon icon={faArrowLeft} size={50} color={currentThemeObj.second} />
                         </View>
@@ -64,7 +48,7 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
                     </View>
                 </View>
             </View>
-            <View style={{ marginTop: "3%", paddingBottom: 10 }}>
+            <View style={{ marginTop: "3%", paddingBottom: 10, position: 'relative' }}>
                 <View style={{ width: "37%", display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
                     <PTxt fontSize={FONT_SIZE_SCORE_TXT} fontStyle="italic">Score: </PTxt>
                     <PTxt fontSize={FONT_SIZE_SCORE_TXT}>{rightNum}</PTxt>
