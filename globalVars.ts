@@ -9,3 +9,6 @@ export const SYMBOLS = [
   "*",
   "v"
 ] as const;
+export function structuredClone<TData>(val: any): TData{
+  return JSON.parse(JSON.stringify(val));
+} 
