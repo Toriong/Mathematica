@@ -18,18 +18,17 @@ import LogicSymbol from './components/LogicSymbol';
 import SelectedLogicSymbol from './components/SelectedLogicSymbol';
 import { NativeTouchEvent } from 'react-native';
 
-
+const SYMBOL_WIDTH_AND_HEIGHT = 45;
 const SELECTED_LOGIC_SYMBOLS_TESTING_DATA = [
   { symbol: "A", _id: uuid.v4() },
   { symbol: "->", _id: uuid.v4() },
   { symbol: "B", _id: uuid.v4() },
 ]
-
 const TXT_FONT_SIZE = 20;
 type TSelectedSymbol = typeof SYMBOLS[number] | typeof LETTERS[number]
 interface ISelectedLogicSymbol {
   symbol: TSelectedSymbol
-  _id: ReturnType<typeof uuid.v4>
+  _id?: ReturnType<typeof uuid.v4>
   wasPressed?: boolean
 }
 
@@ -47,7 +46,7 @@ const GameScrnPresentation = () => {
   const letters = choices?.length ? choices.map(({ letter }) => letter) : (answer?.length ? answer.filter(choice => ENGLISH_ALPHABET.includes(choice)) : []);
   const symbolOptions: ISelectedLogicSymbol[] = useMemo(() => [...SYMBOLS, ...letters].map(symbol => ({
     symbol: symbol,
-    _id: uuid.v4()
+    wasPressed: false
   })), [questions, questionIndex]);
 
   useEffect(() => {
@@ -56,7 +55,7 @@ const GameScrnPresentation = () => {
 
   function handleSymbolOptPress(selectedLogicSymbol: ISelectedLogicSymbol) {
     console.log("hey there: ")
-    setSelectedLogicSymbols(prevState => [...prevState, { symbol: selectedLogicSymbol.symbol, _id: selectedLogicSymbol._id }])
+    setSelectedLogicSymbols(prevState => [...prevState, { symbol: selectedLogicSymbol.symbol, _id: uuid.v4() }])
   };
 
   function handleSelectedLogicSymbol(selectedLogicSymbol: ISelectedLogicSymbol) {
@@ -125,10 +124,17 @@ const GameScrnPresentation = () => {
 
   };
 
-  function handleSubmitBtnPress(event: GestureResponderEvent) {
-    if (JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols)) {
+  function handleSubmitBtnPress() {
+    if (JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol))) {
       console.log("CORRECT!")
+      // GOAL: display the correct logic screen
+      
+      // get the next question here
+      return;
     }
+
+    // GOAL: display the incorrect  logic screen
+
   };
 
 
@@ -145,7 +151,8 @@ const GameScrnPresentation = () => {
         height: "100%",
         display: 'flex',
         alignItems: 'center',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        position:'relative'
       }}
       backgroundColor="#343541"
     >
@@ -206,8 +213,8 @@ const GameScrnPresentation = () => {
                 style={{ opacity: symbol.wasPressed ? .4 : 1 }}
               >
                 <LogicSymbol
-                  width={55}
-                  height={55}
+                  width={SYMBOL_WIDTH_AND_HEIGHT}
+                  height={SYMBOL_WIDTH_AND_HEIGHT}
                   backgroundColor={currentColorsThemeObj.second}
                 >
                   {symbol.symbol}
@@ -221,12 +228,12 @@ const GameScrnPresentation = () => {
       <View style={{ flex: 1, width: "100%", display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
         {/* display placement of the tiles/choices */}
         <View style={{ display: 'flex', width: "80%", flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
-          {symbolOptions.map(symbolOpt => (
+          {symbolOptions.map((symbolOpt, index) => (
             <TouchableOpacity
-              key={symbolOpt._id.toString()}
+              key={index}
               onPress={() => handleSymbolOptPress(symbolOpt)}
             >
-              <LogicSymbol width={55} height={55} backgroundColor={currentColorsThemeObj.second}>
+              <LogicSymbol width={SYMBOL_WIDTH_AND_HEIGHT} height={SYMBOL_WIDTH_AND_HEIGHT} backgroundColor={currentColorsThemeObj.second}>
                 {symbolOpt.symbol}
               </LogicSymbol>
             </TouchableOpacity>

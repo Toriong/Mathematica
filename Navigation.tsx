@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import GameScrnContainer from './Screens/GameScrn/GameScrnContainer';
 import GameScrnTab from './global_components/tab_navs/GameScrnTab';
+import { Text } from 'react-native';
 
 const Tab = createMaterialTopTabNavigator();
 const navTabs = [{ name: 'GameScreen', comp: GameScrnTab }];
