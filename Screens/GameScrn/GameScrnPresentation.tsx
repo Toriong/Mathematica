@@ -91,8 +91,29 @@ const GameScrnPresentation = () => {
         setSelectedLogicSymbols(selectedLogicSymbolsUpdated);
         return;
       };
+      
+      // CASE: there was a symbol that was clicked already, the user clicks on another symbol to swap the values
+      // GOAL: swap the symbols with one another in the state of the selectedLogicSymbols 
+      // the symbols were swapped with one another
+      // pseudo code of the swap:
+      // selectedLogicSymbols[the index of symbol A] = symbolB 
+      // selectedLogicSymbols[the index of symbol B] = symbolA 
+      // symbolB = structureClone(selectedLogicSymbols[the index of symbolB])
+      // symbolA = structureClone(selectedLogicSymbols[the index of symbolA])
+      // store the symbols that will be swapped into their respective variables, as seen above:
+      // symbolBIndex = find the index by getting the first value from the state of selectedLogicSymbols that has wasPressed === true
+      // symbolAIndex (the most recently pressed symbol) = using the id of selectedLogicSymbol parameter, find it from the state of selectedLogicSymbols 
+      // get the indexes of the pressed symbols, as seen above: 
+      // there is a value that has the boolean of wasPressed set true
 
-      setSelectedLogicSymbols(symbols => symbols.filter(({ _id }) => _id !== selectedLogicSymbol._id));
+      // const previouslyPressedSelectedSymbolIndex = selectedLogicSymbols.findIndex(symbol => symbol.wasPressed);
+      // const currentlyPressedSelectedSymbolIndex = selectedLogicSymbols.findIndex(symbol => symbol._id === selectedLogicSymbol._id);
+
+      // if((currentlyPressedSelectedSymbolIndex !== -1) && (previouslyPressedSelectedSymbolIndex !== -1)){
+      //   console.log("will execute swap...")
+      // }
+
+      setSelectedLogicSymbols(symbols => symbols.filter(({ _id }) => _id !== selectedLogicSymbol._id).map(symbol => ({ ...symbol, wasPressed: false })))
     } catch (error) {
       console.error("An error has occurred: ", error)
     }
