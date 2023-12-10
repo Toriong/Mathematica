@@ -1,27 +1,22 @@
 import { SafeAreaView, StyleSheet, View } from 'react-native';
-import { IComponentProps } from '../globalTypes&Interfaces';
-
-type TLayout = {
-    layoutStyle?: Pick<IComponentProps, 'style'>['style'] & { width: '100%', height: '100%' }
-    OverlayComp?: Pick<IComponentProps, 'children'>['children']
-}
+import { IComponentProps, TLayout } from '../globalTypes&Interfaces';
+import SafeAreaViewWrapper from './SafeAreaViewWrapper';
 
 const Layout = ({
     children,
-    OverlayComp,
-    layoutStyle = { width: '100%', height: '100%' },
     style = { width: "100%", height: "100%" },
-    backgroundColor = "#343541"
+    backgroundColor = "#343541",
+    OverlayComp,
+    layoutStyle
 }: IComponentProps & TLayout) => {
     const styleObj = StyleSheet.create({ main: { ...style, backgroundColor: backgroundColor } });
 
     return (
-        <View style={{ ...layoutStyle }}>
-            {OverlayComp}
+        <SafeAreaViewWrapper layoutStyle={layoutStyle} OverlayComp={OverlayComp}>
             <SafeAreaView style={styleObj.main}>
                 {children}
             </SafeAreaView>
-        </View>
+        </SafeAreaViewWrapper>
     );
 };
 

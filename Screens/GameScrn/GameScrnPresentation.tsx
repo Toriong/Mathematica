@@ -7,7 +7,7 @@ import { PTxt } from '../../global_components/text';
 import { useColorStore, useIsGettingReqStore, useQuestionsStore } from '../../zustand';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import { ENGLISH_ALPHABET, LETTERS, SYMBOLS, structuredClone } from '../../globalVars';
+import { ENGLISH_ALPHABET, LETTERS, OVERLAY_OPACITY, SYMBOLS, structuredClone } from '../../globalVars';
 import Button, { OnPressAction } from '../../global_components/Button';
 import DraggableFlatList, {
   NestableScrollContainer,
@@ -124,11 +124,12 @@ const GameScrnPresentation = () => {
 
   };
 
+
   function handleSubmitBtnPress() {
     if (JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol))) {
-      console.log("CORRECT!")
+      console.log("CORRECT!");
       // GOAL: display the correct logic screen
-      
+
       // get the next question here
       return;
     }
@@ -152,16 +153,18 @@ const GameScrnPresentation = () => {
         display: 'flex',
         alignItems: 'center',
         flexDirection: 'column',
-        position:'relative'
+        position: 'relative'
       }}
       backgroundColor="#343541"
       layoutStyle={{ position: 'relative', width: '100%', height: '100%' }}
       OverlayComp={
-        <View 
-          style={{ width: '100%', height: '100%', backgroundColor: 'black', position: 'absolute', zIndex: 1, opacity: .5 }}
-        >
+        (
+          <View
+            style={{ width: '100%', height: '100%', backgroundColor: 'black', position: 'absolute', zIndex: 1, opacity: OVERLAY_OPACITY }}
+          >
 
-        </View>
+          </View>
+        )
       }
     >
       <View style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
