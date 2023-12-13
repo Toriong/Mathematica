@@ -4,7 +4,7 @@ import { GestureResponderEvent, LayoutChangeEvent, TouchableOpacity } from 'reac
 import Layout from '../../global_components/Layout';
 import { View } from 'react-native';
 import { PTxt } from '../../global_components/text';
-import { useColorStore, useIsGettingReqStore, useQuestionsStore } from '../../zustand';
+import { useColorStore, useGameScrnTabStore, useIsGettingReqStore, useQuestionsStore } from '../../zustand';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ENGLISH_ALPHABET, LETTERS, OVERLAY_OPACITY, SYMBOLS, structuredClone } from '../../globalVars';
@@ -38,6 +38,7 @@ const GameScrnPresentation = () => {
   const currentColorsThemeObj = colorThemesObj[currentThemeStr];
   const questions = useQuestionsStore(state => state.questions);
   const task = useQuestionsStore(state => state.task);
+  const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
   const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
@@ -158,7 +159,7 @@ const GameScrnPresentation = () => {
       backgroundColor="#343541"
       layoutStyle={{ position: 'relative', width: '100%', height: '100%' }}
       OverlayComp={
-        (
+        wasSubmitBtnPressed && (
           <View
             style={{ width: '100%', height: '100%', backgroundColor: 'black', position: 'absolute', zIndex: 1, opacity: OVERLAY_OPACITY }}
           >

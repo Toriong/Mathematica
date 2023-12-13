@@ -30,20 +30,11 @@ interface IColorStore {
     setCurrentTheme: (theme: TCurrentTheme) => () => void
 }
 
-// NOTES: 
-// do I need to store the timer into a global state? 
-// when the timer is done, end the game
-// store it locally in the GameScrnTab component
-
-// this store will have the following: 
-// right: number
-// wrong: number
-// score: number
-
 
 export const useGameScrnTabStore = create<TGameScrnTabStore>(set => ({
     right: 0,
     wrong: 0,
+    wasSubmitBtnPressed: false,
     updateState: (newState, fieldName) => () => set(() => ({ [fieldName]: newState }))
 }))
 
