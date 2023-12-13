@@ -12,13 +12,10 @@ import { OVERLAY_OPACITY } from "../../globalVars";
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
 
-// create an object that will hold the following properties: 
-// minute: this will display the minute string onto the ui
-// seconds: this will display the seconds onto the UI
-
-function getTime(millis: number): string {
+function getTimeForUI(millis: number): string {
     const minutes = Math.floor(millis / 60_000);
     const seconds = ((millis % 60_000) / 1000).toFixed(0);
+    
     return minutes + ":" + (parseInt(seconds) < 10 ? "0" : "") + seconds;
 };
 
@@ -30,7 +27,7 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
     const wrongNum = useGameScrnTabStore(state => state.wrong);
     const timer = useGameScrnTabStore(state => state.timer);
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
-    const [timerObj, setTimerObj] = useState({ timerStr: getTime(timer), timerMs: timer });
+    const [timerObj, setTimerObj] = useState({ timerStr: getTimeForUI(timer), timerMs: timer });
     const currentThemeObj = colorThemesObj[currentTheme];
 
     function handleBtnPress(event: GestureResponderEvent) {
@@ -41,7 +38,7 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
         setInterval(() => {
             setTimerObj(timerObj => {
                 const timerMs = timerObj.timerMs - 1_000;
-                const timerStr = getTime(timerMs);
+                const timerStr = getTimeForUI(timerMs);
 
                 return { timerStr, timerMs }
             })

@@ -124,8 +124,6 @@ const GameScrnPresentation = () => {
 
   };
 
-  // GOAL: make the timer to work
-
   function handleSubmitBtnPress() {
     setGameScrnTabStore(true, 'isTimerPaused');
     let correctAnswerArr: string[] = [];
