@@ -39,14 +39,10 @@ const GameScrnPresentation = () => {
   const questions = useQuestionsStore(state => state.questions);
   const task = useQuestionsStore(state => state.task);
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
-
-  useEffect(() => {
-    console.log("wasSubmitBtnPressed: ", wasSubmitBtnPressed)
-  });
-
   const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
   const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
   const [questionIndex, setQuestionIndex] = useState(0);
+  const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
   const question = questions[questionIndex];
   const { choices, answer } = question ?? {};
@@ -116,13 +112,9 @@ const GameScrnPresentation = () => {
     }
   }
 
-  // GOAL: make the logic for that will check if the answer is correct.
-  // 
-
   function handleEnterBtnPress() {
 
   };
-
 
   function getIsAnswerCorrect() {
 
@@ -132,18 +124,36 @@ const GameScrnPresentation = () => {
 
   };
 
+  // GOAL: make the timer to work
 
   function handleSubmitBtnPress() {
-    console.log("hey there!")
+    setGameScrnTabStore(true, 'isTimerPaused');
+    let correctAnswerArr: string[] = [];
+    let answerArrClone = structuredClone<string[]>(answer);
+
+    for (let index = 0; index < answerArrClone.length; ++index) {
+      const currentAnswerSymbol = answerArrClone[index];
+      const nextAnswerSymbol = answerArrClone[index + 1];
+
+      if ((currentAnswerSymbol !== "~") || !nextAnswerSymbol) {
+        correctAnswerArr.push(currentAnswerSymbol);
+        continue
+      }
+
+      let newAnswerSymbol = `${currentAnswerSymbol}${nextAnswerSymbol}`;
+      answerArrClone.splice(index + 1, 1);
+      correctAnswerArr.push(newAnswerSymbol);
+    }
+
+    setCorrectAnswerArr(correctAnswerArr);
     setGameScrnTabStore(true, 'wasSubmitBtnPressed');
-    console.log("wasSubmitBtnPressed: ", wasSubmitBtnPressed)
+
+    setTimeout(() => {
+      setGameScrnTabStore(false, 'wasSubmitBtnPressed');
+      setQuestionIndex(index => index + 1)
+      setGameScrnTabStore(false, 'isTimerPaused');
+    }, 2000);
   };
-
-
-  // BRAIN DUMP NOTES: 
-  // when the user drags the element over the input field and releases the drag, perform the following: 
-  // get the coordinates where the user releases the element
-  // if it is in the input section field, then add that the element into the input section array
 
   return (
     <Layout
@@ -181,7 +191,12 @@ const GameScrnPresentation = () => {
                 alignItems: 'center'
               }}
             >
-              <PTxt fontSize={30} txtColor={isAnswerCorrect ? 'green' : 'red'}>{isAnswerCorrect ? "CORRECT!" : "WRONG."}</PTxt>
+              <PTxt
+                fontSize={30}
+                txtColor={isAnswerCorrect ? 'green' : 'red'}
+              >
+                {isAnswerCorrect ? "CORRECT!" : "WRONG."}
+              </PTxt>
               <PTxt fontSize={200}>
                 {isAnswerCorrect
                   ?
@@ -190,6 +205,25 @@ const GameScrnPresentation = () => {
                   "❌"
                 }
               </PTxt>
+              <PTxt
+                fontSize={30}
+                txtColor={isAnswerCorrect ? 'green' : 'red'}
+              >
+                Correct Answer:
+              </PTxt>
+              <View
+                style={{ display: 'flex', marginTop: 10, flexDirection: 'row', gap: 10, width: "100%", justifyContent: 'center', alignItems: 'center' }}
+              >
+                {correctAnswerArr.map((symbol, index) => (
+                  <PTxt
+                    key={index}
+                    fontSize={30}
+                    txtColor={isAnswerCorrect ? 'green' : 'red'}
+                  >
+                    {symbol}
+                  </PTxt>
+                ))}
+              </View>
             </View>
           </>
         )

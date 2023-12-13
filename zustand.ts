@@ -35,7 +35,8 @@ export const useGameScrnTabStore = create<TGameScrnTabStore>(set => ({
     right: 0,
     wrong: 0,
     wasSubmitBtnPressed: false,
-    updateState: (newState: boolean | number, fieldName: keyof TGameScrnTabStore) => () => set(() => ({ [fieldName]: newState }))
+    isTimerPaused: false,
+    updateState: (newState: boolean | number, fieldName: keyof TGameScrnTabStore) => set(() => ({ [fieldName]: newState }))
 }))
 
 export const useColorStore = create<IColorStore>(set => ({
