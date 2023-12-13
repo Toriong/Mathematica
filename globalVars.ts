@@ -9,8 +9,8 @@ export const SYMBOLS = [
   "*",
   "v"
 ] as const;
-export const OVERLAY_OPACITY = .5
+export const OVERLAY_OPACITY = .55
 
-export function structuredClone<TData>(val: any): TData{
+export function structuredClone<TData>(val: any): TData {
   return JSON.parse(JSON.stringify(val));
 } 

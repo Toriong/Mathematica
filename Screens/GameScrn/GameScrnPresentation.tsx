@@ -39,6 +39,12 @@ const GameScrnPresentation = () => {
   const questions = useQuestionsStore(state => state.questions);
   const task = useQuestionsStore(state => state.task);
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
+
+  useEffect(() => {
+    console.log("wasSubmitBtnPressed: ", wasSubmitBtnPressed)
+  });
+  
+  const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
   const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
@@ -49,10 +55,11 @@ const GameScrnPresentation = () => {
     symbol: symbol,
     wasPressed: false
   })), [questions, questionIndex]);
+  let isAnswerCorrect: boolean | null = null;
 
-  useEffect(() => {
-    console.log('answer: ', answer)
-  })
+  if (wasSubmitBtnPressed) {
+    isAnswerCorrect = JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol));
+  }
 
   function handleSymbolOptPress(selectedLogicSymbol: ISelectedLogicSymbol) {
     console.log("hey there: ")
@@ -127,16 +134,8 @@ const GameScrnPresentation = () => {
 
 
   function handleSubmitBtnPress() {
-    if (JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol))) {
-      console.log("CORRECT!");
-      // GOAL: display the correct logic screen
-
-      // get the next question here
-      return;
-    }
-
-    // GOAL: display the incorrect  logic screen
-
+    console.log("hey there!")
+    setGameScrnTabStore(true, 'wasSubmitBtnPressed')
   };
 
 
@@ -154,17 +153,44 @@ const GameScrnPresentation = () => {
         display: 'flex',
         alignItems: 'center',
         flexDirection: 'column',
-        position: 'relative'
+        position: 'relative',
       }}
       backgroundColor="#343541"
       layoutStyle={{ position: 'relative', width: '100%', height: '100%' }}
       OverlayComp={
         wasSubmitBtnPressed && (
-          <View
-            style={{ width: '100%', height: '100%', backgroundColor: 'black', position: 'absolute', zIndex: 1, opacity: OVERLAY_OPACITY }}
-          >
-
-          </View>
+          <>
+            <View
+              style={{
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'black',
+                position: 'absolute',
+                zIndex: 1,
+                opacity: OVERLAY_OPACITY,
+              }}
+            />
+            <View
+              style={{
+                zIndex: 2,
+                width: "100%",
+                height: "100%",
+                position: 'absolute',
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
+              <PTxt fontSize={30} txtColor={isAnswerCorrect ? 'green' : 'red'}>{isAnswerCorrect ? "CORRECT!" : "WRONG."}</PTxt>
+              <PTxt fontSize={200}>
+                {isAnswerCorrect
+                  ?
+                  "✅"
+                  :
+                  "❌"
+                }
+              </PTxt>
+            </View>
+          </>
         )
       }
     >
@@ -256,9 +282,12 @@ const GameScrnPresentation = () => {
         <Button handleOnPress={handleClearBtnPress} backgroundColor='#FFC12F' dynamicStyles={{ padding: 17, borderRadius: 15 }}>
           <PTxt>CLEAR</PTxt>
         </Button>
-        <Button handleOnPress={handleSubmitBtnPress} backgroundColor='#4287FF' dynamicStyles={{ padding: 17, borderRadius: 15 }}>
+        <TouchableOpacity
+          onPress={handleSubmitBtnPress}
+          style={{ padding: 17, borderRadius: 15, backgroundColor: "#4287FF" }}
+        >
           <PTxt>SUBMIT</PTxt>
-        </Button>
+        </TouchableOpacity>
       </View>
     </Layout>
   );

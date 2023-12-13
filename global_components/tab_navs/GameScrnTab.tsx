@@ -32,9 +32,7 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
                 wasSubmitBtnPressed && (
                     <View
                         style={{ width: '100%', height: '100%', backgroundColor: 'black', position: 'absolute', zIndex: 1, opacity: OVERLAY_OPACITY }}
-                    >
-
-                    </View>
+                    />
                 )
             }
         >

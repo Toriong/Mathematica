@@ -35,6 +35,6 @@ export type TUpdateStoreState<TNewState, TFieldName> = {
     updateState: (newState: TNewState, fieldName: TFieldName) => void
 }
 export type TErrorStore = IErrorStore & TUpdateStoreState<boolean, keyof IErrorStore>
-export type TGameScrnTabStore = IGameScrnTabStoreState & TUpdateStoreState<number, keyof IGameScrnTabStoreState> 
+export type TGameScrnTabStore = IGameScrnTabStoreState & TUpdateStoreState<number | boolean, keyof IGameScrnTabStoreState> 
 export type TIsGettingReqStore = IIsGettingReqStoreState & TUpdateStoreState<boolean, keyof IIsGettingReqStoreState>;
 export type IQuestionsForObj = IQuestionObjActions & IQuestionsStates

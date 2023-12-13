@@ -24,7 +24,7 @@ function getIdsObj(id: string | undefined, testID: string | undefined): IIdsObj 
 }
 
 
-
+// children cannot be a empty whitespace either
 export const PTxt = ({
     children,
     style,
