@@ -34,7 +34,12 @@ export interface IQuestionsStates {
 export type TUpdateStoreState<TNewState, TFieldName> = {
     updateState: (newState: TNewState, fieldName: TFieldName) => void
 }
+type TGameScrnTabStoreActions = {
+    setWasSubmitBtnPressed: (newState: boolean) => void
+    setRight: (newState: number) => void
+    setWrong: (newState: number) => void
+}
 export type TErrorStore = IErrorStore & TUpdateStoreState<boolean, keyof IErrorStore>
 export type TGameScrnTabStore = IGameScrnTabStoreState & TUpdateStoreState<number | boolean, keyof IGameScrnTabStoreState> 
-export type TIsGettingReqStore = IIsGettingReqStoreState & TUpdateStoreState<boolean, keyof IIsGettingReqStoreState>;
+export type TIsGettingReqStore = IIsGettingReqStoreState & TUpdateStoreState<boolean, keyof IIsGettingReqStoreState>
 export type IQuestionsForObj = IQuestionObjActions & IQuestionsStates

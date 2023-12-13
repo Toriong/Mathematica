@@ -43,7 +43,7 @@ const GameScrnPresentation = () => {
   useEffect(() => {
     console.log("wasSubmitBtnPressed: ", wasSubmitBtnPressed)
   });
-  
+
   const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
   const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -135,7 +135,8 @@ const GameScrnPresentation = () => {
 
   function handleSubmitBtnPress() {
     console.log("hey there!")
-    setGameScrnTabStore(true, 'wasSubmitBtnPressed')
+    setGameScrnTabStore(true, 'wasSubmitBtnPressed');
+    console.log("wasSubmitBtnPressed: ", wasSubmitBtnPressed)
   };
 
 
