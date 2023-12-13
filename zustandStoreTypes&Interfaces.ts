@@ -9,6 +9,7 @@ interface IErrorStore{
 interface IGameScrnTabStoreState {
     right: number
     wrong: number
+    timer: number
     isTimerPaused: boolean
     wasSubmitBtnPressed: boolean
 }

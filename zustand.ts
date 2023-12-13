@@ -36,6 +36,7 @@ export const useGameScrnTabStore = create<TGameScrnTabStore>(set => ({
     wrong: 0,
     wasSubmitBtnPressed: false,
     isTimerPaused: false,
+    timer: 120_000,
     updateState: (newState: boolean | number, fieldName: keyof TGameScrnTabStore) => set(() => ({ [fieldName]: newState }))
 }))
 

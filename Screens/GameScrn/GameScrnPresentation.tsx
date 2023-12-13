@@ -149,6 +149,7 @@ const GameScrnPresentation = () => {
     setGameScrnTabStore(true, 'wasSubmitBtnPressed');
 
     setTimeout(() => {
+      setSelectedLogicSymbols([]);
       setGameScrnTabStore(false, 'wasSubmitBtnPressed');
       setQuestionIndex(index => index + 1)
       setGameScrnTabStore(false, 'isTimerPaused');
