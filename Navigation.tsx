@@ -3,11 +3,8 @@ import { View } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import GameScrnContainer from './Screens/GameScrn/GameScrnContainer';
 import GameScrnTab from './global_components/tab_navs/GameScrnTab';
-import { Text } from 'react-native';
-import SafeAreaViewWrapper from './global_components/SafeAreaViewWrapper';
-import { OVERLAY_OPACITY } from './globalVars';
-import { useGameScrnTabStore } from './zustand';
 import ResultContainer from './Screens/Results/ResultsContainer';
+import ResultsScrnTab from './global_components/tab_navs/ResultsScrnTab';
 
 const Tab = createMaterialTopTabNavigator();
 const navTabs = [
@@ -17,7 +14,7 @@ const navTabs = [
     },
     {
         name: "ResultsScreen",
-        comp: GameScrnTab
+        comp: ResultsScrnTab
     }
 ];
 
@@ -25,7 +22,7 @@ const LogicGameAppNavigation = () => {
     return (
         <NavigationContainer>
             <Tab.Navigator
-                initialRouteName="ResultsScreen"
+                initialRouteName="GameScreen"
                 tabBar={props => {
                     const state = props.navigation.getState();
                     const { name: currentRouteName } = state.routes[state.index];

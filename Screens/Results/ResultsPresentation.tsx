@@ -1,15 +1,10 @@
 import Layout from "../../global_components/Layout";
 import { View, StyleSheet } from 'react-native';
 import { HeadingTxt, PTxt } from "../../global_components/text";
-import { useColorStore, useGameScrnTabStore } from "../../zustand";
+import { useGameScrnTabStore } from "../../zustand";
 import Button from "../../global_components/Button";
 import { useGetAppColors } from "../../custom_hooks/useGetAppColors";
 import { BORDER_RADIUS_NUM, PRIMARY_COLOR, SUCCESS_COLOR, WARNING_COLOR } from "../../globalVars";
-
-// GOAL: for the nav, only present the following: 
-// the back button
-// Logica 
-// "PLAY" button 
 
 const BTN_FONT_SIZE = 22;
 const PTXT_FONT_SIZE = 35;
@@ -108,7 +103,7 @@ const ResultsPresentation = () => {
                             txtColor={appColors.third}
                             style={{ textAlign: 'center' }}
                         >
-                            Leader Board
+                            Leaderboard
                         </PTxt>
                     </Button>
                     <Button
@@ -130,7 +125,7 @@ const ResultsPresentation = () => {
 
 const styles = StyleSheet.create({
     button: {
-        width: 125,
+        width: 145,
         height: 65,
         borderRadius: BORDER_RADIUS_NUM,
         display: 'flex',

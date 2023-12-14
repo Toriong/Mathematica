@@ -15,7 +15,7 @@ const FONT_SIZE_SCORE_TXT = 28;
 function getTimeForUI(millis: number): string {
     const minutes = Math.floor(millis / 60_000);
     const seconds = ((millis % 60_000) / 1000).toFixed(0);
-    
+
     return minutes + ":" + (parseInt(seconds) < 10 ? "0" : "") + seconds;
 };
 
@@ -43,7 +43,9 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
                 return { timerStr, timerMs }
             })
         }, 1_000)
-    }, [])
+    }, []);
+
+    
 
     return (
         <SafeAreaViewWrapper
@@ -56,7 +58,16 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
                 )
             }
         >
-            <SafeAreaView style={{ width: "100%", position: 'relative', display: 'flex', backgroundColor: currentThemeObj.first, borderBottomColor: currentThemeObj.second, borderWidth: 1 }}>
+            <SafeAreaView
+                style={{
+                    width: "100%",
+                    position: 'relative',
+                    display: 'flex',
+                    backgroundColor: currentThemeObj.first,
+                    borderBottomColor: currentThemeObj.second,
+                    borderWidth: 1
+                }}
+            >
                 <View style={{ display: 'flex', flexDirection: 'row', width: "100%", paddingTop: "3%" }}>
                     <View style={{ width: "30%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <Button backgroundColor='none' handleOnPress={handleBtnPress}>
