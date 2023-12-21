@@ -2,15 +2,13 @@ export interface IIsGettingReqStoreState {
     isGettingQs: boolean
     isGettingUserInfo: boolean
 }
-interface IErrorStore{
-    didAnErrorOccurInGettingQs: boolean,
-    didAnErrorOccurInUserAuth: boolean,
-}
+
 interface IGameScrnTabStoreState {
     right: number
     wrong: number
     timer: number
     isTimerPaused: boolean
+    isGameOn: boolean
     wasSubmitBtnPressed: boolean
 }
 export interface IChoice {
@@ -36,6 +34,12 @@ export interface IQuestionsStates {
 export type TUpdateStoreState<TNewState, TFieldName> = {
     updateState: (newState: TNewState, fieldName: TFieldName) => void
 }
+
+interface IErrorStore{
+    didAnErrorOccurInGettingQs: boolean,
+    didAnErrorOccurInUserAuth: boolean,
+}
+
 export type TErrorStore = IErrorStore & TUpdateStoreState<boolean, keyof IErrorStore>
 export type TGameScrnTabStore = IGameScrnTabStoreState & TUpdateStoreState<number | boolean, keyof IGameScrnTabStoreState> 
 export type TIsGettingReqStore = IIsGettingReqStoreState & TUpdateStoreState<boolean, keyof IIsGettingReqStoreState>

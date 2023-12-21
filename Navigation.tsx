@@ -16,7 +16,9 @@ const navTabs = [
         name: "ResultsScreen",
         comp: ResultsScrnTab
     }
-];
+] as const;
+
+export type TScreenNames = typeof navTabs[number]['name'];
 
 const LogicGameAppNavigation = () => {
     return (
@@ -35,6 +37,8 @@ const LogicGameAppNavigation = () => {
                             </View>
                         )
                     }
+
+                    
 
                     return <TabBar {...props} />
                 }}

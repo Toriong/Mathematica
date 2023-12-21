@@ -16,16 +16,18 @@ function getTimeForUI(millis: number): string {
     const minutes = Math.floor(millis / 60_000);
     const seconds = ((millis % 60_000) / 1000).toFixed(0);
 
-    return minutes + ":" + (parseInt(seconds) < 10 ? "0" : "") + seconds;
+    return minutes + ":" + ((parseInt(seconds) < 10) ? "0" : "") + seconds;
 };
 
-const GameScrnTab = (props: MaterialTopTabBarProps) => {
+
+const GameScrnTab = ({ navigation }: MaterialTopTabBarProps) => {
     const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
     const currentTheme = useColorStore(state => state.currentTheme);
     const colorThemesObj = useColorStore(state => state.themesObj);
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
     const timer = useGameScrnTabStore(state => state.timer);
+    const isGameOn = useGameScrnTabStore(state => state.isGameOn);
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
     const [timerObj, setTimerObj] = useState({ timerStr: getTimeForUI(timer), timerMs: timer });
     const currentThemeObj = colorThemesObj[currentTheme];
@@ -37,6 +39,10 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
     useEffect(() => {
         setInterval(() => {
             setTimerObj(timerObj => {
+                if (timerObj.timerMs <= 0) {
+                    return timerObj;
+                }
+
                 const timerMs = timerObj.timerMs - 1_000;
                 const timerStr = getTimeForUI(timerMs);
 
@@ -45,7 +51,12 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
         }, 1_000)
     }, []);
 
-    
+    useEffect(() => {
+        if ((timerObj.timerMs <= 0) && isGameOn) {
+            navigation.navigate('ResultsScreen');
+            setGameScrnTabStore(false, 'isGameOn');
+        }
+    }, [timerObj])
 
     return (
         <SafeAreaViewWrapper
@@ -85,9 +96,12 @@ const GameScrnTab = (props: MaterialTopTabBarProps) => {
                                 Wrong: {wrongNum}
                             </PTxt>
                         </View>
-                        <View style={{ width: '100%', marginTop: 15, paddingRight: "16%", display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
-                            <PTxt style={{ width: "auto" }} fontSize={FONT_SIZE_NON_SCORE_TXT} >
-                                TIME: {timerObj.timerStr}
+                        <View style={{ width: '100%', marginTop: 15, paddingRight: "16%", display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', flexDirection: 'row' }}>
+                            <PTxt style={{ width: "auto" }} fontSize={FONT_SIZE_NON_SCORE_TXT}>
+                                TIME:
+                            </PTxt>
+                            <PTxt style={{ width: 57, display: 'flex', justifyContent: 'flex-end', textAlign: 'right' }} fontSize={FONT_SIZE_NON_SCORE_TXT}>
+                                {timerObj.timerStr}
                             </PTxt>
                         </View>
                     </View>

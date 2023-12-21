@@ -9,8 +9,9 @@ dist/
 web-build/
 
 testingQs.json
+testingRequest.js
 
-# Native
+# Native`
 *.orig.*
 *.jks
 *.p8

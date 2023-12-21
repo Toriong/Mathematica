@@ -31,12 +31,14 @@ interface IColorStore {
 }
 
 
+
 export const useGameScrnTabStore = create<TGameScrnTabStore>(set => ({
     right: 0,
     wrong: 0,
     wasSubmitBtnPressed: false,
     isTimerPaused: false,
     timer: 120_000,
+    isGameOn: true,
     updateState: (newState: boolean | number, fieldName: keyof TGameScrnTabStore) => set(() => ({ [fieldName]: newState }))
 }))
 
