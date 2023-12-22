@@ -2,10 +2,11 @@ import { NavigationContainer, NavigationProp, useNavigation } from '@react-navig
 import { View } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import GameScrnContainer from './Screens/GameScrn/GameScrnContainer';
-import GameScrnTab from './global_components/tab_navs/GameScrnTab';
+import GameScrnTab from './global_components/tab_navs/top/GameScrnTab';
 import ResultContainer from './Screens/Results/ResultsContainer';
-import ResultsScrnTab from './global_components/tab_navs/ResultsScrnTab';
+import ResultsScrnTab from './global_components/tab_navs/top/ResultsScrnTab';
 import HomeScrnContainer from './Screens/Home/HomeScrnContainer';
+import HomeScrnTab from './global_components/tab_navs/top/HomeScrnTab';
 
 const Tab = createMaterialTopTabNavigator();
 const navTabs = [
@@ -19,8 +20,7 @@ const navTabs = [
     },
     {
         name: "Home",
-        // GOAL: create the Home Tab for the Home screen.
-        comp: GameScrnTab
+        comp: HomeScrnTab
     }
 ] as const;
 
@@ -54,9 +54,9 @@ const LogicGameAppNavigation = () => {
                 }}
 
             >
-                <Tab.Screen name="GameScreen" component={GameScrnContainer} />
-                <Tab.Screen name="ResultsScreen" component={ResultContainer} />
-                <Tab.Screen name="Home" component={HomeScrnContainer} />
+                <Tab.Screen options={{ swipeEnabled: false }} name="Home" component={HomeScrnContainer} />
+                <Tab.Screen  options={{ swipeEnabled: false,  }} name="GameScreen" component={GameScrnContainer} />
+                <Tab.Screen options={{ swipeEnabled: false }} name="ResultsScreen" component={ResultContainer} />
             </Tab.Navigator>
         </NavigationContainer>
     )
