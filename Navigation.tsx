@@ -1,5 +1,6 @@
 import { NavigationContainer, NavigationProp, useNavigation } from '@react-navigation/native';
 import { View } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import GameScrnContainer from './Screens/GameScrn/GameScrnContainer';
 import GameScrnTab from './global_components/tab_navs/top/GameScrnTab';
@@ -8,6 +9,7 @@ import ResultsScrnTab from './global_components/tab_navs/top/ResultsScrnTab';
 import HomeScrnContainer from './Screens/Home/HomeScrnContainer';
 import HomeScrnTab from './global_components/tab_navs/top/HomeScrnTab';
 
+const Stack = createStackNavigator();
 const Tab = createMaterialTopTabNavigator();
 const navTabs = [
     {
