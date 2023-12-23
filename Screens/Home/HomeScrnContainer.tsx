@@ -14,19 +14,22 @@ import { useEffect } from "react";
 
 // whenever the user clicks on the submit button
 
+// Getting the first five questions from the server: 
+// 1) get it on the first render of the HomeScrnContainer comp
+// -have it within the useEffect within this component
+// -create a global zustand state, boolean toggle to get the questions. If the state is true, then get the questions. 
+// 2) get it when the user presses on a button to navigate to the Home screen
+// -will use more code? Can create a function for this. 
+// -invoke the function on every instance that the user will go the Home screen
+// -still need to invoke the function within the HomeScrnContainer component is on the UI in order to get the questions on the first render of this 
+// component
+
+// Need to get the questions when the user is on the Home screen. 
+
 const HomeScrnContainer = () => {
-
+    
     useEffect(() => {
-        (async () => {
-            try {
-                const res = await fetch(SERVER_ORIGIN);
-                const data = await res.text();
-
-                console.log("data yo there: ", data)
-            } catch(error){
-                console.error("An error has occurred in pinging the server: ", error)
-            }
-        })();
+        
     }, []);
 
     return <HomeScrnPresentation />;

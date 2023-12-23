@@ -5,5 +5,6 @@ export const PATHS = [
     "/get-quiz-questions"
 ] as TPaths;
 
+export type TResponseStatus = "SUCCESS" | "FAILURE" | "IN_PROGRESS" | "NOT_EXECUTING"
 export type TPaths = ["/get-quiz-questions"]
 export type TPathsStr = typeof PATHS[number]

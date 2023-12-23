@@ -1,3 +1,6 @@
+import { TResponseStatus } from "./api_services/globalApiVars"
+import { IThemeColors } from "./globalTypes&Interfaces"
+
 export interface IIsGettingReqStoreState {
     isGettingQs: boolean
     isGettingUserInfo: boolean
@@ -35,12 +38,25 @@ export type TUpdateStoreState<TNewState, TFieldName> = {
     updateState: (newState: TNewState, fieldName: TFieldName) => void
 }
 
-interface IErrorStore{
+interface IErrorStore {
     didAnErrorOccurInGettingQs: boolean,
     didAnErrorOccurInUserAuth: boolean,
 }
 
+export type TCurrentTheme = "dark" | "light";
+
+export interface IColorStore {
+    themesObj: IThemeColors
+    currentTheme: TCurrentTheme
+    setCurrentTheme: (theme: TCurrentTheme) => () => void
+}
+export interface IApiQsFetchingStatus {
+    isGettingQs: boolean
+    gettingQsResponseStatus: TResponseStatus
+}
+
+export type TApiQsFetchingStatusStore = IApiQsFetchingStatus & TUpdateStoreState<IApiQsFetchingStatus[keyof IApiQsFetchingStatus], keyof IApiQsFetchingStatus>
 export type TErrorStore = IErrorStore & TUpdateStoreState<boolean, keyof IErrorStore>
-export type TGameScrnTabStore = IGameScrnTabStoreState & TUpdateStoreState<number | boolean, keyof IGameScrnTabStoreState> 
+export type TGameScrnTabStore = IGameScrnTabStoreState & TUpdateStoreState<number | boolean, keyof IGameScrnTabStoreState>
 export type TIsGettingReqStore = IIsGettingReqStoreState & TUpdateStoreState<boolean, keyof IIsGettingReqStoreState>
 export type IQuestionsForObj = IQuestionObjActions & IQuestionsStates

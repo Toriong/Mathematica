@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IQuestion, IQuestionsForObj, TGameScrnTabStore, TIsGettingReqStore } from './zustandStoreTypes&Interfaces';
+import { TApiQsFetchingStatusStore, IColorStore, IQuestion, IQuestionsForObj, TCurrentTheme, TGameScrnTabStore, TIsGettingReqStore, TUpdateStoreState, IApiQsFetchingStatus } from './zustandStoreTypes&Interfaces';
 import { IThemeColors } from './globalTypes&Interfaces';
 
 export const useQuestionsStore = create<IQuestionsForObj>(set => ({
@@ -22,15 +22,6 @@ export const useIsGettingReqStore = create<TIsGettingReqStore>(set => ({
     isGettingUserInfo: false,
     updateState: (newState: boolean, fieldName: keyof TIsGettingReqStore) => set(() => ({ [fieldName]: newState }))
 }));
-
-type TCurrentTheme = "dark" | "light";
-interface IColorStore {
-    themesObj: IThemeColors
-    currentTheme: TCurrentTheme
-    setCurrentTheme: (theme: TCurrentTheme) => () => void
-}
-
-
 
 export const useGameScrnTabStore = create<TGameScrnTabStore>(set => ({
     right: 0,
@@ -57,4 +48,12 @@ export const useColorStore = create<IColorStore>(set => ({
     },
     currentTheme: "dark",
     setCurrentTheme: (theme: TCurrentTheme) => () => set(() => ({ currentTheme: theme }))
-}))
+}));
+export const useApiQsFetchingStatusStore = create<TApiQsFetchingStatusStore>(set => {
+    let store: TApiQsFetchingStatusStore = {
+        isGettingQs: true,
+        gettingQsResponseStatus: "NOT_EXECUTING",
+        updateState: (newState: IApiQsFetchingStatus[keyof IApiQsFetchingStatus], fieldName: keyof IApiQsFetchingStatus) => set(() => ({ [fieldName]: newState }))
+    }
+    return store;
+})
