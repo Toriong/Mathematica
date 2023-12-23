@@ -32,8 +32,8 @@ const GameScrnTab = ({ navigation }: MaterialTopTabBarProps) => {
     const [timerObj, setTimerObj] = useState({ timerStr: getTimeForUI(timer), timerMs: timer });
     const currentThemeObj = colorThemesObj[currentTheme];
 
-    function handleBtnPress(event: GestureResponderEvent) {
-
+    function handleBtnPress() {
+        navigation.navigate("Home")
     };
 
     useEffect(() => {
