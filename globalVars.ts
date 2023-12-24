@@ -17,4 +17,6 @@ export const PRIMARY_COLOR = "#0069D9";
 export const APP_NAME = "Logica";
 export function structuredClone<TData>(val: any): TData {
   return JSON.parse(JSON.stringify(val));
-} 
+};
+
+export const TESTING_USER_ID = "1234";

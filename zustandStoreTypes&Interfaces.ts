@@ -51,7 +51,7 @@ export interface IColorStore {
     setCurrentTheme: (theme: TCurrentTheme) => () => void
 }
 export interface IApiQsFetchingStatus {
-    isGettingQs: boolean
+    willGetQs: boolean
     gettingQsResponseStatus: TResponseStatus
 }
 

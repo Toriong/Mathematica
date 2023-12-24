@@ -1,6 +1,7 @@
 import HomeScrnPresentation from "./HomeScrnPresentation";
 import { SERVER_ORIGIN } from "../../api_services/globalApiVars";
 import { useEffect } from "react";
+import { useApiQsFetchingStatusStore } from "../../zustand";
 
 // NOTES: 
 // need to send the text of the question to the server in order to tell chat gpt not to copy the previous question text in its new question generation
@@ -27,10 +28,15 @@ import { useEffect } from "react";
 // Need to get the questions when the user is on the Home screen. 
 
 const HomeScrnContainer = () => {
-    
+    const willGetQs = useApiQsFetchingStatusStore(state => state.willGetQs);
+    const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
+
     useEffect(() => {
-        
-    }, []);
+        if (willGetQs) {
+            
+            updateApiQsFetchingStatusStore(false, "willGetQs");
+        }
+    }, [willGetQs]);
 
     return <HomeScrnPresentation />;
 };

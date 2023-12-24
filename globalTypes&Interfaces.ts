@@ -6,7 +6,6 @@ export const DEFAULT_THIRD_COLOR = "#FFFFFF";
 export type TFirstColor = "#343541"; 
 export type TSecondColor = "#6B7280";
 export type TThirdColor = typeof DEFAULT_THIRD_COLOR;
-
 export type TLayout = {
     layoutStyle?: Pick<IComponentProps, 'style'>['style'] & { width?: '100%', height?: '100%' }
     OverlayComp?: Pick<IComponentProps, 'children'>['children']

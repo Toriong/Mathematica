@@ -51,7 +51,7 @@ export const useColorStore = create<IColorStore>(set => ({
 }));
 export const useApiQsFetchingStatusStore = create<TApiQsFetchingStatusStore>(set => {
     let store: TApiQsFetchingStatusStore = {
-        isGettingQs: true,
+        willGetQs: true,
         gettingQsResponseStatus: "NOT_EXECUTING",
         updateState: (newState: IApiQsFetchingStatus[keyof IApiQsFetchingStatus], fieldName: keyof IApiQsFetchingStatus) => set(() => ({ [fieldName]: newState }))
     }
