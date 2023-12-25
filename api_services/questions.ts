@@ -21,15 +21,15 @@ function appendParamsToUrl(url: URL, paths: TPath[]) {
 
 const memory = new Storage();
 
-export type TReturnValGetQuestions = Promise<IReturnObjOfAsyncFn<IQuestion[]>>
+export type TReturnValGetQuestions<TData> = Promise<IReturnObjOfAsyncFn<TData>>
 
-export async function getQuestions(
+export async function getQuestions<TData>(
     questionsToGetNum: number,
     questionTypes: TQuestionTypes[],
     userId: string,
     questionsAnsweredArr?: string[],
     hasAnsweredAQuestion?: boolean,
-): TReturnValGetQuestions {
+): TReturnValGetQuestions<TData> {
     try {
         console.log("what is up...")
         const getQuestionsApiUrl = new URL(`${SERVER_ORIGIN}/${getQuestionsApiPath}`);
@@ -52,9 +52,9 @@ export async function getQuestions(
 
         console.log("getQuestionsApiUrl: ", getQuestionsApiUrl)
 
-        const response = await axios.get(getQuestionsApiUrl.toString());
+        const response = await axios.get<TData>(getQuestionsApiUrl.toString());
 
-        return { data: response.data as IQuestion[] }
+        return { data: response.data }
     } catch (error) {
         console.error("An error has occurred: ", error)
         const { response } = error as IError<{ msg: string }>;

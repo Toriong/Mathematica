@@ -47,10 +47,10 @@ const HomeScrnContainer = () => {
                     console.time()
                     let userId = await memory.getItem("userId");
                     userId = IS_TESTING ? TESTING_USER_ID : userId;
-                    const responseGetPropostionalQs = await getQuestions(3, ["propositional"], userId as string);
+                    const responseGetPropostionalQs = await getQuestions<IQuestion[]>(3, ["propositional"], userId as string);
                     // const responseGetDiagramQs = getQuestions(3, ["diagrams"])
                     // const responseGetPredicateQs = getQuestions(3, ["predicate"])
-                    const responses: Awaited<TReturnValGetQuestions>[] = await Promise.all([responseGetPropostionalQs]);
+                    const responses: Awaited<TReturnValGetQuestions<IQuestion[]>>[] = await Promise.all([responseGetPropostionalQs]);
                     console.log("responses: ", responses[0].data);
                     updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
                     console.timeEnd()
