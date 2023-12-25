@@ -1,11 +1,12 @@
 import HomeScrnPresentation from "./HomeScrnPresentation";
-import { SERVER_ORIGIN } from "../../api_services/globalApiVars";
+import { IReturnObjOfAsyncFn, SERVER_ORIGIN, TResponseStatus } from "../../api_services/globalApiVars";
 import { useEffect } from "react";
-import { useApiQsFetchingStatusStore } from "../../zustand";
+import { useApiQsFetchingStatusStore, useQuestionsStore } from "../../zustand";
 import { TPromiseReturnValGetQuestions, getQuestions } from "../../api_services/questions";
-import { IQuestion } from "../../zustandStoreTypes&Interfaces";
+import { IChoice, IQuestion } from "../../zustandStoreTypes&Interfaces";
 import { Storage } from "../../utils/storage";
 import { IS_TESTING, TESTING_USER_ID } from "../../globalVars";
+import { getIsTValid } from "../../utils/generalFns";
 
 
 
@@ -33,10 +34,61 @@ import { IS_TESTING, TESTING_USER_ID } from "../../globalVars";
 
 // Need to get the questions when the user is on the Home screen. 
 
+interface IInitialQsGetReqResult {
+    gettingQsResponseStatus: TResponseStatus
+    questions: IQuestion[]
+}
+
+async function getInitialQs(userId: string): Promise<IInitialQsGetReqResult> {
+    try {
+        userId = IS_TESTING ? TESTING_USER_ID : userId;
+        const responseGetPropostionalQs = getQuestions<{ questions: IQuestion[] }>(3, ["propositional"], userId as string);
+        const responseGetPredicateQs = getQuestions<{ questions: IQuestion[] }>(3, ["predicate"], userId as string)
+        const responses: Awaited<TPromiseReturnValGetQuestions<{ questions: IQuestion[] } | null>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
+        let responsesFiltered = responses.filter(response => !!response.data || !!response) as IReturnObjOfAsyncFn<{ questions: IQuestion[] }>[];
+        let result: IInitialQsGetReqResult | null = null;
+        responsesFiltered = responsesFiltered?.length
+            ?
+            responsesFiltered.filter(response => {
+                if(!response.data?.questions?.length){
+                    return false;
+                }
+
+                return response.data.questions.every(question => {
+                    const isAnswerPropertyValid = question.answer.every(answer => getIsTValid(answer, "string"));
+                    const isChoicesPropertyValid = question.choices.every(choice => getIsTValid(choice, "object") && getIsTValid<string>(choice.value, "string") && getIsTValid<string>(choice.letter, "string")); 
+                    const isSentencePropertyValid = getIsTValid(question.sentence, "string")
+
+                    return isSentencePropertyValid && isChoicesPropertyValid && isAnswerPropertyValid;
+                });
+            })
+            :
+            []
+
+
+        if (!responsesFiltered.length) {
+            result = await getInitialQs(userId);
+        }
+
+        const questions = responsesFiltered.map<unknown>(response => response.data?.questions) as IQuestion[];
+
+        return { gettingQsResponseStatus: 'SUCCESS', questions: questions }
+        // GOAL: filter out all of the questions are that are not valid.
+
+        // CASE: if all of the questions are invalid, then execute the `getInitialQuestions` function again. 
+    } catch (error) {
+        console.error("Failed to get questions from the server. Error message: ", error)
+
+        return { gettingQsResponseStatus: 'FAILURE', questions: [] }
+    }
+}
+
 const HomeScrnContainer = () => {
     const memory = new Storage();
     const willGetQs = useApiQsFetchingStatusStore(state => state.willGetQs);
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
+    const updateQuestionsStore = useQuestionsStore(state => state.updateState);
+
 
     useEffect(() => {
         if (willGetQs) {
@@ -48,8 +100,11 @@ const HomeScrnContainer = () => {
                     userId = IS_TESTING ? TESTING_USER_ID : userId;
                     const responseGetPropostionalQs = getQuestions<IQuestion[]>(3, ["propositional"], userId as string);
                     const responseGetPredicateQs = getQuestions<IQuestion[]>(3, ["predicate"], userId as string)
-                    const responses: Awaited<TPromiseReturnValGetQuestions<IQuestion[]>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
-                    console.log("responses: ", responses);
+                    const responses: Awaited<TPromiseReturnValGetQuestions<IQuestion[] | null>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
+                    
+                    // GOAL: filter out all of the questions are that are not valid.
+
+                    // CASE: if all of the questions are invalid, then execute the `getInitialQuestions` function again. 
                     updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
                 } catch (error) {
                     console.error("Failed to get questions from the server. Error message: ", error)

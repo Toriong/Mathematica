@@ -1,12 +1,10 @@
 import { create } from 'zustand';
-import { TApiQsFetchingStatusStore, IColorStore, IQuestion, IQuestionsForObj, TCurrentTheme, TGameScrnTabStore, TIsGettingReqStore, TUpdateStoreState, IApiQsFetchingStatus } from './zustandStoreTypes&Interfaces';
-import { IThemeColors } from './globalTypes&Interfaces';
+import { TApiQsFetchingStatusStore, IColorStore, IQuestion, IQuestionsForObj, TCurrentTheme, TGameScrnTabStore, TIsGettingReqStore, TUpdateStoreState, IApiQsFetchingStatus, IQuestionsStates } from './zustandStoreTypes&Interfaces';
 
 export const useQuestionsStore = create<IQuestionsForObj>(set => ({
     task: "",
     questions: [],
-    setQuestions: (questions: IQuestion[]) => set(() => ({ questions: questions })),
-    setTask: (task: string) => set(() => ({ task: task }))
+    updateState: (newState: IQuestionsStates[keyof IQuestionsStates],fieldName: keyof IQuestionsStates) => set(() => ({ [fieldName]: newState })),
 }));
 
 export const useErrorsStore = create(set => ({

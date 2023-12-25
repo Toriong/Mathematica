@@ -23,7 +23,7 @@ export interface IQuestion {
     sentence: string
     answer: string[]
     task?: string
-    choices?: IChoice[]
+    choices: IChoice[]
 }
 export interface IQuestionObjActions {
     setQuestions: (questions: IQuestion[]) => void
@@ -59,4 +59,4 @@ export type TApiQsFetchingStatusStore = IApiQsFetchingStatus & TUpdateStoreState
 export type TErrorStore = IErrorStore & TUpdateStoreState<boolean, keyof IErrorStore>
 export type TGameScrnTabStore = IGameScrnTabStoreState & TUpdateStoreState<number | boolean, keyof IGameScrnTabStoreState>
 export type TIsGettingReqStore = IIsGettingReqStoreState & TUpdateStoreState<boolean, keyof IIsGettingReqStoreState>
-export type IQuestionsForObj = IQuestionObjActions & IQuestionsStates
+export type IQuestionsForObj = IQuestionsStates & TUpdateStoreState<IQuestionsStates[keyof IQuestionsStates], keyof IQuestionsStates>
