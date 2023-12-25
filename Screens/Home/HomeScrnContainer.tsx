@@ -70,7 +70,7 @@ async function getInitialQs(userId: string): Promise<IInitialQsGetReqResult> {
             result = await getInitialQs(userId);
         }
 
-        const questions = responsesFiltered.map<unknown>(response => response.data?.questions) as IQuestion[];
+        const questions = responsesFiltered.flatMap<unknown>(response => response.data?.questions) as IQuestion[];
 
         return { gettingQsResponseStatus: 'SUCCESS', questions: questions }
         // GOAL: filter out all of the questions are that are not valid.
@@ -98,10 +98,12 @@ const HomeScrnContainer = () => {
                 try {
                     let userId = await memory.getItem("userId");
                     userId = IS_TESTING ? TESTING_USER_ID : userId;
-                    const responseGetPropostionalQs = getQuestions<IQuestion[]>(3, ["propositional"], userId as string);
-                    const responseGetPredicateQs = getQuestions<IQuestion[]>(3, ["predicate"], userId as string)
-                    const responses: Awaited<TPromiseReturnValGetQuestions<IQuestion[] | null>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
-                    
+                    const responseGetPropostionalQs = getQuestions<{questions: IQuestion[]}>(3, ["propositional"], userId as string);
+                    const responseGetPredicateQs = getQuestions<{questions: IQuestion[]}>(3, ["predicate"], userId as string)
+                    const responses: Awaited<TPromiseReturnValGetQuestions<{questions: IQuestion[]} | null>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
+                    const questions = responses.flatMap(response => response.data?.questions);
+
+                    console.log("questions sup there meng: ", questions);
                     // GOAL: filter out all of the questions are that are not valid.
 
                     // CASE: if all of the questions are invalid, then execute the `getInitialQuestions` function again. 
