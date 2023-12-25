@@ -19,9 +19,7 @@ function appendParamsToUrl(url: URL, paths: TPath[]) {
     paths.forEach(({ name, value }) => url.searchParams.append(name, JSON.stringify(value)))
 }
 
-const memory = new Storage();
-
-export type TReturnValGetQuestions<TData> = Promise<IReturnObjOfAsyncFn<TData>>
+export type TPromiseReturnValGetQuestions<TData> = Promise<IReturnObjOfAsyncFn<TData>>
 
 export async function getQuestions<TData>(
     questionsToGetNum: number,
@@ -29,7 +27,7 @@ export async function getQuestions<TData>(
     userId: string,
     questionsAnsweredArr?: string[],
     hasAnsweredAQuestion?: boolean,
-): TReturnValGetQuestions<TData> {
+): TPromiseReturnValGetQuestions<TData> {
     try {
         console.log("what is up...")
         const getQuestionsApiUrl = new URL(`${SERVER_ORIGIN}/${getQuestionsApiPath}`);

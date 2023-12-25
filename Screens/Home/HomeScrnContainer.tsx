@@ -2,7 +2,7 @@ import HomeScrnPresentation from "./HomeScrnPresentation";
 import { SERVER_ORIGIN } from "../../api_services/globalApiVars";
 import { useEffect } from "react";
 import { useApiQsFetchingStatusStore } from "../../zustand";
-import { TReturnValGetQuestions, getQuestions } from "../../api_services/questions";
+import { TPromiseReturnValGetQuestions, getQuestions } from "../../api_services/questions";
 import { IQuestion } from "../../zustandStoreTypes&Interfaces";
 import { Storage } from "../../utils/storage";
 import { IS_TESTING, TESTING_USER_ID } from "../../globalVars";
@@ -44,16 +44,13 @@ const HomeScrnContainer = () => {
             console.log("yo there meng...");
             (async () => {
                 try {
-                    console.time()
                     let userId = await memory.getItem("userId");
                     userId = IS_TESTING ? TESTING_USER_ID : userId;
-                    const responseGetPropostionalQs = await getQuestions<IQuestion[]>(3, ["propositional"], userId as string);
-                    // const responseGetDiagramQs = getQuestions(3, ["diagrams"])
-                    // const responseGetPredicateQs = getQuestions(3, ["predicate"])
-                    const responses: Awaited<TReturnValGetQuestions<IQuestion[]>>[] = await Promise.all([responseGetPropostionalQs]);
-                    console.log("responses: ", responses[0].data);
+                    const responseGetPropostionalQs = getQuestions<IQuestion[]>(3, ["propositional"], userId as string);
+                    const responseGetPredicateQs = getQuestions<IQuestion[]>(3, ["predicate"], userId as string)
+                    const responses: Awaited<TPromiseReturnValGetQuestions<IQuestion[]>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
+                    console.log("responses: ", responses);
                     updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
-                    console.timeEnd()
                 } catch (error) {
                     console.error("Failed to get questions from the server. Error message: ", error)
                     updateApiQsFetchingStatusStore("FAILURE", "gettingQsResponseStatus");
