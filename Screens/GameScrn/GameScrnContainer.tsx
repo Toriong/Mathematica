@@ -41,15 +41,15 @@ const GameScrnContainer = () => {
     };
   }
 
-  useEffect(() => {
-    (async () => {
-      if (IS_TESTING) {
-        setTimeout(() => {
-          getQuestions(handleGetQuestionsSuccessfulResponse);
-        }, 2000);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     if (IS_TESTING) {
+  //       setTimeout(() => {
+  //         getQuestions(handleGetQuestionsSuccessfulResponse);
+  //       }, 2000);
+  //     }
+  //   })();
+  // }, []);
 
   return <GameScrnPresentation />;
 };

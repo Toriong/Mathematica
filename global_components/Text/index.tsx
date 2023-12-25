@@ -7,7 +7,7 @@ interface IIdsObj {
 }
 type TTxt = Omit<IComponentProps, "style">
 
-const FONT_FAMILY_MAIN = "San Francisco"
+const FONT_FAMILY_MAIN = ""
 
 function getIdsObj(id: string | undefined, testID: string | undefined): IIdsObj | {} {
     let _ids = {};
@@ -41,7 +41,7 @@ export const PTxt = ({
     return (
         <Text
             {..._idsObj}
-            style={{ ...style, fontFamily: FONT_FAMILY_MAIN, fontSize: fontSize, color: txtColor, fontStyle: fontStyle }}
+            style={{ ...style, fontSize: fontSize, color: txtColor, fontStyle: fontStyle }}
         >
             {children}
         </Text>
@@ -61,7 +61,7 @@ export const HeadingTxt = ({
     return (
         <Text
             {..._idsObj}
-            style={{ ...style, fontFamily: FONT_FAMILY_MAIN, fontSize: fontSize, color: txtColor }}
+            style={{ ...style, fontSize: fontSize, color: txtColor }}
         >
             {children}
         </Text>

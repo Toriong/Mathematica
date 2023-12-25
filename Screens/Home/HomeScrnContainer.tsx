@@ -2,6 +2,12 @@ import HomeScrnPresentation from "./HomeScrnPresentation";
 import { SERVER_ORIGIN } from "../../api_services/globalApiVars";
 import { useEffect } from "react";
 import { useApiQsFetchingStatusStore } from "../../zustand";
+import { TReturnValGetQuestions, getQuestions } from "../../api_services/questions";
+import { IQuestion } from "../../zustandStoreTypes&Interfaces";
+import { Storage } from "../../utils/storage";
+import { IS_TESTING, TESTING_USER_ID } from "../../globalVars";
+
+
 
 // NOTES: 
 // need to send the text of the question to the server in order to tell chat gpt not to copy the previous question text in its new question generation
@@ -28,13 +34,33 @@ import { useApiQsFetchingStatusStore } from "../../zustand";
 // Need to get the questions when the user is on the Home screen. 
 
 const HomeScrnContainer = () => {
+    const memory = new Storage();
     const willGetQs = useApiQsFetchingStatusStore(state => state.willGetQs);
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
 
     useEffect(() => {
         if (willGetQs) {
-            
-            updateApiQsFetchingStatusStore(false, "willGetQs");
+            updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
+            console.log("yo there meng...");
+            (async () => {
+                try {
+                    console.time()
+                    let userId = await memory.getItem("userId");
+                    userId = IS_TESTING ? TESTING_USER_ID : userId;
+                    const responseGetPropostionalQs = await getQuestions(3, ["propositional"], userId as string);
+                    // const responseGetDiagramQs = getQuestions(3, ["diagrams"])
+                    // const responseGetPredicateQs = getQuestions(3, ["predicate"])
+                    const responses: Awaited<TReturnValGetQuestions>[] = await Promise.all([responseGetPropostionalQs]);
+                    console.log("responses: ", responses[0].data);
+                    updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
+                    console.timeEnd()
+                } catch (error) {
+                    console.error("Failed to get questions from the server. Error message: ", error)
+                    updateApiQsFetchingStatusStore("FAILURE", "gettingQsResponseStatus");
+                } finally {
+                    updateApiQsFetchingStatusStore(false, "willGetQs");
+                }
+            })();
         }
     }, [willGetQs]);
 
