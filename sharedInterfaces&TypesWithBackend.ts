@@ -1,5 +1,7 @@
 import uuid from "react-native-uuid"
 
+const QUESTION_TYPES = ['propositional', 'predicate', 'diagrams'] as const;
+export type TQuestionTypes = typeof QUESTION_TYPES[number]
 export interface IChoice {
     letter: String
     value: String
@@ -9,7 +11,7 @@ export interface IQuestion {
     sentence: string
     answer: string[]
     choices: IChoice[]
-    type: string | null
+    type: TQuestionTypes
     userAnswer: string[] | null
 }
 export interface IQuiz {
@@ -17,3 +19,7 @@ export interface IQuiz {
     finishedQuizAtMs: number
     questions: IQuestion[]
 }
+export type IResponse<TData> = Partial<{
+    msg: string
+    data: TData
+}>
