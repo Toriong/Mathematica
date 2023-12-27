@@ -4,7 +4,7 @@ import { TApiQsFetchingStatusStore, IColorStore, IQuestion, IQuestionsForObj, TC
 export const useQuestionsStore = create<IQuestionsForObj>(set => ({
     task: "",
     questions: [],
-    updateState: (newState: IQuestionsStates[keyof IQuestionsStates],fieldName: keyof IQuestionsStates) => set(() => ({ [fieldName]: newState })),
+    updateState: (newState: IQuestionsStates[keyof IQuestionsStates], fieldName: keyof IQuestionsStates) => set(() => ({ [fieldName]: newState })),
 }));
 
 export const useErrorsStore = create(set => ({
@@ -21,15 +21,19 @@ export const useIsGettingReqStore = create<TIsGettingReqStore>(set => ({
     updateState: (newState: boolean, fieldName: keyof TIsGettingReqStore) => set(() => ({ [fieldName]: newState }))
 }));
 
-export const useGameScrnTabStore = create<TGameScrnTabStore>(set => ({
-    right: 0,
-    wrong: 0,
-    wasSubmitBtnPressed: false,
-    isTimerPaused: false,
-    timer: 120_000,
-    isGameOn: true,
-    updateState: (newState: boolean | number, fieldName: keyof TGameScrnTabStore) => set(() => ({ [fieldName]: newState }))
-}))
+export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
+    const gameScrnTabStore:TGameScrnTabStore = {
+        right: 0,
+        wrong: 0,
+        wasSubmitBtnPressed: false,
+        isTimerPaused: false,
+        timer: 120_000,
+        isGameOn: true,
+        updateState: (newState: boolean | number, fieldName: keyof TGameScrnTabStore) => set(() => ({ [fieldName]: newState }))
+    }
+
+    return gameScrnTabStore;
+})
 
 export const useColorStore = create<IColorStore>(set => ({
     themesObj: {

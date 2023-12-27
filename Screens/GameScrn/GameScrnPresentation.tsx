@@ -250,7 +250,7 @@ const GameScrnPresentation = () => {
         <View style={{ flex: .8, width: "100%", alignItems: 'center', display: 'flex', justifyContent: 'center', paddingHorizontal: 18 }}>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 5, width: "70%" }}>
             {choices.map((choice, index, self) => (
-              <View style={{ display: 'flex', flexDirection: 'row', }}>
+              <View key={index} style={{ display: 'flex', flexDirection: 'row', }}>
                 <PTxt fontSize={TXT_FONT_SIZE}>{choice.letter} = </PTxt>
                 <PTxt fontSize={TXT_FONT_SIZE} >{choice.value}{(index !== (self.length - 1)) ? ',' : ''}</PTxt>
               </View>

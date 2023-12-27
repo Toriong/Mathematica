@@ -1,6 +1,6 @@
 
 // run the server using serveo and get the url
-export const SERVER_ORIGIN = "https://4b0f6e20dbb3e6fd26109a83a3ae59ef.serveo.net";
+export const SERVER_ORIGIN = "https://5ee527ec3d3f276c9038e7e8309f5ff5.serveo.net";
 export const PATHS = [
     "get-quiz-questions"
 ] as TPaths;

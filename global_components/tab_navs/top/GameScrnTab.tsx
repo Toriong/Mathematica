@@ -30,14 +30,24 @@ const GameScrnTab = ({ navigation }: MaterialTopTabBarProps) => {
     const isGameOn = useGameScrnTabStore(state => state.isGameOn);
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
     const [timerObj, setTimerObj] = useState({ timerStr: getTimeForUI(timer), timerMs: timer });
+    const [intervalTimer, setIntervalTimer] = useState<ReturnType<typeof setInterval> | null>(null);
     const currentThemeObj = colorThemesObj[currentTheme];
 
     function handleBtnPress() {
-        navigation.navigate("Home")
+        navigation.navigate("Home");
+
+        if(intervalTimer){
+            clearInterval(intervalTimer);
+            setIntervalTimer(null);
+        }
     };
 
     useEffect(() => {
-        setInterval(() => {
+        console.log("yo there meng...");
+    })
+
+    useEffect(() => {
+        const intervalTimer = setInterval(() => {
             setTimerObj(timerObj => {
                 if (timerObj.timerMs <= 0) {
                     return timerObj;
@@ -48,7 +58,8 @@ const GameScrnTab = ({ navigation }: MaterialTopTabBarProps) => {
 
                 return { timerStr, timerMs }
             })
-        }, 1_000)
+        }, 1_000);
+        setIntervalTimer(intervalTimer)
     }, []);
 
     useEffect(() => {

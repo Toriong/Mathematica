@@ -26,6 +26,8 @@ describe("Getting questions from the backend.", () => {
                 throw new Error("The 'questions' array does not exist in the response received from the server.")
             }
 
+            console.log("questions: ", questions)
+
             const areTheQuestionsCorrect = questions.every(question => {
                 const { answer, sentence, choices } = question ?? {};
 

@@ -7,6 +7,7 @@ import { IChoice, IQuestion } from "../../zustandStoreTypes&Interfaces";
 import { Storage } from "../../utils/storage";
 import { IS_TESTING, TESTING_USER_ID } from "../../globalVars";
 import { getIsTValid } from "../../utils/generalFns";
+import { CustomError, ICustomError } from "../../utils/errors";
 
 
 
@@ -39,6 +40,8 @@ interface IInitialQsGetReqResult {
     questions: IQuestion[]
 }
 
+let apiRequestTriesNum = 0;
+
 async function getInitialQs(userId: string): Promise<IInitialQsGetReqResult> {
     try {
         userId = IS_TESTING ? TESTING_USER_ID : userId;
@@ -65,19 +68,25 @@ async function getInitialQs(userId: string): Promise<IInitialQsGetReqResult> {
             :
             []
 
+        console.log("apiRequestTriesNum: ", apiRequestTriesNum)
+        if(apiRequestTriesNum >= 5){
+            throw new CustomError("Exceeded tries of contacting api to get questions for user.", 429);
+        }
 
         if (!responsesFiltered.length) {
+            ++apiRequestTriesNum  
             result = await getInitialQs(userId);
         }
 
         const questions = responsesFiltered.flatMap<unknown>(response => response.data?.questions) as IQuestion[];
 
-        return { gettingQsResponseStatus: 'SUCCESS', questions: questions }
-        // GOAL: filter out all of the questions are that are not valid.
+        console.log("questions: ", questions)
 
-        // CASE: if all of the questions are invalid, then execute the `getInitialQuestions` function again. 
+        return { gettingQsResponseStatus: 'SUCCESS', questions: questions } 
     } catch (error) {
-        console.error("Failed to get questions from the server. Error message: ", error)
+        const { msg, status } = error as ICustomError
+        const _msg = msg ? `${msg}. Status code: ${status}` : null; 
+        console.error(_msg ?? "Failed to get questions from the server. Error message: ", error)
 
         return { gettingQsResponseStatus: 'FAILURE', questions: [] }
     }
@@ -89,7 +98,6 @@ const HomeScrnContainer = () => {
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);
 
-
     useEffect(() => {
         if (willGetQs) {
             updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
@@ -98,15 +106,13 @@ const HomeScrnContainer = () => {
                 try {
                     let userId = await memory.getItem("userId");
                     userId = IS_TESTING ? TESTING_USER_ID : userId;
-                    const responseGetPropostionalQs = getQuestions<{questions: IQuestion[]}>(3, ["propositional"], userId as string);
-                    const responseGetPredicateQs = getQuestions<{questions: IQuestion[]}>(3, ["predicate"], userId as string)
-                    const responses: Awaited<TPromiseReturnValGetQuestions<{questions: IQuestion[]} | null>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
-                    const questions = responses.flatMap(response => response.data?.questions);
+                    const response = await getInitialQs(userId as string);
 
-                    console.log("questions sup there meng: ", questions);
-                    // GOAL: filter out all of the questions are that are not valid.
+                    if(response.gettingQsResponseStatus === "FAILURE"){
+                        throw new Error("Failed to get the initial questions from the server.")
+                    }
 
-                    // CASE: if all of the questions are invalid, then execute the `getInitialQuestions` function again. 
+                    updateQuestionsStore(response.questions, "questions");
                     updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
                 } catch (error) {
                     console.error("Failed to get questions from the server. Error message: ", error)

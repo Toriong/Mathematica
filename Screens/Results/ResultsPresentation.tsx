@@ -5,6 +5,7 @@ import { useGameScrnTabStore } from "../../zustand";
 import Button from "../../global_components/Button";
 import { useGetAppColors } from "../../custom_hooks/useGetAppColors";
 import { BORDER_RADIUS_NUM, PRIMARY_COLOR, SUCCESS_COLOR, WARNING_COLOR } from "../../globalVars";
+import { useEffect } from "react";
 
 const BTN_FONT_SIZE = 22;
 const PTXT_FONT_SIZE = 35;
@@ -25,6 +26,11 @@ const ResultsPresentation = () => {
     function handleReviewBtnPress() {
 
     };
+
+
+useEffect(() => {
+        // SEND the quiz to the server to be saved into the database
+    }, [])
 
     return (
         <Layout>
