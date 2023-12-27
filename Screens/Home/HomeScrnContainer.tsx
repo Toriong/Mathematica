@@ -75,7 +75,6 @@ const HomeScrnContainer = () => {
     useEffect(() => {
         if (willGetQs) {
             updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
-            console.log("yo there meng...");
             (async () => {
                 try {
                     let userId = await memory.getItem("userId");

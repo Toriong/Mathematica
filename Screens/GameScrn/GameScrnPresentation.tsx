@@ -1,6 +1,6 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { GestureResponderEvent, LayoutChangeEvent, TouchableOpacity } from 'react-native'
+import { GestureResponderEvent, LayoutChangeEvent, SafeAreaView, TouchableOpacity } from 'react-native'
 import Layout from '../../global_components/Layout';
 import { View } from 'react-native';
 import { PTxt } from '../../global_components/text';
@@ -155,175 +155,176 @@ const GameScrnPresentation = () => {
   };
 
   return (
-    <Layout
-      style={{
-        flex: 1,
-        width: "100%",
-        height: "100%",
-        display: 'flex',
-        alignItems: 'center',
-        flexDirection: 'column',
-        position: 'relative',
-      }}
-      backgroundColor="#343541"
-      layoutStyle={{ position: 'relative', width: '100%', height: '100%' }}
-      OverlayComp={
-        wasSubmitBtnPressed && (
-          <>
-            <View
-              style={{
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'black',
-                position: 'absolute',
-                zIndex: 1,
-                opacity: OVERLAY_OPACITY,
-              }}
-            />
-            <View
-              style={{
-                zIndex: 2,
-                width: "100%",
-                height: "100%",
-                position: 'absolute',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              <PTxt
-                fontSize={30}
-                txtColor={isAnswerCorrect ? 'green' : 'red'}
-              >
-                {isAnswerCorrect ? "CORRECT!" : "WRONG."}
-              </PTxt>
-              <PTxt fontSize={200}>
-                {isAnswerCorrect
-                  ?
-                  "✅"
-                  :
-                  "❌"
-                }
-              </PTxt>
-              <PTxt
-                fontSize={30}
-                txtColor={isAnswerCorrect ? 'green' : 'red'}
-              >
-                Correct Answer:
-              </PTxt>
+    <>
+      <Layout
+        style={{
+          flex: 1,
+          width: "100%",
+          height: "100%",
+          display: 'flex',
+          alignItems: 'center',
+          flexDirection: 'column',
+          position: 'relative',
+        }}
+        backgroundColor="#343541"
+        layoutStyle={{ position: 'relative', width: '100%', height: '100%' }}
+        OverlayComp={
+          wasSubmitBtnPressed && (
+            <>
               <View
-                style={{ display: 'flex', marginTop: 10, flexDirection: 'row', gap: 10, width: "100%", justifyContent: 'center', alignItems: 'center' }}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: 'black',
+                  position: 'absolute',
+                  zIndex: 1,
+                  opacity: OVERLAY_OPACITY,
+                }}
+              />
+              <View
+                style={{
+                  zIndex: 2,
+                  width: "100%",
+                  height: "100%",
+                  position: 'absolute',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
               >
-                {correctAnswerArr.map((symbol, index) => (
-                  <PTxt
-                    key={index}
-                    fontSize={30}
-                    txtColor={isAnswerCorrect ? 'green' : 'red'}
-                  >
-                    {symbol}
-                  </PTxt>
-                ))}
+                <PTxt
+                  fontSize={30}
+                  txtColor={isAnswerCorrect ? 'green' : 'red'}
+                >
+                  {isAnswerCorrect ? "CORRECT!" : "WRONG."}
+                </PTxt>
+                <PTxt fontSize={200}>
+                  {isAnswerCorrect
+                    ?
+                    "✅"
+                    :
+                    "❌"
+                  }
+                </PTxt>
+                <PTxt
+                  fontSize={30}
+                  txtColor={isAnswerCorrect ? 'green' : 'red'}
+                >
+                  Correct Answer:
+                </PTxt>
+                <View
+                  style={{ display: 'flex', marginTop: 10, flexDirection: 'row', gap: 10, width: "100%", justifyContent: 'center', alignItems: 'center' }}
+                >
+                  {correctAnswerArr.map((symbol, index) => (
+                    <PTxt
+                      key={index}
+                      fontSize={30}
+                      txtColor={isAnswerCorrect ? 'green' : 'red'}
+                    >
+                      {symbol}
+                    </PTxt>
+                  ))}
+                </View>
               </View>
+            </>
+          )
+        }
+      >
+        <View style={{ flex: .7, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <PTxt fontSize={TXT_FONT_SIZE}>TASK: </PTxt>
+          <PTxt
+            fontSize={TXT_FONT_SIZE}
+            style={{ textAlign: 'center', transform: [{ translateY: 20 }], paddingHorizontal: 11 }}
+          >
+            {task}
+          </PTxt>
+        </View>
+        <View style={{ flex: 1, width: "100%", display: 'flex', paddingTop: 7, justifyContent: 'center', alignItems: 'center' }}>
+          <PTxt
+            fontSize={TXT_FONT_SIZE}
+            style={{ textAlign: 'center', paddingHorizontal: 7 }}
+            fontStyle='italic'
+          >
+            {question?.sentence}
+          </PTxt>
+        </View>
+        {choices?.length && (
+          <View style={{ flex: .8, width: "100%", alignItems: 'center', display: 'flex', justifyContent: 'center', paddingHorizontal: 18 }}>
+            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 5, width: "70%" }}>
+              {choices.map((choice, index, self) => (
+                <View key={index} style={{ display: 'flex', flexDirection: 'row', }}>
+                  <PTxt fontSize={TXT_FONT_SIZE}>{choice.letter} = </PTxt>
+                  <PTxt fontSize={TXT_FONT_SIZE} >{choice.value}{(index !== (self.length - 1)) ? ',' : ''}</PTxt>
+                </View>
+              ))
+              }
             </View>
-          </>
-        )
-      }
-    >
-      <View style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <PTxt fontSize={TXT_FONT_SIZE}>TASK: </PTxt>
-        <PTxt
-          fontSize={TXT_FONT_SIZE}
-          style={{ textAlign: 'center', transform: [{ translateY: 20 }], paddingHorizontal: 11 }}
-        >
-          {task}
-        </PTxt>
-      </View>
-      <View style={{ flex: 1, width: "100%", display: 'flex', paddingTop: 7, justifyContent: 'center', alignItems: 'center' }}>
-        <PTxt
-          fontSize={TXT_FONT_SIZE}
-          style={{ textAlign: 'center', paddingHorizontal: 7 }}
-          fontStyle='italic'
-        >
-          {question?.sentence}
-        </PTxt>
-      </View>
-      {choices?.length && (
-        <View style={{ flex: .8, width: "100%", alignItems: 'center', display: 'flex', justifyContent: 'center', paddingHorizontal: 18 }}>
-          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 5, width: "70%" }}>
-            {choices.map((choice, index, self) => (
-              <View key={index} style={{ display: 'flex', flexDirection: 'row', }}>
-                <PTxt fontSize={TXT_FONT_SIZE}>{choice.letter} = </PTxt>
-                <PTxt fontSize={TXT_FONT_SIZE} >{choice.value}{(index !== (self.length - 1)) ? ',' : ''}</PTxt>
-              </View>
-            ))
+          </View>
+        )}
+        <View style={{ flex: 1.3, width: "100%", display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <View
+            style={{
+              width: "93%",
+              height: 70,
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: 10,
+              borderBottomWidth: 1,
+              borderBottomColor: currentColorsThemeObj.second,
+              position: 'relative',
+            }}
+          >
+            {!!selectedLogicSymbols.length && selectedLogicSymbols.map(symbol => {
+              const _id = uuid.v4().toString();
+
+              return (
+                <TouchableOpacity
+                  id={_id}
+                  key={_id}
+                  onPress={() => handleSelectedLogicSymbol(symbol)}
+                  style={{ opacity: symbol.wasPressed ? .4 : 1 }}
+                >
+                  <LogicSymbol
+                    width={SYMBOL_WIDTH_AND_HEIGHT}
+                    height={SYMBOL_WIDTH_AND_HEIGHT}
+                    backgroundColor={currentColorsThemeObj.second}
+                  >
+                    {symbol.symbol}
+                  </LogicSymbol>
+                </TouchableOpacity>
+              )
             }
+            )}
           </View>
         </View>
-      )}
-      <View style={{ flex: 1, width: "100%", display: 'flex', alignItems: 'center' }}>
-        <View
-          style={{
-            width: "93%",
-            height: 70,
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 10,
-            borderBottomWidth: 1,
-            borderBottomColor: currentColorsThemeObj.second,
-            position: 'relative',
-          }}
-        >
-          {!!selectedLogicSymbols.length && selectedLogicSymbols.map(symbol => {
-            const _id = uuid.v4().toString();
-
-            return (
+        <View style={{ flex: 1, width: "100%", display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ display: 'flex', width: "80%", flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
+            {symbolOptions.map((symbolOpt, index) => (
               <TouchableOpacity
-                id={_id}
-                key={_id}
-                onPress={() => handleSelectedLogicSymbol(symbol)}
-                style={{ opacity: symbol.wasPressed ? .4 : 1 }}
+                key={index}
+                onPress={() => handleSymbolOptPress(symbolOpt)}
               >
-                <LogicSymbol
-                  width={SYMBOL_WIDTH_AND_HEIGHT}
-                  height={SYMBOL_WIDTH_AND_HEIGHT}
-                  backgroundColor={currentColorsThemeObj.second}
-                >
-                  {symbol.symbol}
+                <LogicSymbol width={SYMBOL_WIDTH_AND_HEIGHT} height={SYMBOL_WIDTH_AND_HEIGHT} backgroundColor={currentColorsThemeObj.second}>
+                  {symbolOpt.symbol}
                 </LogicSymbol>
               </TouchableOpacity>
-            )
-          }
-          )}
+            ))}
+          </View>
         </View>
-      </View>
-      <View style={{ flex: 1, width: "100%", display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-        {/* display placement of the tiles/choices */}
-        <View style={{ display: 'flex', width: "80%", flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
-          {symbolOptions.map((symbolOpt, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => handleSymbolOptPress(symbolOpt)}
-            >
-              <LogicSymbol width={SYMBOL_WIDTH_AND_HEIGHT} height={SYMBOL_WIDTH_AND_HEIGHT} backgroundColor={currentColorsThemeObj.second}>
-                {symbolOpt.symbol}
-              </LogicSymbol>
-            </TouchableOpacity>
-          ))}
+        <View style={{ flex: 1, width: "100%", marginTop: "5%", display: 'flex', flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: 'center' }}>
+          <Button handleOnPress={handleClearBtnPress} backgroundColor='#FFC12F' dynamicStyles={{ padding: 17, borderRadius: 15 }}>
+            <PTxt>CLEAR</PTxt>
+          </Button>
+          <TouchableOpacity
+            onPress={handleSubmitBtnPress}
+            style={{ padding: 17, borderRadius: 15, backgroundColor: "#4287FF" }}
+          >
+            <PTxt>SUBMIT</PTxt>
+          </TouchableOpacity>
         </View>
-      </View>
-      <View style={{ flex: 1, width: "100%", marginTop: "5%", display: 'flex', flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: 'center' }}>
-        <Button handleOnPress={handleClearBtnPress} backgroundColor='#FFC12F' dynamicStyles={{ padding: 17, borderRadius: 15 }}>
-          <PTxt>CLEAR</PTxt>
-        </Button>
-        <TouchableOpacity
-          onPress={handleSubmitBtnPress}
-          style={{ padding: 17, borderRadius: 15, backgroundColor: "#4287FF" }}
-        >
-          <PTxt>SUBMIT</PTxt>
-        </TouchableOpacity>
-      </View>
-    </Layout>
+      </Layout>
+    </>
   );
 };
 

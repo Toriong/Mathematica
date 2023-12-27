@@ -56,9 +56,9 @@ const LogicGameAppNavigation = () => {
                 }}
 
             >
-                <Tab.Screen options={{ swipeEnabled: false }} name="Home" component={HomeScrnContainer} />
-                <Tab.Screen  options={{ swipeEnabled: false,  }} name="GameScreen" component={GameScrnContainer} />
-                <Tab.Screen options={{ swipeEnabled: false }} name="ResultsScreen" component={ResultContainer} />
+                <Tab.Screen  name="Home" component={HomeScrnContainer} />
+                <Tab.Screen  name="GameScreen" component={GameScrnContainer} />
+                <Tab.Screen name="ResultsScreen" component={ResultContainer} />
             </Tab.Navigator>
         </NavigationContainer>
     )

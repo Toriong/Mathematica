@@ -43,10 +43,6 @@ const GameScrnTab = ({ navigation }: MaterialTopTabBarProps) => {
     };
 
     useEffect(() => {
-        console.log("yo there meng...");
-    })
-
-    useEffect(() => {
         const intervalTimer = setInterval(() => {
             setTimerObj(timerObj => {
                 if (timerObj.timerMs <= 0) {
