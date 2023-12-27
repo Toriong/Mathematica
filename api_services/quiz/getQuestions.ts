@@ -1,15 +1,8 @@
-import { TQuestionTypes } from "../Screens/GameScrn/typesAndInterfaces";
-import { IReturnObjOfAsyncFn, PATHS, SERVER_ORIGIN } from "./globalApiVars"
+import { TQuestionTypes } from "../../Screens/GameScrn/typesAndInterfaces";
+import { IReturnObjOfAsyncFn, PATHS, SERVER_ORIGIN } from "../globalApiVars"
 import axios from "axios";
-import { IError } from "./types&Interfaces";
-import { Storage } from "../utils/storage";
-import { IS_TESTING, TESTING_USER_ID } from "../globalVars";
+import { IError } from "../types&Interfaces";
 
-interface IQuestion {
-    sentence: string
-    answer: string[]
-    choices: { letter: string, value: string }[]
-};
 type TPath = { name: string, value: string | string[] | number | boolean };
 
 // how to throw an error if the element does not exist

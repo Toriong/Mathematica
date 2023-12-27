@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { TESTING_USER_ID } from "../../globalVars";
-import { getQuestions } from "../questions"
+import { getQuestions } from "../quiz/getQuestions"
 import { IChoice, IQuestion } from "../../zustandStoreTypes&Interfaces";
 import { getIsTValid } from "../../utils/generalFns";
 

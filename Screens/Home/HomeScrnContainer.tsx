@@ -2,7 +2,7 @@ import HomeScrnPresentation from "./HomeScrnPresentation";
 import { IReturnObjOfAsyncFn, SERVER_ORIGIN, TResponseStatus } from "../../api_services/globalApiVars";
 import { useEffect } from "react";
 import { useApiQsFetchingStatusStore, useQuestionsStore } from "../../zustand";
-import { TPromiseReturnValGetQuestions, getQuestions } from "../../api_services/questions";
+import { TPromiseReturnValGetQuestions, getQuestions } from "../../api_services/quiz/getQuestions";
 import { IChoice, IQuestion } from "../../zustandStoreTypes&Interfaces";
 import { Storage } from "../../utils/storage";
 import { IS_TESTING, TESTING_USER_ID } from "../../globalVars";
@@ -85,6 +85,7 @@ async function getInitialQs(userId: string): Promise<IInitialQsGetReqResult> {
         return { gettingQsResponseStatus: 'SUCCESS', questions: questions } 
     } catch (error) {
         const { msg, status } = error as ICustomError
+        apiRequestTriesNum = 0;
         const _msg = msg ? `${msg}. Status code: ${status}` : null; 
         console.error(_msg ?? "Failed to get questions from the server. Error message: ", error)
 

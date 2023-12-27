@@ -10,3 +10,9 @@ export interface IError<TData> {
     response: IResponse<TData>
     status: Omit<TStatusesNumber, 200> | Omit<TStatusesStr, "200">
 }
+
+export interface ISentRequestResult{
+    status?: TStatusesNumber
+    wasOperationSuccessful: boolean
+    msg?: string
+}
