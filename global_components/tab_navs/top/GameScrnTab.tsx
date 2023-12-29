@@ -42,28 +42,28 @@ const GameScrnTab = ({ navigation }: MaterialTopTabBarProps) => {
         }
     };
 
-    useEffect(() => {
-        const intervalTimer = setInterval(() => {
-            setTimerObj(timerObj => {
-                if (timerObj.timerMs <= 0) {
-                    return timerObj;
-                }
+    // useEffect(() => {
+    //     const intervalTimer = setInterval(() => {
+    //         setTimerObj(timerObj => {
+    //             if (timerObj.timerMs <= 0) {
+    //                 return timerObj;
+    //             }
 
-                const timerMs = timerObj.timerMs - 1_000;
-                const timerStr = getTimeForUI(timerMs);
+    //             const timerMs = timerObj.timerMs - 1_000;
+    //             const timerStr = getTimeForUI(timerMs);
 
-                return { timerStr, timerMs }
-            })
-        }, 1_000);
-        setIntervalTimer(intervalTimer)
-    }, []);
+    //             return { timerStr, timerMs }
+    //         })
+    //     }, 1_000);
+    //     setIntervalTimer(intervalTimer)
+    // }, []);
 
-    useEffect(() => {
-        if ((timerObj.timerMs <= 0) && isGameOn) {
-            navigation.navigate('ResultsScreen');
-            setGameScrnTabStore(false, 'isGameOn');
-        }
-    }, [timerObj])
+    // useEffect(() => {
+    //     if ((timerObj.timerMs <= 0) && isGameOn) {
+    //         navigation.navigate('ResultsScreen');
+    //         setGameScrnTabStore(false, 'isGameOn');
+    //     }
+    // }, [timerObj])
 
     return (
         <SafeAreaViewWrapper

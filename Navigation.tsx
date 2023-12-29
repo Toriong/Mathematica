@@ -8,6 +8,7 @@ import ResultContainer from './Screens/Results/ResultsContainer';
 import ResultsScrnTab from './global_components/tab_navs/top/ResultsScrnTab';
 import HomeScrnContainer from './Screens/Home/HomeScrnContainer';
 import HomeScrnTab from './global_components/tab_navs/top/HomeScrnTab';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialTopTabNavigator();
@@ -56,9 +57,18 @@ const LogicGameAppNavigation = () => {
                 }}
 
             >
-                <Tab.Screen  name="Home" component={HomeScrnContainer} />
-                <Tab.Screen  name="GameScreen" component={GameScrnContainer} />
-                <Tab.Screen name="ResultsScreen" component={ResultContainer} />
+                <Tab.Screen
+                    name="Home"
+                    component={HomeScrnContainer}
+                />
+                <Tab.Screen
+                    name="GameScreen"
+                    component={GameScrnContainer}
+                />
+                <Tab.Screen
+                    name="ResultsScreen"
+                    component={ResultContainer}
+                />
             </Tab.Navigator>
         </NavigationContainer>
     )
