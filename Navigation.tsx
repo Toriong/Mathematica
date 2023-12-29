@@ -1,7 +1,7 @@
 import { NavigationContainer, NavigationProp, useNavigation } from '@react-navigation/native';
 import { View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { createMaterialTopTabNavigator, } from '@react-navigation/material-top-tabs';
 import GameScrnContainer from './Screens/GameScrn/GameScrnContainer';
 import GameScrnTab from './global_components/tab_navs/top/GameScrnTab';
 import ResultContainer from './Screens/Results/ResultsContainer';
@@ -31,45 +31,30 @@ export type TScreenNames = typeof navTabs[number]['name'];
 export type TRootStackParamList = Record<TScreenNames[number], undefined>;
 export type TStackNavigation = NavigationProp<TRootStackParamList>;
 
-
-
 const LogicGameAppNavigation = () => {
     return (
         <NavigationContainer>
-            <Tab.Navigator
-                initialRouteName="Home"
-                tabBar={props => {
-                    const state = props.navigation.getState();
-                    const { name: currentRouteName } = state.routes[state.index];
-                    const { comp: TabBar } = navTabs.find(({ name }) => name === currentRouteName) ?? {};
-
-                    if (!TabBar) {
-                        return (
-                            <View style={{ backgroundColor: "pink", height: 100 }}>
-
-                            </View>
-                        )
+            <Stack.Navigator
+                initialRouteName='Home'
+                screenOptions={{
+                    header: ({ route,  }) => {
+                        return <HomeScrnTab />
                     }
-
-
-
-                    return <TabBar {...props} />
                 }}
-
             >
-                <Tab.Screen
+                <Stack.Screen
                     name="Home"
                     component={HomeScrnContainer}
                 />
-                <Tab.Screen
+                <Stack.Screen
                     name="GameScreen"
                     component={GameScrnContainer}
                 />
-                <Tab.Screen
+                <Stack.Screen
                     name="ResultsScreen"
                     component={ResultContainer}
                 />
-            </Tab.Navigator>
+            </Stack.Navigator>
         </NavigationContainer>
     )
 };
