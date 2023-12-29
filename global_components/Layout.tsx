@@ -12,11 +12,11 @@ const Layout = ({
     const styleObj = StyleSheet.create({ main: { ...style, backgroundColor: backgroundColor } });
 
     return (
-        // <SafeAreaViewWrapper layoutStyle={layoutStyle} OverlayComp={OverlayComp}>
+        <SafeAreaViewWrapper layoutStyle={layoutStyle} OverlayComp={OverlayComp}>
             <SafeAreaView style={styleObj.main}>
                 {children}
             </SafeAreaView>
-        // </SafeAreaViewWrapper>
+        </SafeAreaViewWrapper>
     );
 };
 

@@ -5,10 +5,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faArrowLeft, faStar } from "@fortawesome/free-solid-svg-icons";
 import { PTxt } from "../../text";
 import { APP_NAME } from "../../../globalVars";
+import { NativeStackHeaderProps } from "@react-navigation/native-stack";
+import { TStackNavigationProp } from "../../../Navigation";
 
 const FONT_SIZE_TITLE = 32;
 
-const ResultsScrnTab = () => {
+const ResultsScrnTab = ({ navigate }:TStackNavigationProp) => {
     const currentThemeObj = useGetAppColors();
 
     function handleBackBtnPress() {

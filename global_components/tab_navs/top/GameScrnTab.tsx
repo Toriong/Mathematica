@@ -8,6 +8,8 @@ import { PTxt } from "../../text";
 import { useState, useEffect } from "react";
 import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
 import { OVERLAY_OPACITY } from "../../../globalVars";
+import { NativeStackHeaderProps,  } from "@react-navigation/native-stack";
+import { TStackNavigationProp } from "../../../Navigation";
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
@@ -20,7 +22,7 @@ function getTimeForUI(millis: number): string {
 };
 
 
-const GameScrnTab = ({ navigation }: MaterialTopTabBarProps) => {
+const GameScrnTab = ({ navigate }:TStackNavigationProp) => {
     const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
     const currentTheme = useColorStore(state => state.currentTheme);
     const colorThemesObj = useColorStore(state => state.themesObj);
@@ -34,7 +36,7 @@ const GameScrnTab = ({ navigation }: MaterialTopTabBarProps) => {
     const currentThemeObj = colorThemesObj[currentTheme];
 
     function handleBtnPress() {
-        navigation.navigate("Home");
+        navigate("Home");
 
         if(intervalTimer){
             clearInterval(intervalTimer);
