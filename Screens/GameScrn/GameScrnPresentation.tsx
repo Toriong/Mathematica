@@ -205,6 +205,7 @@ const GameScrnPresentation = () => {
                 alignItems: 'center'
               }}
             >
+              
               <PTxt
                 fontSize={30}
                 txtColor={isAnswerCorrect ? 'green' : 'red'}

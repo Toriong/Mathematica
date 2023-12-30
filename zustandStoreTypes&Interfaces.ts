@@ -32,8 +32,8 @@ export interface IQuestionObjActions {
     setTask: (task: string) => void
 }
 export interface IQuestionsStates {
-    task: string,
-    questions: IQuestion[],
+    task: string
+    questions: IQuestion[]
 }
 
 export type TUpdateStoreState<TNewState, TFieldName> = {

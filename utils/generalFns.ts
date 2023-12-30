@@ -1,3 +1,5 @@
+import { IS_TESTING, TESTING_USER_ID } from "../globalVars";
+import { Storage } from "./storage";
 
 const getType = (val: any) => typeof val;
 
@@ -9,4 +11,10 @@ export function getIsTValid<TData>(
     isNotNullForObj = true
 ) {
     return (typeof val === expectedType) && isNotNullForObj
+}
+
+const memory = new Storage()
+
+export async function getUserId(): Promise<string | null>{
+    return IS_TESTING ? TESTING_USER_ID : await memory.getItem("userId");
 }

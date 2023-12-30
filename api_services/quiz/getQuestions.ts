@@ -18,8 +18,8 @@ export async function getQuestions<TData>(
     questionsToGetNum: number,
     questionTypes: TQuestionTypes[],
     userId: string,
-    questionsAnsweredArr?: string[],
-    hasAnsweredAQuestion?: boolean,
+    sentenceTxts?: string[],
+    hasAnsweredAQuestion?: boolean
 ): TPromiseReturnValGetQuestions<TData> {
     try {
         console.log("what is up...")
@@ -31,8 +31,8 @@ export async function getQuestions<TData>(
             { name: "userId", value: userId }
         ];
 
-        if (questionsAnsweredArr?.length) {
-            params.push({ name: "questionsAnsweredArr", value: questionsAnsweredArr })
+        if (sentenceTxts?.length) {
+            params.push({ name: "sentenceTxts", value: sentenceTxts })
         };
 
         if (hasAnsweredAQuestion) {
