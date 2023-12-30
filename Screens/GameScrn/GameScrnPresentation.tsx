@@ -45,9 +45,8 @@ const GameScrnPresentation = () => {
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
   const question = questions[questionIndex];
-  const { choices, answer } = question ?? {};
-  const letters = choices?.length ? choices.map(({ letter }) => letter) : (answer?.length ? answer.filter(choice => choice) : []);
-  const symbolOptions: ISelectedLogicSymbol[] = useMemo(() => [...SYMBOLS, ...letters].map(symbol => ({
+  const { choices, answer, symbolOptions: symbolOptionsFromServer } = question ?? {};
+  const symbolOptions = useMemo(() => [...SYMBOLS, ...symbolOptionsFromServer].map(symbol => ({
     symbol: symbol,
     wasPressed: false
   })), [questions, questionIndex]);

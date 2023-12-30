@@ -4,7 +4,7 @@ import { IQuiz, IResponse } from "../../sharedInterfaces&TypesWithBackend";
 import { CustomError, ICustomError } from "../../utils/errors";
 import { TDataTypes } from "../../utils/generalFns";
 import { Storage } from "../../utils/storage";
-import { SERVER_ORIGIN, getPath } from "../globalApiVars";
+import { PATHS, SERVER_ORIGIN, TPathsStr, getPath } from "../globalApiVars";
 import { ISentRequestResult } from "../types&Interfaces";
 
 interface IMandatoryFields<TFieldName> {
@@ -88,7 +88,7 @@ export async function saveQuiz(quiz: IQuiz & { _id: string }): Promise<ISentRequ
             questions: quiz.questions
         }
         console.log("will send the request to the server...")
-        const url = new URL(`${SERVER_ORIGIN}/${getPath("save-quiz-result")}`)
+        const url = new URL(`${SERVER_ORIGIN}/${PATHS[1]}`)
         const response = await axios.post<IResponse<null>>(url.toString(), reqBody)
 
         console.log("response yo there: ", response)

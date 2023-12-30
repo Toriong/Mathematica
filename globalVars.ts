@@ -1,5 +1,6 @@
 export const IS_TESTING = true;
 export const ENGLISH_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+const LETTERS_SPLITTED = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split("")
 export const LETTERS = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'] as const;
 export const SYMBOLS = [
   "~",

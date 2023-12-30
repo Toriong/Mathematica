@@ -1,5 +1,6 @@
 import { TResponseStatus } from "./api_services/globalApiVars"
-import { IThemeColors } from "./globalTypes&Interfaces"
+import { IThemeColors, TLogicalSymbols, TLowerCaseLetters, TUpperCaseLetters } from "./globalTypes&Interfaces"
+import { LETTERS } from "./globalVars"
 
 export interface IIsGettingReqStoreState {
     isGettingQs: boolean
@@ -24,6 +25,7 @@ export interface IQuestion {
     answer: string[]
     task?: string
     choices: IChoice[]
+    symbolOptions: (TUpperCaseLetters | TLogicalSymbols)[] 
 }
 export interface IQuestionObjActions {
     setQuestions: (questions: IQuestion[]) => void

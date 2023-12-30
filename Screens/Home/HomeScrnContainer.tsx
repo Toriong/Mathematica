@@ -85,6 +85,10 @@ const HomeScrnContainer = () => {
                         throw new Error("Failed to get the initial questions from the server.")
                     }
 
+                    if(!response.questions || !response?.questions?.length ){
+                        throw new Error("Failed to get the initial questions from the server. The `questions` array is either empty or undefined.")
+                    }
+
                     updateQuestionsStore(response.questions, "questions");
                     updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
                 } catch (error) {
