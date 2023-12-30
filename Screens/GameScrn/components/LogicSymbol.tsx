@@ -1,14 +1,11 @@
-import { IAppColor, IComponentProps, TFirstColor, TSecondColor, TThirdColor } from "../../../globalTypes&Interfaces"
-import { View, Animated, PanResponder, GestureResponderEvent, TouchableOpacity } from 'react-native';
+import { IAppColor, IComponentProps, TAppColors, TFirstColor, TSecondColor, TThirdColor } from "../../../globalTypes&Interfaces"
+import { View } from 'react-native';
 import { PTxt } from "../../../global_components/text";
-import { ScaleDecorator } from "react-native-draggable-flatlist";
-import Button from "../../../global_components/Button";
-
 
 interface ISymbol {
-    width: number
-    height: number
-    backgroundColor: TFirstColor | TSecondColor | TThirdColor
+    width: number | "auto"
+    height: number | "auto"
+    backgroundColor: TAppColors | "transparent"
     opacity?: number
 }
 
