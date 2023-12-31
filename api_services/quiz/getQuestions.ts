@@ -19,7 +19,6 @@ export async function getQuestions<TData>(
     questionTypes: TQuestionTypes[],
     userId: string,
     sentenceTxts?: string[],
-    hasAnsweredAQuestion?: boolean
 ): TPromiseReturnValGetQuestions<TData> {
     try {
         console.log("what is up...")
@@ -33,10 +32,6 @@ export async function getQuestions<TData>(
 
         if (sentenceTxts?.length) {
             params.push({ name: "sentenceTxts", value: sentenceTxts })
-        };
-
-        if (hasAnsweredAQuestion) {
-            params.push({ name: "hasAnsweredAQuestion", value: hasAnsweredAQuestion })
         };
 
         appendParamsToUrl(getQuestionsApiUrl, params);

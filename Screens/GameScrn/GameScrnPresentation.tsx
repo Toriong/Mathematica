@@ -41,9 +41,9 @@ const GameScrnPresentation = () => {
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
   const rightNum = useGameScrnTabStore(state => state.right);
   const wrongNum = useGameScrnTabStore(state => state.wrong);
+  const questionIndex = useGameScrnTabStore(state => state.currentQuestionIndex);
   const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
   const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
-  const [questionIndex, setQuestionIndex] = useState(0);
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
   const question = questions[questionIndex];
@@ -156,7 +156,7 @@ const GameScrnPresentation = () => {
 
       setGameScrnTabStore(false, 'wasSubmitBtnPressed');
 
-      setQuestionIndex(index => index + 1)
+      setGameScrnTabStore(questionIndex + 1, "currentQuestionIndex");
 
       setGameScrnTabStore(false, 'isTimerPaused');
     }, 2000);

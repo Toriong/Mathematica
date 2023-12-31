@@ -1,3 +1,4 @@
+import { TQuestionTypes } from "./Screens/GameScrn/typesAndInterfaces"
 import { TResponseStatus } from "./api_services/globalApiVars"
 import { IThemeColors, TLogicalSymbols, TLowerCaseLetters, TUpperCaseLetters } from "./globalTypes&Interfaces"
 import { LETTERS } from "./globalVars"
@@ -13,6 +14,7 @@ interface IGameScrnTabStoreState {
     timer: number
     isTimerPaused: boolean
     isGameOn: boolean
+    questionTypes: TQuestionTypes[]
     wasSubmitBtnPressed: boolean
 }
 export interface IChoice {
