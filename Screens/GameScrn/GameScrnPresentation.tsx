@@ -37,7 +37,7 @@ interface ISelectedLogicSymbol {
 function getDeleteAndMoveSelctedSymbolBtns(
   handleMovementButtonPress: (num: 1 | -1) => void,
   handleDeleteSymbolButtonPress: () => void,
-  opacity: number 
+  opacity: number
 ) {
   return [
     <EditSelectedSymbolBtn dynamicStyles={{ opacity: opacity }} backgroundColor="transparent" Icon={<FontAwesomeIcon size={25} icon={faArrowLeft} />} handleOnPress={() => { handleMovementButtonPress(-1) }} />,
@@ -88,19 +88,25 @@ const GameScrnPresentation = () => {
 
   function handleMovementSymbolBtnPress(numToIncreaseSelectedIndexBy: -1 | 1) {
     try {
+      console.log("selectedLogicSymbols: ", selectedLogicSymbols)
       const selectedSymbolIndex = selectedLogicSymbols.findIndex(({ wasPressed }) => wasPressed);
-      let indexToSwitchSelectedSymbolWith: number | null = null;
+      let indexToSwitchSelectedSymbolWith: number | null = (selectedSymbolIndex === -1) ? null : (selectedSymbolIndex + (numToIncreaseSelectedIndexBy));
+
+      console.log("indexToSwitchSelectedSymbolWith: ", indexToSwitchSelectedSymbolWith);
+      console.log("selectedSymbolIndex: ", selectedSymbolIndex);
 
       if (selectedSymbolIndex === -1) {
         throw new Error("Failed to retrieve the selected symbol by the user.")
       };
 
-      // NOTES: 
-      // WHAT DO I KNOW: 
-      // we have the index of the selected symbol 
-      // case: the selected symbol is at the beginning of the index, it is 0 
-      // if 0, get the last index of the array. This will be indexToSwitchSelectedSymbolWith
-      // if the last index of the array, and the user presses the right arrow button, then indexToSwitchSelectedSymbolWith will be 0
+      // NOTES:
+      // BUTTON PRESS IS NOT WORKING.
+
+      // BUG: 
+      // WHAT IS HAPPENING: when the user presses on a symbol, and then clicks on one of the arrow buttons to move the selected symbol, nothing happens. 
+      // WHAT I WANT: when the user presses on a selected symbol, an then clicks on the arrow button, have that symbol switch with either 
+      // the symbol to its left or to its right 
+
 
       if ((selectedSymbolIndex === (selectedLogicSymbols.length - 1)) && (Math.sign(numToIncreaseSelectedIndexBy) === 1)) {
         indexToSwitchSelectedSymbolWith = 0
@@ -108,7 +114,11 @@ const GameScrnPresentation = () => {
         indexToSwitchSelectedSymbolWith = selectedLogicSymbols.length - 1
       }
 
-      const updatedSelectedSymbolsArr = getUpdatedSelectedSymbolsArr(indexToSwitchSelectedSymbolWith as number, selectedSymbolIndex, selectedLogicSymbols);
+      const updatedSelectedSymbolsArr = getUpdatedSelectedSymbolsArr(
+        indexToSwitchSelectedSymbolWith as number,
+        selectedSymbolIndex,
+        selectedLogicSymbols
+      );
       setSelectedLogicSymbols(updatedSelectedSymbolsArr);
     } catch (error) {
       console.error("An error has occurred in moving the selected symbol: ", error);
