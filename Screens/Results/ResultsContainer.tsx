@@ -1,11 +1,12 @@
 import { useGetInitialQs } from "../../custom_hooks/useGetInitialQs";
+import { IQuestionOnClient } from "../../zustandStoreTypes&Interfaces";
 import ResultsPresentation from "./ResultsPresentation"
 
 
 const ResultContainer = () => {
-    useGetInitialQs(true);
+    const [questionsForNextQuiz,] = useGetInitialQs<IQuestionOnClient>(true);
 
-    return <ResultsPresentation />;
+    return <ResultsPresentation questionsForNextQuiz={questionsForNextQuiz} />;
 }
 
 export default ResultContainer

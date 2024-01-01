@@ -1,26 +1,34 @@
 import Layout from "../../global_components/Layout";
 import { View, StyleSheet } from 'react-native';
 import { HeadingTxt, PTxt } from "../../global_components/text";
-import { useGameScrnTabStore } from "../../zustand";
+import { useGameScrnTabStore, useQuestionsStore } from "../../zustand";
 import Button from "../../global_components/Button";
 import { useGetAppColors } from "../../custom_hooks/useGetAppColors";
 import { BORDER_RADIUS_NUM, PRIMARY_COLOR, SUCCESS_COLOR, WARNING_COLOR } from "../../globalVars";
 import { useEffect } from "react";
+import { IQuestion } from "../../sharedInterfaces&TypesWithBackend";
+import { IQuestionOnClient, IQuestionsForObj } from "../../zustandStoreTypes&Interfaces";
+import { useNavigation } from "@react-navigation/native";
+import { TStackNavigation } from "../../Navigation";
 
 const BTN_FONT_SIZE = 22;
 const PTXT_FONT_SIZE = 35;
 
-const ResultsPresentation = () => {
+const ResultsPresentation = ({ questionsForNextQuiz }: { questionsForNextQuiz: IQuestionOnClient[] }) => {
+    // How to provide type checking for the navigation function for the screen names? 
+    const { navigate } = useNavigation<TStackNavigation>();
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
+    const updateQuestionsStore = useQuestionsStore(state => state.updateState);
     const appColors = useGetAppColors();
 
     function handlePlayAgainBtnPress() {
-
+        updateQuestionsStore<IQuestionsForObj["questions"], "questions">(questionsForNextQuiz, "questions");
+        navigate("GameScreen")
     };
 
     function handleHomeBtnPress() {
-
+        navigate("Home")
     };
 
     function handleReviewBtnPress() {
