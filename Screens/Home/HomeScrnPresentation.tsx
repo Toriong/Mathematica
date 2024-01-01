@@ -3,10 +3,9 @@ import { View } from 'react-native'
 import { PTxt } from "../../global_components/text";
 import { useNavigation } from '@react-navigation/native';
 import { TScreenNames, TStackNavigation } from "../../Navigation";
-import Button from "../../global_components/Button";
 import { useColorStore } from "../../zustand";
-
-
+import Modal from "react-native-modal";
+import Button from "../../global_components/Button";
 
 const HomeScrnPresentation = () => {
     const navigation = useNavigation<TStackNavigation>();

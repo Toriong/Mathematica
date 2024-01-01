@@ -6,7 +6,7 @@ import { View } from 'react-native';
 import { PTxt } from '../../global_components/text';
 import { useColorStore, useGameScrnTabStore, useIsGettingReqStore, useQuestionsStore } from '../../zustand';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faArrowRight, faCancel } from "@fortawesome/free-solid-svg-icons";
 import { ENGLISH_ALPHABET, LETTERS, OVERLAY_OPACITY, SYMBOLS, structuredClone } from '../../globalVars';
 import Button, { OnPressAction } from '../../global_components/Button';
 import DraggableFlatList, {
@@ -15,8 +15,9 @@ import DraggableFlatList, {
 } from "react-native-draggable-flatlist";
 import uuid from 'react-native-uuid';
 import LogicSymbol from './components/LogicSymbol';
-import SelectedLogicSymbol from './components/SelectedLogicSymbol';
-import { NativeTouchEvent } from 'react-native';
+import EditSelectedSymbolBtn from './components/EditSelectedSymbolBtn';
+import { CustomError } from '../../utils/errors';
+
 
 const SYMBOL_WIDTH_AND_HEIGHT = 45;
 const SELECTED_LOGIC_SYMBOLS_TESTING_DATA = [
@@ -32,6 +33,29 @@ interface ISelectedLogicSymbol {
   wasPressed?: boolean
 }
 
+
+function getDeleteAndMoveSelctedSymbolBtns(
+  handleMovementButtonPress: (num: number) => void,
+  handleDeleteSymbolButtonPress: () => void
+) {
+  return [
+    <EditSelectedSymbolBtn backgroundColor="transparent" Icon={<FontAwesomeIcon icon={faArrowLeft} />} handleOnPress={() => { handleMovementButtonPress(-1) }} />,
+    <EditSelectedSymbolBtn backgroundColor="transparent" Icon={<FontAwesomeIcon icon={faArrowRight} />} handleOnPress={handleDeleteSymbolButtonPress} />,
+    <EditSelectedSymbolBtn backgroundColor="transparent" Icon={<FontAwesomeIcon icon={faArrowLeft} />} handleOnPress={() => { handleMovementButtonPress(1) }} />,
+  ]
+};
+
+function getUpdatedSelectedSymbolsArr(indexToSwitchSelectedSymbolWith: number, selectedSymbolIndex: number, selectedSymbols: ISelectedLogicSymbol[]) {
+  let selectedLogicSymbolsClone = structuredClone<ISelectedLogicSymbol[]>(selectedSymbols);
+  let selectedSymbol = structuredClone<ISelectedLogicSymbol>(selectedLogicSymbolsClone[selectedSymbolIndex]);
+  let symbolToSwitchWithSelectedSymbol = structuredClone<ISelectedLogicSymbol>(selectedLogicSymbolsClone[indexToSwitchSelectedSymbolWith]);
+  selectedLogicSymbolsClone[indexToSwitchSelectedSymbolWith] = selectedSymbol;
+  selectedLogicSymbolsClone[selectedSymbolIndex] = symbolToSwitchWithSelectedSymbol;
+
+  return selectedLogicSymbolsClone;
+}
+
+
 const GameScrnPresentation = () => {
   const currentThemeStr = useColorStore(state => state.currentTheme);
   const colorThemesObj = useColorStore(state => state.themesObj);
@@ -41,9 +65,9 @@ const GameScrnPresentation = () => {
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
   const rightNum = useGameScrnTabStore(state => state.right);
   const wrongNum = useGameScrnTabStore(state => state.wrong);
-  const questionIndex = useGameScrnTabStore(state => state.currentQuestionIndex);
   const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
-  const isGettingQs = useIsGettingReqStore(state => state.isGettingQs);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [directionButtons, setDirectionButtons] = useState([]);
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
   const question = questions[questionIndex];
@@ -54,6 +78,7 @@ const GameScrnPresentation = () => {
   })), [questions, questionIndex]);
   let isAnswerCorrect: boolean | null = null;
 
+  // const selectedSymbols = useMemo(() => getDeleteAndMoveSelctedSymbolBtns(), [])
   if (wasSubmitBtnPressed) {
     isAnswerCorrect = JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol));
   }
@@ -61,6 +86,35 @@ const GameScrnPresentation = () => {
   function handleSymbolOptPress(selectedLogicSymbol: ISelectedLogicSymbol) {
     setSelectedLogicSymbols(prevState => [...prevState, { symbol: selectedLogicSymbol.symbol, _id: uuid.v4() }])
   };
+
+  function handleMovementSymbolBtnPress(numToIncreaseSelectedIndexBy: -1 | 1) {
+    try {
+      const selectedSymbolIndex = selectedLogicSymbols.findIndex(({ wasPressed }) => wasPressed);
+      let indexToSwitchSelectedSymbolWith: number | null = null;
+
+      if (selectedSymbolIndex === -1) {
+        throw new Error("Failed to retrieve the selected symbol by the user.")
+      };
+
+      // NOTES: 
+      // WHAT DO I KNOW: 
+      // we have the index of the selected symbol 
+      // case: the selected symbol is at the beginning of the index, it is 0 
+      // if 0, get the last index of the array. This will be indexToSwitchSelectedSymbolWith
+      // if the last index of the array, and the user presses the right arrow button, then indexToSwitchSelectedSymbolWith will be 0
+
+      if ((selectedSymbolIndex === (selectedLogicSymbols.length - 1)) && (Math.sign(numToIncreaseSelectedIndexBy) === 1)) {
+        indexToSwitchSelectedSymbolWith = 0
+      } else if ((selectedSymbolIndex === 0) && (Math.sign(numToIncreaseSelectedIndexBy) === -1)) {
+        indexToSwitchSelectedSymbolWith = selectedLogicSymbols.length - 1
+      }
+
+      const updatedSelectedSymbolsArr = getUpdatedSelectedSymbolsArr(indexToSwitchSelectedSymbolWith as number, selectedSymbolIndex, selectedLogicSymbols);
+      setSelectedLogicSymbols(updatedSelectedSymbolsArr);
+    } catch (error) {
+      console.error("An error has occurred in moving the selected symbol: ", error);
+    }
+  }
 
   function handleSelectedLogicSymbol(selectedLogicSymbol: ISelectedLogicSymbol) {
     try {
@@ -73,14 +127,15 @@ const GameScrnPresentation = () => {
       const previouslyPressedSelectedSymbolIndex = selectedLogicSymbols.findIndex(({ wasPressed, _id }) => wasPressed && (selectedLogicSymbol._id !== _id));
       const currentlyPressedSelectedSymbolIndex = selectedLogicSymbols.findIndex(symbol => symbol._id === selectedLogicSymbol._id);
 
+      // switch the symbols with one another
       if ((currentlyPressedSelectedSymbolIndex !== -1) && (previouslyPressedSelectedSymbolIndex !== -1)) {
         let selectedLogicSymbolsClone = structuredClone<ISelectedLogicSymbol[]>(selectedLogicSymbols);
         let previouslyPressedSelectedSymbol = structuredClone<ISelectedLogicSymbol>(selectedLogicSymbolsClone[previouslyPressedSelectedSymbolIndex]);
         let currentlyPressedSelectedSymbol = structuredClone<ISelectedLogicSymbol>(selectedLogicSymbolsClone[currentlyPressedSelectedSymbolIndex]);
-        previouslyPressedSelectedSymbol.wasPressed = false;
-        currentlyPressedSelectedSymbol.wasPressed = false;
         selectedLogicSymbolsClone[previouslyPressedSelectedSymbolIndex] = currentlyPressedSelectedSymbol;
         selectedLogicSymbolsClone[currentlyPressedSelectedSymbolIndex] = previouslyPressedSelectedSymbol;
+        previouslyPressedSelectedSymbol.wasPressed = false;
+        currentlyPressedSelectedSymbol.wasPressed = false;
         setSelectedLogicSymbols(selectedLogicSymbolsClone);
         return;
       }
@@ -156,12 +211,12 @@ const GameScrnPresentation = () => {
 
       setGameScrnTabStore(false, 'wasSubmitBtnPressed');
 
-      setGameScrnTabStore(questionIndex + 1, "currentQuestionIndex");
+      setQuestionIndex(questionIndex => questionIndex + 1);
 
       setGameScrnTabStore(false, 'isTimerPaused');
     }, 2000);
 
-    if(isAnswerCorrect){
+    if (isAnswerCorrect) {
       setGameScrnTabStore(rightNum + 1, "right");
       return;
     }
@@ -205,7 +260,6 @@ const GameScrnPresentation = () => {
                 alignItems: 'center'
               }}
             >
-              
               <PTxt
                 fontSize={30}
                 txtColor={isAnswerCorrect ? 'green' : 'red'}
@@ -321,8 +375,33 @@ const GameScrnPresentation = () => {
           )}
         </View>
       </View>
-      <View style={{ flex: 1, width: "100%", display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-        <View style={{ display: 'flex', width: "80%", flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{
+          display: "flex",
+          flexDirection: "row",
+          borderBottomWidth: 1,
+          borderBottomColor: currentColorsThemeObj.second,
+          width: "93%",
+          gap: 8,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingVertical: 8
+        }}>
+          {/* {directionButtons.map((symbolOpt, index) => (
+            
+          ))} */}
+        </View>
+        <View style={{
+          display: 'flex',
+          width: "80%",
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: 8,
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginTop: 8
+        }}
+        >
           {symbolOptions.map((symbolOpt, index) => (
             <TouchableOpacity
               key={index}
