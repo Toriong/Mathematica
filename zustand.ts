@@ -1,5 +1,15 @@
 import { create } from 'zustand';
-import { TApiQsFetchingStatusStore, IColorStore, IQuestionsForObj, TCurrentTheme, TGameScrnTabStore, TIsGettingReqStore, TUpdateStoreState, IApiQsFetchingStatus, IQuestionsStates } from './zustandStoreTypes&Interfaces';
+import {
+    TApiQsFetchingStatusStore,
+    IColorStore,
+    IQuestionsForObj,
+    TCurrentTheme,
+    TGameScrnTabStore,
+    TIsGettingReqStore,
+    TUpdateStoreState,
+    IApiQsFetchingStatus,
+    IQuestionsStates
+} from './zustandStoreTypes&Interfaces';
 
 export const useQuestionsStore = create<IQuestionsForObj>(set => ({
     task: "",
@@ -22,7 +32,7 @@ export const useIsGettingReqStore = create<TIsGettingReqStore>(set => ({
 }));
 
 export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
-    const gameScrnTabStore:TGameScrnTabStore = {
+    const gameScrnTabStore: TGameScrnTabStore = {
         right: 0,
         wrong: 0,
         wasSubmitBtnPressed: false,

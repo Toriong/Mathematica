@@ -56,7 +56,6 @@ function getUpdatedSelectedSymbolsArr(indexToSwitchSelectedSymbolWith: number, s
   return selectedLogicSymbolsClone;
 }
 
-
 const GameScrnPresentation = () => {
   const currentThemeStr = useColorStore(state => state.currentTheme);
   const colorThemesObj = useColorStore(state => state.themesObj);

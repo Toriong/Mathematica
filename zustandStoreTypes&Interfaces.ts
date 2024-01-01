@@ -1,13 +1,17 @@
 import { TQuestionTypes } from "./Screens/GameScrn/typesAndInterfaces"
 import { TResponseStatus } from "./api_services/globalApiVars"
-import { IThemeColors, TLogicalSymbols, TLowerCaseLetters, TUpperCaseLetters } from "./globalTypes&Interfaces"
-import { LETTERS } from "./globalVars"
+import { IThemeColors } from "./globalTypes&Interfaces"
+import { IQuestion } from "./sharedInterfaces&TypesWithBackend"
 
 export interface IIsGettingReqStoreState {
     isGettingQs: boolean
     isGettingUserInfo: boolean
 }
-
+export type TCurrentTheme = "dark" | "light";
+interface IErrorStore {
+    didAnErrorOccurInGettingQs: boolean,
+    didAnErrorOccurInUserAuth: boolean,
+}
 interface IGameScrnTabStoreState {
     right: number
     wrong: number
@@ -21,21 +25,16 @@ export interface IChoice {
     value: string
     letter: string
 }
-export interface IQuestion {
-    _id: string
-    sentence: string
-    answer: string[]
-    task?: string
-    choices: IChoice[]
-    symbolOptions: (TUpperCaseLetters | TLogicalSymbols)[] 
+export interface IQuestionOnClient extends IQuestion {
+    symbolOptions: string[]
 }
 export interface IQuestionObjActions {
-    setQuestions: (questions: IQuestion[]) => void
+    setQuestions: (questions: IQuestionOnClient[]) => void
     setTask: (task: string) => void
 }
 export interface IQuestionsStates {
     task: string
-    questions: IQuestion[]
+    questions: IQuestionOnClient[]
 }
 
 export type TUpdateStoreState<TNewState, TFieldName> = {
@@ -45,13 +44,6 @@ export type TUpdateStoreState<TNewState, TFieldName> = {
 export type TUpdateStoreStateDynamicType = {
     updateState: <TNewState, TFieldName>(newState: TNewState, fieldName: TFieldName) => void
 }
-
-interface IErrorStore {
-    didAnErrorOccurInGettingQs: boolean,
-    didAnErrorOccurInUserAuth: boolean,
-}
-
-export type TCurrentTheme = "dark" | "light";
 
 export interface IColorStore {
     themesObj: IThemeColors

@@ -6,13 +6,16 @@ import { TScreenNames, TStackNavigation } from "../../Navigation";
 import { useColorStore } from "../../zustand";
 import Modal from "react-native-modal";
 import Button from "../../global_components/Button";
+import { Storage } from "../../utils/storage";
 
 const HomeScrnPresentation = () => {
     const navigation = useNavigation<TStackNavigation>();
     const appColors = useColorStore();
+    const memory = new Storage();
     const currentAppColors = appColors.themesObj[appColors.currentTheme];
 
     function handleOnBtnPress(scrnName: TScreenNames) {
+        memory.setItem("isGameOn", true);
         navigation.navigate(scrnName)
     }
 

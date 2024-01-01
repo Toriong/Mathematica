@@ -3,8 +3,8 @@ import uuid from "react-native-uuid"
 const QUESTION_TYPES = ['propositional', 'predicate', 'diagrams'] as const;
 export type TQuestionTypes = typeof QUESTION_TYPES[number]
 export interface IChoice {
-    letter: String
-    value: String
+    letter: string
+    value: string
 }
 export interface IQuestion {
     _id?: ReturnType<typeof uuid.v4>

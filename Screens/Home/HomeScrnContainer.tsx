@@ -3,7 +3,7 @@ import { IReturnObjOfAsyncFn, SERVER_ORIGIN, TResponseStatus } from "../../api_s
 import { useEffect } from "react";
 import { useApiQsFetchingStatusStore, useQuestionsStore } from "../../zustand";
 import { TPromiseReturnValGetQuestions, getQuestions } from "../../api_services/quiz/getQuestions";
-import { IChoice, IQuestion } from "../../zustandStoreTypes&Interfaces";
+import { IChoice, IQuestionOnClient } from "../../zustandStoreTypes&Interfaces";
 import { Storage } from "../../utils/storage";
 import { IS_TESTING, TESTING_USER_ID } from "../../globalVars";
 import { getIsTValid } from "../../utils/generalFns";
@@ -11,7 +11,7 @@ import { CustomError, ICustomError } from "../../utils/errors";
 
 interface IInitialQsGetReqResult {
     gettingQsResponseStatus: TResponseStatus
-    questions: IQuestion[]
+    questions: IQuestionOnClient[]
 }
 
 let apiRequestTriesNum = 0;
@@ -19,10 +19,10 @@ let apiRequestTriesNum = 0;
 async function getInitialQs(userId: string): Promise<IInitialQsGetReqResult> {
     try {
         userId = IS_TESTING ? TESTING_USER_ID : userId;
-        const responseGetPropostionalQs = getQuestions<{ questions: IQuestion[] }>(3, ["propositional"], userId as string);
-        const responseGetPredicateQs = getQuestions<{ questions: IQuestion[] }>(3, ["predicate"], userId as string)
-        const responses: Awaited<TPromiseReturnValGetQuestions<{ questions: IQuestion[] } | null>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
-        let responsesFiltered = responses.filter(response => !!response.data || !!response) as IReturnObjOfAsyncFn<{ questions: IQuestion[] }>[];
+        const responseGetPropostionalQs = getQuestions<{ questions: IQuestionOnClient[] }>(3, ["propositional"], userId as string);
+        const responseGetPredicateQs = getQuestions<{ questions: IQuestionOnClient[] }>(3, ["predicate"], userId as string)
+        const responses: Awaited<TPromiseReturnValGetQuestions<{ questions: IQuestionOnClient[] } | null>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
+        let responsesFiltered = responses.filter(response => !!response.data || !!response) as IReturnObjOfAsyncFn<{ questions: IQuestionOnClient[] }>[];
         let result: IInitialQsGetReqResult | null = null;
         responsesFiltered = responsesFiltered?.length
             ?
@@ -51,7 +51,7 @@ async function getInitialQs(userId: string): Promise<IInitialQsGetReqResult> {
             result = await getInitialQs(userId);
         }
 
-        const questions = responsesFiltered.flatMap<unknown>(response => response.data?.questions) as IQuestion[];
+        const questions = responsesFiltered.flatMap<unknown>(response => response.data?.questions) as IQuestionOnClient[];
 
         console.log("questions: ", questions)
 
