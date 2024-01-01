@@ -60,6 +60,8 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     }, []);
 
     useEffect(() => {
+        console.log("hey there timerObj.timerMs: ", timerObj.timerMs)
+        console.log("isGameOn: ", isGameOn);
         if ((timerObj.timerMs <= 0) && isGameOn) {
             navigate('ResultsScreen');
             setGameScrnTabStore(false, 'isGameOn');
@@ -89,7 +91,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
             >
                 <View style={{ display: 'flex', flexDirection: 'row', width: "100%", paddingTop: "3%" }}>
                     <View style={{ width: "30%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <Button backgroundColor='none' handleOnPress={handleBtnPress}>
+                        <Button isDisabled={false} backgroundColor='none' handleOnPress={handleBtnPress}>
                             <View style={{ borderWidth: 3, borderColor: currentThemeObj.second, borderRadius: 50, padding: 8 }}>
                                 <FontAwesomeIcon icon={faArrowLeft} size={50} color={currentThemeObj.second} />
                             </View>

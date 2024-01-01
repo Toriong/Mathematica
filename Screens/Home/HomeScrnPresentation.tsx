@@ -29,6 +29,7 @@ const HomeScrnPresentation = () => {
             <View style={{ display: "flex", flexDirection: 'column', flex: 1 }}>
                 <View style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <Button
+                        isDisabled={false}
                         dynamicStyles={{ padding: 10, borderRadius: 15 }}
                         backgroundColor={currentAppColors.second}
                         handleOnPress={async _ => { await handleOnBtnPress("GameScreen", ["propositional", "predicate"]) }}
@@ -41,6 +42,7 @@ const HomeScrnPresentation = () => {
                     style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                 >
                     <Button
+                        isDisabled={false}
                         dynamicStyles={{ padding: 10, borderRadius: 15 }}
                         backgroundColor={currentAppColors.second}
                         handleOnPress={async _ => { await handleOnBtnPress("GameScreen", ["predicate"]) }}
@@ -52,6 +54,7 @@ const HomeScrnPresentation = () => {
                     style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                 >
                     <Button
+                        isDisabled={false}
                         dynamicStyles={{ padding: 10, borderRadius: 15 }}
                         backgroundColor={currentAppColors.second} handleOnPress={async _ => { await handleOnBtnPress("GameScreen", ["diagrams"]) }}
                     >
@@ -62,6 +65,7 @@ const HomeScrnPresentation = () => {
                     style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                 >
                     <Button
+                        isDisabled={false}
                         dynamicStyles={{ padding: 10, borderRadius: 15 }}
                         backgroundColor={currentAppColors.second} handleOnPress={async _ => { await handleOnBtnPress("GameScreen", ["diagrams", "predicate", "propositional"]) }}
                     >

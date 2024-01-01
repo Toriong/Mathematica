@@ -7,13 +7,15 @@ type TMoveSymbolBtnProps = Omit<ButtonProps & { Icon: TFontAwesomeIcon }, "child
 const EditSelectedSymbolBtn = ({
         handleOnPress,
         dynamicStyles = {},
-        Icon
+        Icon,
+        isDisabled
 }: TMoveSymbolBtnProps) => {
     return (
         <Button
             handleOnPress={handleOnPress}
             dynamicStyles={dynamicStyles}
             backgroundColor="transparent"
+            isDisabled={isDisabled}
         >
             {Icon}
         </Button>

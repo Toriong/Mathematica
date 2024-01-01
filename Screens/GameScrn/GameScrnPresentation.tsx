@@ -37,12 +37,14 @@ interface ISelectedLogicSymbol {
 function getDeleteAndMoveSelctedSymbolBtns(
   handleMovementButtonPress: (num: 1 | -1) => void,
   handleDeleteSymbolButtonPress: () => void,
-  opacity: number
+  opacity: 1 | .1
 ) {
+  const areBtnsDisabled = opacity === .1;
+
   return [
-    <EditSelectedSymbolBtn dynamicStyles={{ opacity: opacity }} backgroundColor="transparent" Icon={<FontAwesomeIcon size={25} icon={faArrowLeft} />} handleOnPress={() => { handleMovementButtonPress(-1) }} />,
-    <EditSelectedSymbolBtn dynamicStyles={{ opacity: opacity }} backgroundColor="transparent" Icon={<FontAwesomeIcon size={25} color='red' icon={faCancel} />} handleOnPress={handleDeleteSymbolButtonPress} />,
-    <EditSelectedSymbolBtn dynamicStyles={{ opacity: opacity }} backgroundColor="transparent" Icon={<FontAwesomeIcon size={25} icon={faArrowRight} />} handleOnPress={() => { handleMovementButtonPress(1) }} />,
+    <EditSelectedSymbolBtn isDisabled={areBtnsDisabled} dynamicStyles={{ opacity: opacity }} backgroundColor="transparent" Icon={<FontAwesomeIcon size={25} icon={faArrowLeft} />} handleOnPress={() => { handleMovementButtonPress(-1) }} />,
+    <EditSelectedSymbolBtn isDisabled={areBtnsDisabled} dynamicStyles={{ opacity: opacity }} backgroundColor="transparent" Icon={<FontAwesomeIcon size={25} color='red' icon={faCancel} />} handleOnPress={handleDeleteSymbolButtonPress} />,
+    <EditSelectedSymbolBtn isDisabled={areBtnsDisabled} dynamicStyles={{ opacity: opacity }} backgroundColor="transparent" Icon={<FontAwesomeIcon size={25} icon={faArrowRight} />} handleOnPress={() => { handleMovementButtonPress(1) }} />,
   ]
 };
 
@@ -167,7 +169,7 @@ const GameScrnPresentation = () => {
       }
 
       if (!targetSymbol?.wasPressed && (previouslyPressedSelectedSymbolIndex === -1)) {
-        const selectedLogicSymbolsUpdated = selectedLogicSymbols.map(symbol => {
+        setSelectedLogicSymbols(symbols => symbols.map(symbol => {
           if (symbol._id === selectedLogicSymbol._id) {
             return {
               ...symbol,
@@ -175,19 +177,21 @@ const GameScrnPresentation = () => {
             }
           }
 
-          return symbol;
-        });
-
-        setSelectedLogicSymbols(selectedLogicSymbolsUpdated);
+          return symbol
+        }));
         return;
       };
 
+      setSelectedLogicSymbols(symbols => symbols.map(symbol => {
+        if (symbol._id === selectedLogicSymbol._id) {
+          return {
+            ...symbol,
+            wasPressed: false
+          }
+        }
 
-      setSelectedLogicSymbols(symbols => {
-        const symbolsFiltered = symbols.filter(({ _id }) => _id !== selectedLogicSymbol._id)
-
-        return symbolsFiltered?.length ? symbolsFiltered.map(symbol => ({ ...symbol, wasPressed: false })) : symbolsFiltered;
-      })
+        return symbol
+      }));
     } catch (error) {
       console.error("An error has occurred: ", error)
     }
@@ -442,7 +446,6 @@ const GameScrnPresentation = () => {
                 height={SYMBOL_WIDTH_AND_HEIGHT}
                 backgroundColor={currentColorsThemeObj.second}
                 txtFontSize={24}
-                pTxtStyle={(symbolOpt.symbol === "E") ? { transform: [{ rotateY: "180deg" }] } : {}}
               >
                 {symbolOpt.symbol}
               </LogicSymbol>
@@ -451,7 +454,7 @@ const GameScrnPresentation = () => {
         </View>
       </View>
       <View style={{ flex: 1, width: "100%", marginTop: "5%", display: 'flex', flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: 'center' }}>
-        <Button handleOnPress={handleClearBtnPress} backgroundColor='#FFC12F' dynamicStyles={{ padding: 17, borderRadius: 15 }}>
+        <Button isDisabled={false} handleOnPress={handleClearBtnPress} backgroundColor='#FFC12F' dynamicStyles={{ padding: 17, borderRadius: 15 }}>
           <PTxt>CLEAR</PTxt>
         </Button>
         <TouchableOpacity
