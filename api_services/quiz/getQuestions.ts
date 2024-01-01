@@ -3,7 +3,15 @@ import { IReturnObjOfAsyncFn, PATHS, SERVER_ORIGIN } from "../globalApiVars"
 import axios from "axios";
 import { IError } from "../types&Interfaces";
 
-type TPath = { name: string, value: string | string[] | number | boolean };
+type TGetQuestionsParams = {
+    questionsToGetNum: number,
+    questionTypes: TQuestionTypes[],
+    userId: string,
+    sentenceTxts?: string[],
+    willClearUserSentenceTxtsCache?: boolean
+}
+
+type TPath = { name: keyof TGetQuestionsParams, value: string | string[] | number | boolean };
 
 // how to throw an error if the element does not exist
 const getQuestionsApiPath = PATHS[0];
@@ -18,7 +26,8 @@ export async function getQuestions<TData>(
     questionsToGetNum: number,
     questionTypes: TQuestionTypes[],
     userId: string,
-    sentenceTxts?: string[],
+    sentenceTxts?: string[] | null,
+    willClearUserSentenceTxtsCache?: boolean | null
 ): TPromiseReturnValGetQuestions<TData> {
     try {
         console.log("what is up...")
@@ -33,6 +42,11 @@ export async function getQuestions<TData>(
         if (sentenceTxts?.length) {
             params.push({ name: "sentenceTxts", value: sentenceTxts })
         };
+
+        if (willClearUserSentenceTxtsCache) {
+            // how to specify the correct based on the passed value for the field name? 
+            params.push({ name: "willClearUserSentenceTxtsCache", value: true })
+        }
 
         appendParamsToUrl(getQuestionsApiUrl, params);
 

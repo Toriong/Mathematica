@@ -1,7 +1,7 @@
 import { IS_TESTING, TESTING_USER_ID } from "../../globalVars";
+import { IQuestion } from "../../sharedInterfaces&TypesWithBackend";
 import { CustomError, ICustomError } from "../../utils/errors";
 import { getIsTValid } from "../../utils/generalFns";
-import { IQuestion } from "../../zustandStoreTypes&Interfaces";
 import { IReturnObjOfAsyncFn, TResponseStatus } from "../globalApiVars";
 import { TPromiseReturnValGetQuestions, getQuestions } from "./getQuestions";
 
@@ -12,11 +12,11 @@ interface IInitialQsGetReqResult {
 
 let apiRequestTriesNum = 0;
 
-export async function getInitialQs(userId: string): Promise<IInitialQsGetReqResult> {
+export async function getInitialQs(userId: string, willClearCacheOnServer?: boolean): Promise<IInitialQsGetReqResult> {
     try {
         userId = IS_TESTING ? TESTING_USER_ID : userId;
-        const responseGetPropostionalQs = getQuestions<{ questions: IQuestion[] }>(3, ["propositional"], userId as string);
-        const responseGetPredicateQs = getQuestions<{ questions: IQuestion[] }>(3, ["predicate"], userId as string)
+        const responseGetPropostionalQs = getQuestions<{ questions: IQuestion[] }>(3, ["propositional"], userId as string, null, willClearCacheOnServer);
+        const responseGetPredicateQs = getQuestions<{ questions: IQuestion[] }>(3, ["predicate"], userId as string, null, willClearCacheOnServer)
         const responses: Awaited<TPromiseReturnValGetQuestions<{ questions: IQuestion[] } | null>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
         let responsesFiltered = responses.filter(response => !!response.data || !!response) as IReturnObjOfAsyncFn<{ questions: IQuestion[] }>[];
         let result: IInitialQsGetReqResult | null = null;

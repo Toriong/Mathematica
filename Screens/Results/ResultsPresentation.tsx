@@ -27,11 +27,6 @@ const ResultsPresentation = () => {
 
     };
 
-
-useEffect(() => {
-        // SEND the quiz to the server to be saved into the database
-    }, [])
-
     return (
         <Layout>
             <View style={{ width: "100%", display: 'flex', alignItems: 'center', justifyContent: 'center', flex: .6 }}>
@@ -54,7 +49,7 @@ useEffect(() => {
                         Score:
                     </PTxt>
                     <PTxt
-                        fontSize={PTXT_FONT_SIZE}
+                        fontSize={40}
                         txtColor={appColors.third}
                         style={{ display: 'flex', justifyContent: 'center', alignContent: 'center', width: "100%" }}
                     >
@@ -78,12 +73,14 @@ useEffect(() => {
                         backgroundColor={appColors.second}
                         handleOnPress={handleReviewBtnPress}
                         dynamicStyles={styles.button}
+                        isDisabled={false}
                     >
                         <PTxt fontSize={BTN_FONT_SIZE} txtColor={appColors.third}>
                             Review
                         </PTxt>
                     </Button>
                     <Button
+                        isDisabled={false}
                         backgroundColor={SUCCESS_COLOR}
                         handleOnPress={handlePlayAgainBtnPress}
                         dynamicStyles={styles.button}
@@ -100,6 +97,7 @@ useEffect(() => {
                 </View>
                 <View style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', gap: 15 }}>
                     <Button
+                        isDisabled={false}
                         backgroundColor={PRIMARY_COLOR}
                         handleOnPress={handleHomeBtnPress}
                         dynamicStyles={styles.button}
@@ -113,6 +111,7 @@ useEffect(() => {
                         </PTxt>
                     </Button>
                     <Button
+                        isDisabled={false}
                         backgroundColor={WARNING_COLOR}
                         handleOnPress={handleHomeBtnPress}
                         dynamicStyles={styles.button}

@@ -4,7 +4,7 @@ import { Storage } from "../utils/storage";
 import { IS_TESTING, TESTING_USER_ID } from "../globalVars";
 import { getInitialQs } from "../api_services/quiz/getInitialQs";
 
-export function useGetInitialQs(){
+export function useGetInitialQs(willClearCacheOnServer?: boolean){
     const memory = new Storage();
     const willGetQs = useApiQsFetchingStatusStore(state => state.willGetQs);
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
@@ -17,7 +17,7 @@ export function useGetInitialQs(){
                 try {
                     let userId = await memory.getItem("userId");
                     userId = IS_TESTING ? TESTING_USER_ID : userId;
-                    const response = await getInitialQs(userId as string);
+                    const response = await getInitialQs(userId as string, willClearCacheOnServer);
 
                     if(response.gettingQsResponseStatus === "FAILURE"){
                         throw new Error("Failed to get the initial questions from the server.")

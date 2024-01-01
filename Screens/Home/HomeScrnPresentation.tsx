@@ -19,8 +19,11 @@ const HomeScrnPresentation = () => {
         scrnName: TScreenNames,
         types: Exclude<Parameters<typeof updateGameScrnTabStore>[0], number | boolean>
     ) {
+        // when get more questions after the user responds to a question, check if the test is still going when a recursive call is being
+        // implemented
         await memory.setItem("isGameOn", true);
         updateGameScrnTabStore(types, "questionTypes");
+        updateGameScrnTabStore(true, "isGameOn");
         navigation.navigate(scrnName)
     }
 

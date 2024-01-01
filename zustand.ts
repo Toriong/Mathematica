@@ -31,6 +31,9 @@ export const useIsGettingReqStore = create<TIsGettingReqStore>(set => ({
     updateState: (newState: boolean, fieldName: keyof TIsGettingReqStore) => set(() => ({ [fieldName]: newState }))
 }));
 
+// Get the properties of the TGameScrnTabStore type 
+// dynamically select them via their field names
+
 export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
     const gameScrnTabStore: TGameScrnTabStore = {
         right: 0,
