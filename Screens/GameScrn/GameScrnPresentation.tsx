@@ -35,13 +35,14 @@ interface ISelectedLogicSymbol {
 
 
 function getDeleteAndMoveSelctedSymbolBtns(
-  handleMovementButtonPress: (num: number) => void,
-  handleDeleteSymbolButtonPress: () => void
+  handleMovementButtonPress: (num: 1 | -1) => void,
+  handleDeleteSymbolButtonPress: () => void,
+  opacity: number 
 ) {
   return [
-    <EditSelectedSymbolBtn backgroundColor="transparent" Icon={<FontAwesomeIcon icon={faArrowLeft} />} handleOnPress={() => { handleMovementButtonPress(-1) }} />,
-    <EditSelectedSymbolBtn backgroundColor="transparent" Icon={<FontAwesomeIcon icon={faArrowRight} />} handleOnPress={handleDeleteSymbolButtonPress} />,
-    <EditSelectedSymbolBtn backgroundColor="transparent" Icon={<FontAwesomeIcon icon={faArrowLeft} />} handleOnPress={() => { handleMovementButtonPress(1) }} />,
+    <EditSelectedSymbolBtn dynamicStyles={{ opacity: opacity }} backgroundColor="transparent" Icon={<FontAwesomeIcon size={25} icon={faArrowLeft} />} handleOnPress={() => { handleMovementButtonPress(-1) }} />,
+    <EditSelectedSymbolBtn dynamicStyles={{ opacity: opacity }} backgroundColor="transparent" Icon={<FontAwesomeIcon size={25} color='red' icon={faCancel} />} handleOnPress={handleDeleteSymbolButtonPress} />,
+    <EditSelectedSymbolBtn dynamicStyles={{ opacity: opacity }} backgroundColor="transparent" Icon={<FontAwesomeIcon size={25} icon={faArrowRight} />} handleOnPress={() => { handleMovementButtonPress(1) }} />,
   ]
 };
 
@@ -67,7 +68,6 @@ const GameScrnPresentation = () => {
   const wrongNum = useGameScrnTabStore(state => state.wrong);
   const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [directionButtons, setDirectionButtons] = useState([]);
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
   const question = questions[questionIndex];
@@ -78,7 +78,6 @@ const GameScrnPresentation = () => {
   })), [questions, questionIndex]);
   let isAnswerCorrect: boolean | null = null;
 
-  // const selectedSymbols = useMemo(() => getDeleteAndMoveSelctedSymbolBtns(), [])
   if (wasSubmitBtnPressed) {
     isAnswerCorrect = JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol));
   }
@@ -115,6 +114,13 @@ const GameScrnPresentation = () => {
       console.error("An error has occurred in moving the selected symbol: ", error);
     }
   }
+
+  function handleDeleteSelectedSymbolBtnPress() {
+    setSelectedLogicSymbols(selectedLogicSymbols => selectedLogicSymbols.filter(({ wasPressed }) => !wasPressed));
+  };
+
+  const pressedSelectedSymbol = selectedLogicSymbols ? selectedLogicSymbols.find(({ wasPressed }) => wasPressed) : null;
+  const directionAndDeleteButtons = useMemo(() => getDeleteAndMoveSelctedSymbolBtns(handleMovementSymbolBtnPress, handleDeleteSelectedSymbolBtnPress, pressedSelectedSymbol ? 1 : .1), [pressedSelectedSymbol]);
 
   function handleSelectedLogicSymbol(selectedLogicSymbol: ISelectedLogicSymbol) {
     try {
@@ -387,9 +393,19 @@ const GameScrnPresentation = () => {
           alignItems: 'center',
           paddingVertical: 8
         }}>
-          {/* {directionButtons.map((symbolOpt, index) => (
-            
-          ))} */}
+          {directionAndDeleteButtons.map(Button => (
+            <View style={{
+              width: SYMBOL_WIDTH_AND_HEIGHT,
+              height: SYMBOL_WIDTH_AND_HEIGHT,
+              backgroundColor: currentColorsThemeObj.second,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 5,
+            }}>
+              {Button}
+            </View>
+          ))}
         </View>
         <View style={{
           display: 'flex',
