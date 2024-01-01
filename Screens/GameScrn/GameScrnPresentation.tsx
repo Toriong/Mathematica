@@ -84,16 +84,14 @@ const GameScrnPresentation = () => {
   }
 
   function handleSymbolOptPress(selectedLogicSymbol: ISelectedLogicSymbol) {
-    // CASE: a selected symbol was pressed, and the user clicked on one of the selected symbol options
-    // GOAL: Replace the selected symbol that was pressed with the symbol option that was pressed 
     const selectedSymbolPressed = selectedLogicSymbols.find(({ wasPressed }) => wasPressed);
 
     setSelectedLogicSymbols(selectedLogicSymbols => {
       const newSelectedSymbol = { symbol: selectedLogicSymbol.symbol, _id: uuid.v4() };
 
-      if(selectedSymbolPressed){
+      if (selectedSymbolPressed) {
         return selectedLogicSymbols.map(logicSymbol => {
-          if(logicSymbol._id === selectedSymbolPressed._id){
+          if (logicSymbol._id === selectedSymbolPressed._id) {
             return newSelectedSymbol;
           };
 
@@ -114,17 +112,23 @@ const GameScrnPresentation = () => {
         throw new Error("Failed to retrieve the selected symbol by the user.")
       };
 
-      if ((selectedSymbolIndex === (selectedLogicSymbols.length - 1)) && (Math.sign(numToIncreaseSelectedIndexBy) === 1)) {
-        indexToSwitchSelectedSymbolWith = 0
-      } else if ((selectedSymbolIndex === 0) && (Math.sign(numToIncreaseSelectedIndexBy) === -1)) {
-        indexToSwitchSelectedSymbolWith = selectedLogicSymbols.length - 1
-      }
+      let updatedSelectedSymbolsArr = structuredClone<ISelectedLogicSymbol[]>(selectedLogicSymbols);
 
-      const updatedSelectedSymbolsArr = getUpdatedSelectedSymbolsArr(
-        indexToSwitchSelectedSymbolWith as number,
-        selectedSymbolIndex,
-        selectedLogicSymbols
-      );
+      if ((selectedSymbolIndex === (selectedLogicSymbols.length - 1)) && (Math.sign(numToIncreaseSelectedIndexBy) === 1)) {
+        const selectedSymbol = updatedSelectedSymbolsArr[selectedSymbolIndex];
+        updatedSelectedSymbolsArr.splice(selectedSymbolIndex, 1);
+        updatedSelectedSymbolsArr.unshift(selectedSymbol);
+      } else if ((selectedSymbolIndex === 0) && (Math.sign(numToIncreaseSelectedIndexBy) === -1)) {
+        const selectedSymbol = updatedSelectedSymbolsArr[0];
+        updatedSelectedSymbolsArr.splice(0, 1);
+        updatedSelectedSymbolsArr.push(selectedSymbol);
+      } else {
+        updatedSelectedSymbolsArr = getUpdatedSelectedSymbolsArr(
+          indexToSwitchSelectedSymbolWith as number,
+          selectedSymbolIndex,
+          selectedLogicSymbols
+        );
+      }
       setSelectedLogicSymbols(updatedSelectedSymbolsArr);
     } catch (error) {
       console.error("An error has occurred in moving the selected symbol: ", error);
