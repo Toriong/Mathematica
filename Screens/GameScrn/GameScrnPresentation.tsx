@@ -84,7 +84,25 @@ const GameScrnPresentation = () => {
   }
 
   function handleSymbolOptPress(selectedLogicSymbol: ISelectedLogicSymbol) {
-    setSelectedLogicSymbols(prevState => [...prevState, { symbol: selectedLogicSymbol.symbol, _id: uuid.v4() }])
+    // CASE: a selected symbol was pressed, and the user clicked on one of the selected symbol options
+    // GOAL: Replace the selected symbol that was pressed with the symbol option that was pressed 
+    const selectedSymbolPressed = selectedLogicSymbols.find(({ wasPressed }) => wasPressed);
+
+    setSelectedLogicSymbols(selectedLogicSymbols => {
+      const newSelectedSymbol = { symbol: selectedLogicSymbol.symbol, _id: uuid.v4() };
+
+      if(selectedSymbolPressed){
+        return selectedLogicSymbols.map(logicSymbol => {
+          if(logicSymbol._id === selectedSymbolPressed._id){
+            return newSelectedSymbol;
+          };
+
+          return logicSymbol;
+        })
+      }
+
+      return [...selectedLogicSymbols, newSelectedSymbol]
+    })
   };
 
   function handleMovementSymbolBtnPress(numToIncreaseSelectedIndexBy: -1 | 1) {
@@ -365,7 +383,7 @@ const GameScrnPresentation = () => {
                   backgroundColor="transparent"
                   pTxtStyle={(symbol.symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
                 >
-                  {symbol.symbol === '∃' ? "E": symbol.symbol}
+                  {symbol.symbol === '∃' ? "E" : symbol.symbol}
                 </LogicSymbol>
               </TouchableOpacity>
             )
