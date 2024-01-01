@@ -68,7 +68,9 @@ const GameScrnPresentation = () => {
   const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
-  const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
+  const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([])
+  console.log("what is up there meng, questions: ", questions);
+  console.log("yo there meng, questions[questionIndex]: ", questions[questionIndex])
   const question = questions[questionIndex];
   const { choices, answer, symbolOptions: symbolOptionsFromServer } = question ?? {};
   const symbolOptions = useMemo(() => [...SYMBOLS, ...symbolOptionsFromServer].map(symbol => ({
@@ -168,14 +170,6 @@ const GameScrnPresentation = () => {
       console.error("An error has occurred: ", error)
     }
   }
-
-  function handleEnterBtnPress() {
-
-  };
-
-  function getIsAnswerCorrect() {
-
-  };
 
   function handleClearBtnPress() {
     setSelectedLogicSymbols([]);
@@ -369,9 +363,9 @@ const GameScrnPresentation = () => {
                   height={50}
                   txtFontSize={30}
                   backgroundColor="transparent"
-                  pTxtStyle={(symbol.symbol === "E") ? { transform: [{ rotateY: "180deg" }] } : {}}
+                  pTxtStyle={(symbol.symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
                 >
-                  {symbol.symbol}
+                  {symbol.symbol === '∃' ? "E": symbol.symbol}
                 </LogicSymbol>
               </TouchableOpacity>
             )

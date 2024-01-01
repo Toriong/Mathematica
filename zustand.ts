@@ -40,7 +40,7 @@ export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
         timer: 120_000,
         isGameOn: false,
         questionTypes: [],
-        updateState: (newState: boolean | number, fieldName: keyof TGameScrnTabStore) => set(() => ({ [fieldName]: newState }))
+        updateState: (newState: TGameScrnTabStore[keyof TGameScrnTabStore], fieldName: keyof TGameScrnTabStore) => set(() => ({ [fieldName]: newState }))
     }
 
     return gameScrnTabStore;

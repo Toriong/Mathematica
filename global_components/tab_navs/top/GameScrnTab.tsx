@@ -5,7 +5,7 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useColorStore, useGameScrnTabStore } from "../../../zustand";
 import Button from "../../Button";
 import { PTxt } from "../../text";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
 import { OVERLAY_OPACITY } from "../../../globalVars";
 import { TStackNavigationProp } from "../../../Navigation";
@@ -13,7 +13,7 @@ import { TStackNavigationProp } from "../../../Navigation";
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
 
-function getTimeForUI(millis: number): string {
+function getTimeForUI(millis: number) {
     const minutes = Math.floor(millis / 60_000);
     const seconds = ((millis % 60_000) / 1000).toFixed(0);
 
@@ -43,28 +43,28 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         }
     };
 
-    // useEffect(() => {
-    //     const intervalTimer = setInterval(() => {
-    //         setTimerObj(timerObj => {
-    //             if (timerObj.timerMs <= 0) {
-    //                 return timerObj;
-    //             }
+    useEffect(() => {
+        const intervalTimer = setInterval(() => {
+            setTimerObj(timerObj => {
+                if (timerObj.timerMs <= 0) {
+                    return timerObj;
+                }
 
-    //             const timerMs = timerObj.timerMs - 1_000;
-    //             const timerStr = getTimeForUI(timerMs);
+                const timerMs = timerObj.timerMs - 1_000;
+                const timerStr = getTimeForUI(timerMs);
 
-    //             return { timerStr, timerMs }
-    //         })
-    //     }, 1_000);
-    //     setIntervalTimer(intervalTimer)
-    // }, []);
+                return { timerStr, timerMs }
+            })
+        }, 1_000);
+        setIntervalTimer(intervalTimer)
+    }, []);
 
-    // useEffect(() => {
-    //     if ((timerObj.timerMs <= 0) && isGameOn) {
-    //         navigation.navigate('ResultsScreen');
-    //         setGameScrnTabStore(false, 'isGameOn');
-    //     }
-    // }, [timerObj])
+    useEffect(() => {
+        if ((timerObj.timerMs <= 0) && isGameOn) {
+            navigate('ResultsScreen');
+            setGameScrnTabStore(false, 'isGameOn');
+        }
+    }, [timerObj])
 
     return (
         <SafeAreaViewWrapper

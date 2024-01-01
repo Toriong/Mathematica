@@ -57,6 +57,6 @@ export interface IApiQsFetchingStatus {
 
 export type TApiQsFetchingStatusStore = IApiQsFetchingStatus & TUpdateStoreState<IApiQsFetchingStatus[keyof IApiQsFetchingStatus], keyof IApiQsFetchingStatus>
 export type TErrorStore = IErrorStore & TUpdateStoreState<boolean, keyof IErrorStore>
-export type TGameScrnTabStore = IGameScrnTabStoreState & TUpdateStoreState<number | boolean, keyof IGameScrnTabStoreState>
+export type TGameScrnTabStore = IGameScrnTabStoreState & TUpdateStoreState<IGameScrnTabStoreState[keyof IGameScrnTabStoreState], keyof IGameScrnTabStoreState>
 export type TIsGettingReqStore = IIsGettingReqStoreState & TUpdateStoreState<boolean, keyof IIsGettingReqStoreState>
 export type IQuestionsForObj = IQuestionsStates & TUpdateStoreStateDynamicType
