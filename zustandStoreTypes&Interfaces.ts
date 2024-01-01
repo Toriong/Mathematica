@@ -42,6 +42,10 @@ export type TUpdateStoreState<TNewState, TFieldName> = {
     updateState: (newState: TNewState, fieldName: TFieldName) => void
 }
 
+export type TUpdateStoreStateDynamicType = {
+    updateState: <TNewState, TFieldName>(newState: TNewState, fieldName: TFieldName) => void
+}
+
 interface IErrorStore {
     didAnErrorOccurInGettingQs: boolean,
     didAnErrorOccurInUserAuth: boolean,
@@ -63,4 +67,4 @@ export type TApiQsFetchingStatusStore = IApiQsFetchingStatus & TUpdateStoreState
 export type TErrorStore = IErrorStore & TUpdateStoreState<boolean, keyof IErrorStore>
 export type TGameScrnTabStore = IGameScrnTabStoreState & TUpdateStoreState<number | boolean, keyof IGameScrnTabStoreState>
 export type TIsGettingReqStore = IIsGettingReqStoreState & TUpdateStoreState<boolean, keyof IIsGettingReqStoreState>
-export type IQuestionsForObj = IQuestionsStates & TUpdateStoreState<IQuestionsStates[keyof IQuestionsStates], keyof IQuestionsStates>
+export type IQuestionsForObj = IQuestionsStates & TUpdateStoreStateDynamicType

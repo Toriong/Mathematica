@@ -2,10 +2,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type TStorageKeys = "userId"
 
+interface IStorage{
+    userId: string
+    isGameOn: boolean
+}
+
 export class Storage {
     storage = AsyncStorage;
 
-    getItem<TData>(key: string): Promise<TData | null | string>{
+    getItem<TData>(key: keyof IStorage): Promise<TData | null | string>{
         return this.storage.getItem(key);
     };
 
@@ -17,3 +22,6 @@ export class Storage {
         this.storage.removeItem(key);
     }
 }
+
+export type TStorageInstance = InstanceType<typeof Storage>;
+ 

@@ -5,61 +5,66 @@ import { useGameScrnTabStore, useQuestionsStore } from '../../zustand';
 import { getQuestions } from '../../api_services/quiz/getQuestions';
 import { getUserId } from '../../utils/generalFns';
 import { IQuestion } from '../../sharedInterfaces&TypesWithBackend';
+import { IReturnObjOfAsyncFn } from '../../api_services/globalApiVars';
+import { Storage } from '../../utils/storage';
+import { IQuestionsStates } from '../../zustandStoreTypes&Interfaces';
 
-const GameScrnContainer = () => {
-  const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
-  const questionTypes = useGameScrnTabStore(state => state.questionTypes); 
-  const questions = useQuestionsStore(state => state.questions); 
+async function getAdditionalQuestion(memory, ): Promise<IReturnObjOfAsyncFn<[IQuestion] | null>> {
+    try {
+      const userId = (await getUserId()) as string;
+      const isGameOn = await memory.getItem<boolean>("isGameOn") as boolean;
+      const sentenceTxts = questions.map(question => question.sentence);
+      const questionTypesForServer = questionTypes.length === 1 ? questionTypes : [questionTypes[Math.floor(Math.random() * questionTypes.length)]]
+      const getQuestionsResult = await getQuestions<IQuestion[]>(1, questionTypesForServer, userId, sentenceTxts);
+      let newQuestionArr: [IQuestion] | null = null;
 
-  async function getAdditionalQuestion(){
-    /*
-    this function will do the following: 
-    will get the questions from the server
-    if it fails to get the questions, 
-    try again until there is a succes or until the user answers all of the questions 
-    if the user reaches the end, then show the error UI to the user.  
-     */
+      // HOW TO STOP THE RECURSIVE CALL:
+      // if the user reaches the end of the questions, then set 'isGameOn' in the local storage to false
+      if (isGameOn && (getQuestionsResult.didErrorOccur || !getQuestionsResult?.data?.length)) {
+        const getQuestionResultAfterError = await getAdditionalQuestion();
+        newQuestionArr = getQuestionResultAfterError.data
+      };
 
-    // NOTES: 
-    // if isGameOn is false, then stop the recurion call of this function 
+      if (getQuestionsResult.didErrorOccur) {
+        throw new Error(`An error has occurred in getting the nex question form the server. Error message: ${getQuestionsResult.msg}`)
+      }
 
-    //  CASE: the user answers a question, the next question was successfully received from the server.
-    // GOAL: add the next question to the state of questions
-    // the new question was added to the array of questions
-    // the array that contains all of the questions was received from useQuestionStore.questions
-    // get the array stored in useQuestionStore.questions
-    // received the new question from the server
-    
-    
+      return { data: newQuestionArr };
+    } catch (error) {
+      console.error("An error has occurred in getting the next question from the server. Error message: ", error);
 
-    // GOAL: call the function of getQuestions to get the questions
-    // the getQuestions function is executed with the following arguments: 
-    // questionsToGetNum = 1 
-    // the userId = get it from the local storage 
-    // sentenceTxtsOfAnsweredQuestions = an array that contains all of the sentences on the client side
-    // questionTypes = an array of all the questions on the client side that the user can answer, A will be stored here
-    // the array of questionTypes is retrieved from the GameScoreStoreTab, call it A
-    // map through questions state, return the string stored in sentence, this will be the value that will be passed for 
-    // sentenceTxtsOfAnsweredQuestions
-    const userId = (await getUserId()) as string;
-    const sentenceTxts = questions.map(question => question.sentence);
-    const questionTypesForServer = questionTypes.length === 1 ? questionTypes : [questionTypes[Math.floor(Math.random() * questionTypes.length)]]
-    const getQuestionsResult = await getQuestions<IQuestion[]>(1, questionTypesForServer, userId, sentenceTxts);
-    let newQuestionArr: IQuestion[] | null = null;
-
-    // NOTES:
-    // -use local storage to check if the quiz is still going on. 
-    if((getQuestionsResult.didErrorOccur || !getQuestionsResult?.data?.length)){
-      const getQuestionResultAfterError = await getQuestions<IQuestion[]>(1, questionTypesForServer, userId, sentenceTxts);
+      return { didErrorOccur: true, data: null }
     }
   }
 
+const GameScrnContainer = () => {
+  const memory = new Storage();
+  const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
+  const questionTypes = useGameScrnTabStore(state => state.questionTypes);
+  const questions = useQuestionsStore(state => state.questions);
+  const updateQuestionsStore = useQuestionsStore(state => state.updateState);
+
+  
+
   useEffect(() => {
-    if(wasSubmitBtnPressed){
-      // get the questions from the server
-      // (async () => {
-      //   const questions = 
-      // })();
+    if (wasSubmitBtnPressed) {
+      (async () => {
+        try {
+          const getAdditionalQuestionResult = await getAdditionalQuestion();
+
+          console.log("getAdditionalQuestionResult: ", getAdditionalQuestionResult);
+
+          if (getAdditionalQuestionResult.didErrorOccur || !getAdditionalQuestionResult?.data?.length) {
+            throw new Error(`${getAdditionalQuestionResult.msg} ${!getAdditionalQuestionResult?.data?.length && 'Did not receive a question from the server.'}`);
+          }
+
+          console.log("Total questions received from the server: ", getAdditionalQuestionResult.data)
+
+          updateQuestionsStore<IQuestion[], keyof IQuestionsStates>(getAdditionalQuestionResult.data, "questions")
+        } catch (error) {
+          console.error("An error has occurred in getting the next question from the server. Error message: ", error);
+        }
+      })();
     }
   }, [wasSubmitBtnPressed])
 

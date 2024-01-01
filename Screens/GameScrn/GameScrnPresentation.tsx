@@ -88,25 +88,12 @@ const GameScrnPresentation = () => {
 
   function handleMovementSymbolBtnPress(numToIncreaseSelectedIndexBy: -1 | 1) {
     try {
-      console.log("selectedLogicSymbols: ", selectedLogicSymbols)
       const selectedSymbolIndex = selectedLogicSymbols.findIndex(({ wasPressed }) => wasPressed);
       let indexToSwitchSelectedSymbolWith: number | null = (selectedSymbolIndex === -1) ? null : (selectedSymbolIndex + (numToIncreaseSelectedIndexBy));
-
-      console.log("indexToSwitchSelectedSymbolWith: ", indexToSwitchSelectedSymbolWith);
-      console.log("selectedSymbolIndex: ", selectedSymbolIndex);
 
       if (selectedSymbolIndex === -1) {
         throw new Error("Failed to retrieve the selected symbol by the user.")
       };
-
-      // NOTES:
-      // BUTTON PRESS IS NOT WORKING.
-
-      // BUG: 
-      // WHAT IS HAPPENING: when the user presses on a symbol, and then clicks on one of the arrow buttons to move the selected symbol, nothing happens. 
-      // WHAT I WANT: when the user presses on a selected symbol, an then clicks on the arrow button, have that symbol switch with either 
-      // the symbol to its left or to its right 
-
 
       if ((selectedSymbolIndex === (selectedLogicSymbols.length - 1)) && (Math.sign(numToIncreaseSelectedIndexBy) === 1)) {
         indexToSwitchSelectedSymbolWith = 0
@@ -380,8 +367,10 @@ const GameScrnPresentation = () => {
               >
                 <LogicSymbol
                   width="auto"
-                  height={30}
+                  height={50}
+                  txtFontSize={30}
                   backgroundColor="transparent"
+                  pTxtStyle={(symbol.symbol === "E") ? { transform: [{ rotateY: "180deg" }] } : {}}
                 >
                   {symbol.symbol}
                 </LogicSymbol>
@@ -433,7 +422,13 @@ const GameScrnPresentation = () => {
               key={index}
               onPress={() => handleSymbolOptPress(symbolOpt)}
             >
-              <LogicSymbol width={SYMBOL_WIDTH_AND_HEIGHT} height={SYMBOL_WIDTH_AND_HEIGHT} backgroundColor={currentColorsThemeObj.second}>
+              <LogicSymbol
+                width={SYMBOL_WIDTH_AND_HEIGHT}
+                height={SYMBOL_WIDTH_AND_HEIGHT}
+                backgroundColor={currentColorsThemeObj.second}
+                txtFontSize={24}
+                pTxtStyle={(symbolOpt.symbol === "E") ? { transform: [{ rotateY: "180deg" }] } : {}}
+              >
                 {symbolOpt.symbol}
               </LogicSymbol>
             </TouchableOpacity>
