@@ -14,7 +14,7 @@ import {
 export const useQuestionsStore = create<IQuestionsForObj>(set => ({
     task: "",
     questions: [],
-    updateState: <TData, TFieldName>(newState: TData, fieldName: TFieldName) => set(() => ({ [fieldName as (TFieldName extends string ? string : never)]: newState })),
+    updateState: <TData, TFieldName>(newState: TData, fieldName: keyof IQuestionsStates) => set(() => ({ [fieldName as (TFieldName extends string ? string : never)]: newState })),
 }));
 
 export const useErrorsStore = create(set => ({
@@ -25,7 +25,7 @@ export const useErrorsStore = create(set => ({
     }))
 }));
 
-export const useIsGettingReqStore = create<TIsGettingReqStore>(set => ({
+export const useRequestStatusStore = create<TIsGettingReqStore>(set => ({
     isGettingQs: true,
     isGettingUserInfo: false,
     updateState: (newState: boolean, fieldName: keyof TIsGettingReqStore) => set(() => ({ [fieldName]: newState }))
@@ -41,7 +41,8 @@ export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
         wasSubmitBtnPressed: false,
         isTimerPaused: false,
         timer: 120_000,
-        isGameOn: false,
+        mode: "finish",
+        isLoadingModalOn: false,
         questionTypes: [],
         updateState: (newState: TGameScrnTabStore[keyof TGameScrnTabStore], fieldName: keyof TGameScrnTabStore) => set(() => ({ [fieldName]: newState }))
     }

@@ -2,13 +2,14 @@ import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import { View, SafeAreaView, GestureResponderEvent, Text } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import { useColorStore, useGameScrnTabStore } from "../../../zustand";
+import { useColorStore, useGameScrnTabStore, useQuestionsStore } from "../../../zustand";
 import Button from "../../Button";
 import { PTxt } from "../../text";
 import { useEffect, useState } from "react";
 import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
 import { OVERLAY_OPACITY } from "../../../globalVars";
 import { TStackNavigationProp } from "../../../Navigation";
+import { IQuestionOnClient } from "../../../zustandStoreTypes&Interfaces";
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
@@ -28,7 +29,9 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
     const timer = useGameScrnTabStore(state => state.timer);
-    const isGameOn = useGameScrnTabStore(state => state.isGameOn);
+    const gameScrnMode = useGameScrnTabStore(state => state.mode);
+    const questions = useQuestionsStore(state => state.questions);
+    const updateQuestionsStore = useQuestionsStore(state => state.updateState);
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
     const [timerObj, setTimerObj] = useState({ timerStr: getTimeForUI(timer), timerMs: timer });
     const [intervalTimer, setIntervalTimer] = useState<ReturnType<typeof setInterval> | null>(null);
@@ -60,11 +63,11 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     }, []);
 
     useEffect(() => {
-        console.log("hey there timerObj.timerMs: ", timerObj.timerMs)
-        console.log("isGameOn: ", isGameOn);
-        if ((timerObj.timerMs <= 0) && isGameOn) {
+        if ((timerObj.timerMs <= 0) && (gameScrnMode === "quiz")) {
+            setGameScrnTabStore("finish", 'mode');
+            const answeredQuestions = questions.filter(question => question.userAnswer);
+            updateQuestionsStore<IQuestionOnClient[]>(answeredQuestions, "questions")
             navigate('ResultsScreen');
-            setGameScrnTabStore(false, 'isGameOn');
         }
     }, [timerObj])
 
@@ -74,7 +77,14 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
             OverlayComp={
                 wasSubmitBtnPressed && (
                     <View
-                        style={{ width: '100%', height: '100%', backgroundColor: 'black', position: 'absolute', zIndex: 1, opacity: OVERLAY_OPACITY }}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            backgroundColor: 'black',
+                            position: 'absolute',
+                            zIndex: 1,
+                            opacity: OVERLAY_OPACITY
+                        }}
                     />
                 )
             }
@@ -89,6 +99,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                     borderWidth: 1
                 }}
             >
+                {/* present the loading ui here */}
                 <View style={{ display: 'flex', flexDirection: 'row', width: "100%", paddingTop: "3%" }}>
                     <View style={{ width: "30%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <Button isDisabled={false} backgroundColor='none' handleOnPress={handleBtnPress}>

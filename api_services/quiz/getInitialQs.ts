@@ -5,21 +5,21 @@ import { getIsTValid } from "../../utils/generalFns";
 import { IReturnObjOfAsyncFn, TResponseStatus } from "../globalApiVars";
 import { TPromiseReturnValGetQuestions, getQuestions } from "./getQuestions";
 
-interface IInitialQsGetReqResult {
+interface IInitialQsGetReqResult<TData> {
     gettingQsResponseStatus: TResponseStatus
-    questions: IQuestion[]
+    questions: TData[]
 }
 
 let apiRequestTriesNum = 0;
 
-export async function getInitialQs(userId: string, willClearCacheOnServer?: boolean): Promise<IInitialQsGetReqResult> {
+export async function getInitialQs<TData>(userId: string, willClearCacheOnServer?: boolean): Promise<IInitialQsGetReqResult<TData>> {
     try {
         userId = IS_TESTING ? TESTING_USER_ID : userId;
         const responseGetPropostionalQs = getQuestions<{ questions: IQuestion[] }>(3, ["propositional"], userId as string, null, willClearCacheOnServer);
         const responseGetPredicateQs = getQuestions<{ questions: IQuestion[] }>(3, ["predicate"], userId as string, null, willClearCacheOnServer)
         const responses: Awaited<TPromiseReturnValGetQuestions<{ questions: IQuestion[] } | null>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
         let responsesFiltered = responses.filter(response => !!response.data || !!response) as IReturnObjOfAsyncFn<{ questions: IQuestion[] }>[];
-        let result: IInitialQsGetReqResult | null = null;
+        let result: IInitialQsGetReqResult<TData> | null = null;
         responsesFiltered = responsesFiltered?.length
             ?
             responsesFiltered.filter(response => {
@@ -47,7 +47,7 @@ export async function getInitialQs(userId: string, willClearCacheOnServer?: bool
             result = await getInitialQs(userId);
         }
 
-        const questions = responsesFiltered.flatMap<unknown>(response => response.data?.questions) as IQuestion[];
+        const questions = responsesFiltered.flatMap<unknown>(response => response.data?.questions) as TData[];
 
         console.log("questions: ", questions)
 

@@ -3,7 +3,7 @@ import { TResponseStatus } from "./api_services/globalApiVars"
 import { IThemeColors } from "./globalTypes&Interfaces"
 import { IQuestion } from "./sharedInterfaces&TypesWithBackend"
 
-export interface IIsGettingReqStoreState {
+export interface IIsGetReqStoreState {
     isGettingQs: boolean
     isGettingUserInfo: boolean
 }
@@ -12,12 +12,14 @@ interface IErrorStore {
     didAnErrorOccurInGettingQs: boolean,
     didAnErrorOccurInUserAuth: boolean,
 }
+type TMode = "quiz" | "review" | "finish";
 interface IGameScrnTabStoreState {
     right: number
     wrong: number
     timer: number
     isTimerPaused: boolean
-    isGameOn: boolean
+    mode: TMode
+    isLoadingModalOn: boolean
     questionTypes: TQuestionTypes[]
     wasSubmitBtnPressed: boolean
 }
@@ -42,7 +44,7 @@ export type TUpdateStoreState<TNewState, TFieldName> = {
 }
 
 export type TUpdateStoreStateDynamicType = {
-    updateState: <TNewState, TFieldName>(newState: TNewState, fieldName: TFieldName) => void
+    updateState: <TNewState>(newState: TNewState, fieldName: keyof IQuestionsStates) => void
 }
 
 export interface IColorStore {
@@ -58,5 +60,5 @@ export interface IApiQsFetchingStatus {
 export type TApiQsFetchingStatusStore = IApiQsFetchingStatus & TUpdateStoreState<IApiQsFetchingStatus[keyof IApiQsFetchingStatus], keyof IApiQsFetchingStatus>
 export type TErrorStore = IErrorStore & TUpdateStoreState<boolean, keyof IErrorStore>
 export type TGameScrnTabStore = IGameScrnTabStoreState & TUpdateStoreState<IGameScrnTabStoreState[keyof IGameScrnTabStoreState], keyof IGameScrnTabStoreState>
-export type TIsGettingReqStore = IIsGettingReqStoreState & TUpdateStoreState<boolean, keyof IIsGettingReqStoreState>
+export type TIsGettingReqStore = IIsGetReqStoreState & TUpdateStoreState<boolean, keyof IIsGetReqStoreState>
 export type IQuestionsForObj = IQuestionsStates & TUpdateStoreStateDynamicType

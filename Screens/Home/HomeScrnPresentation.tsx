@@ -23,7 +23,7 @@ const HomeScrnPresentation = () => {
         // implemented
         await memory.setItem("isGameOn", true);
         updateGameScrnTabStore(types, "questionTypes");
-        updateGameScrnTabStore(true, "isGameOn");
+        updateGameScrnTabStore("quiz", "mode");
         navigation.navigate(scrnName)
     }
 

@@ -1,7 +1,7 @@
 import Layout from "../../global_components/Layout";
 import { View, StyleSheet } from 'react-native';
 import { HeadingTxt, PTxt } from "../../global_components/text";
-import { useGameScrnTabStore, useQuestionsStore } from "../../zustand";
+import { useApiQsFetchingStatusStore, useGameScrnTabStore, useQuestionsStore } from "../../zustand";
 import Button from "../../global_components/Button";
 import { useGetAppColors } from "../../custom_hooks/useGetAppColors";
 import { BORDER_RADIUS_NUM, PRIMARY_COLOR, SUCCESS_COLOR, WARNING_COLOR } from "../../globalVars";
@@ -10,6 +10,9 @@ import { IQuestion } from "../../sharedInterfaces&TypesWithBackend";
 import { IQuestionOnClient, IQuestionsForObj } from "../../zustandStoreTypes&Interfaces";
 import { useNavigation } from "@react-navigation/native";
 import { TStackNavigation } from "../../Navigation";
+import { getQuestions } from "../../api_services/quiz/getQuestions";
+import { getInitialQs } from "../../api_services/quiz/getInitialQs";
+import { Storage } from "../../utils/storage";
 
 const BTN_FONT_SIZE = 22;
 const PTXT_FONT_SIZE = 35;
@@ -19,12 +22,24 @@ const ResultsPresentation = ({ questionsForNextQuiz }: { questionsForNextQuiz: I
     const { navigate } = useNavigation<TStackNavigation>();
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
+    const questionTypes = useGameScrnTabStore(state => state.questionTypes);
+    const updateGameScrnStore = useGameScrnTabStore(state => state.updateState);
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);
+    const willGetQs = useApiQsFetchingStatusStore(state => state.willGetQs);
+    const apiQsFetchingStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
+    const updateApiFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const appColors = useGetAppColors();
+    const memory = new Storage();
 
-    function handlePlayAgainBtnPress() {
-        updateQuestionsStore<IQuestionsForObj["questions"], "questions">(questionsForNextQuiz, "questions");
-        navigate("GameScreen")
+    async function handlePlayAgainBtnPress() {
+        if (questionsForNextQuiz.length) {
+            updateQuestionsStore<IQuestionsForObj["questions"]>(questionsForNextQuiz, "questions");
+        } else if ((!willGetQs || ((apiQsFetchingStatus === "FAILURE") || (apiQsFetchingStatus === "NOT_EXECUTING")))) {
+            updateApiFetchingStatusStore(true, "willGetQs");
+        }
+
+        updateGameScrnStore("quiz", "mode");
+        navigate("GameScreen");
     };
 
     function handleHomeBtnPress() {
@@ -32,7 +47,8 @@ const ResultsPresentation = ({ questionsForNextQuiz }: { questionsForNextQuiz: I
     };
 
     function handleReviewBtnPress() {
-
+        updateGameScrnStore("review", "mode");
+        navigate("GameScreen");
     };
 
     return (
@@ -88,7 +104,7 @@ const ResultsPresentation = ({ questionsForNextQuiz }: { questionsForNextQuiz: I
                         </PTxt>
                     </Button>
                     <Button
-                        isDisabled={false}
+                        isDisabled={questionsForNextQuiz.length >= 0}
                         backgroundColor={SUCCESS_COLOR}
                         handleOnPress={handlePlayAgainBtnPress}
                         dynamicStyles={styles.button}
