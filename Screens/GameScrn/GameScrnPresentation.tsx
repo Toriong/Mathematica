@@ -13,6 +13,7 @@ import uuid from 'react-native-uuid';
 import LogicSymbol from './components/LogicSymbol';
 import EditSelectedSymbolBtn from './components/EditSelectedSymbolBtn';
 import Modal from "react-native-modal";
+import LoadingQsModal from './components/LoadingQsModal';
 
 const SYMBOL_WIDTH_AND_HEIGHT = 45;
 const SELECTED_LOGIC_SYMBOLS_TESTING_DATA = [
@@ -338,19 +339,7 @@ const GameScrnPresentation = () => {
         )
       }
     >
-      <Modal
-        isVisible={isModalShown}
-      >
-        <PTxt>
-          {gettingQsStatus === "IN_PROGRESS"
-            ?
-            "Getting questions..."
-            :
-            "Questions received ✅."
-        }
-        </PTxt>
-        <ActivityIndicator size="large" />
-      </Modal>
+      <LoadingQsModal />
       <View style={{ flex: .7, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <PTxt fontSize={TXT_FONT_SIZE}>TASK: </PTxt>
         <PTxt

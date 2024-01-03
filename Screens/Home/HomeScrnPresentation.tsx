@@ -8,6 +8,7 @@ import Modal from "react-native-modal";
 import Button from "../../global_components/Button";
 import { Storage } from "../../utils/storage";
 import { useEffect, useState } from "react";
+import LoadingQsModal from "../GameScrn/components/LoadingQsModal";
 
 const HomeScrnPresentation = () => {
     const navigation = useNavigation<TStackNavigation>();
@@ -38,6 +39,7 @@ const HomeScrnPresentation = () => {
 
     return (
         <Layout>
+            <LoadingQsModal />
             <View style={{ display: "flex", flexDirection: 'column', flex: 1 }}>
                 <View style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <Button
