@@ -23,7 +23,6 @@ function getTimeForUI(millis: number) {
 
 
 const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
-    console.log("what is up meng")
     const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
     const currentTheme = useColorStore(state => state.currentTheme);
     const colorThemesObj = useColorStore(state => state.themesObj);
@@ -41,6 +40,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const currentThemeObj = colorThemesObj[currentTheme];
 
     function handleBtnPress() {
+        // reset the questions when the user goes to the Home screen
         navigate("Home");
 
         if (intervalTimer) {

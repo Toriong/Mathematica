@@ -33,7 +33,6 @@ function getDeleteAndMoveSelectedSymbolBtns(
 
   return [
     <EditSelectedSymbolBtn
-      key={1}
       isDisabled={areBtnsDisabled}
       dynamicStyles={{ opacity: opacity }}
       backgroundColor="transparent"
@@ -43,7 +42,6 @@ function getDeleteAndMoveSelectedSymbolBtns(
       handleOnPress={() => { handleMovementButtonPress(-1) }}
     />,
     <EditSelectedSymbolBtn
-      key={2}
       isDisabled={areBtnsDisabled}
       dynamicStyles={{ opacity: opacity }}
       backgroundColor="transparent"
@@ -54,7 +52,6 @@ function getDeleteAndMoveSelectedSymbolBtns(
       handleOnPress={handleDeleteSymbolButtonPress}
     />,
     <EditSelectedSymbolBtn
-      key={3}
       isDisabled={areBtnsDisabled}
       dynamicStyles={{ opacity: opacity }}
       backgroundColor="transparent"
@@ -451,16 +448,18 @@ const GameScrnPresentation = () => {
             alignItems: 'center',
             paddingVertical: 8
           }}>
-            {directionAndDeleteButtons.map(Button => (
-              <View style={{
-                width: SYMBOL_WIDTH_AND_HEIGHT,
-                height: SYMBOL_WIDTH_AND_HEIGHT,
-                backgroundColor: currentColorsThemeObj.second,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: 5,
-              }}>
+            {directionAndDeleteButtons.map((Button, index) => (
+              <View
+                key={index}
+                style={{
+                  width: SYMBOL_WIDTH_AND_HEIGHT,
+                  height: SYMBOL_WIDTH_AND_HEIGHT,
+                  backgroundColor: currentColorsThemeObj.second,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 5,
+                }}>
                 {Button}
               </View>
             ))}
@@ -494,7 +493,11 @@ const GameScrnPresentation = () => {
           ))}
         </View>
       </View>
-      <View style={{ flex: 1, width: "100%", marginTop: "5%", display: 'flex', flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: 'center' }}>
+      <View 
+      style={{ 
+        flex: 1, 
+        width: "100%", 
+        marginTop: "5%", display: 'flex', flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: 'center' }}>
         {isOnReviewMode ?
           <>
             <Button

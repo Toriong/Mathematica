@@ -3,7 +3,6 @@ import { useApiQsFetchingStatusStore, useQuestionsStore } from "../zustand";
 import { Storage } from "../utils/storage";
 import { IS_TESTING, TESTING_USER_ID } from "../globalVars";
 import { getInitialQs } from "../api_services/quiz/getInitialQs";
-import { IQuestion } from "../sharedInterfaces&TypesWithBackend";
 
 // Why will it throw an error when the return type is not declare?
 export function useGetInitialQs<TData>(willClearCacheOnServer?: boolean): [TData[], Dispatch<SetStateAction<TData[]>>] {
