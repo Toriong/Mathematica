@@ -1,30 +1,28 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { PTxt } from "../../../global_components/text";
-import { useApiQsFetchingStatusStore, useColorStore, } from "../../../zustand";
 import { ActivityIndicator, View } from "react-native";
+import { useApiQsFetchingStatusStore } from "../../../zustand";
+import { useGetAppColors } from "../../../custom_hooks/useGetAppColors";
 import Modal from "react-native-modal";
-
 
 const LoadingQsModal = () => {
     const gettingQsStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
-    const [isModalShown, setIsModalShown] = useState(gettingQsStatus === "IN_PROGRESS");
-    const colorsObj = useColorStore();
-    const appColors = colorsObj.themesObj[colorsObj.currentTheme]
-    const didInitialRenderOccur = useRef(false);
+    const [isModalVisible, setIsModalVisible] = useState(gettingQsStatus === "IN_PROGRESS");
+    const appColors = useGetAppColors();
 
     useEffect(() => {
         if (gettingQsStatus === "IN_PROGRESS") {
-            setIsModalShown(true);
+            setIsModalVisible(true);
         } else {
             setTimeout(() => {
-                setIsModalShown(false);
+                setIsModalVisible(false);
             }, 1000)
         };
     }, [gettingQsStatus])
 
     return (
         <Modal
-            isVisible={isModalShown}
+            isVisible={isModalVisible}
         >
             <View
                 style={{

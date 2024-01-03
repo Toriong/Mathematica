@@ -1,10 +1,10 @@
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, GestureResponderEvent, LayoutChangeEvent, SafeAreaView, TouchableOpacity } from 'react-native'
+import React, { useMemo, useState } from 'react';
+import { TouchableOpacity } from 'react-native'
 import Layout from '../../global_components/Layout';
 import { View } from 'react-native';
 import { PTxt } from '../../global_components/text';
-import { useApiQsFetchingStatusStore, useColorStore, useGameScrnTabStore, useQuestionsStore, useRequestStatusStore } from '../../zustand';
+import { useColorStore, useGameScrnTabStore, useQuestionsStore } from '../../zustand';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft, faArrowRight, faCancel } from "@fortawesome/free-solid-svg-icons";
 import { LETTERS, OVERLAY_OPACITY, SYMBOLS, structuredClone } from '../../globalVars';
@@ -12,15 +12,9 @@ import Button from '../../global_components/Button';
 import uuid from 'react-native-uuid';
 import LogicSymbol from './components/LogicSymbol';
 import EditSelectedSymbolBtn from './components/EditSelectedSymbolBtn';
-import Modal from "react-native-modal";
 import LoadingQsModal from './components/LoadingQsModal';
 
 const SYMBOL_WIDTH_AND_HEIGHT = 45;
-const SELECTED_LOGIC_SYMBOLS_TESTING_DATA = [
-  { symbol: "A", _id: uuid.v4() },
-  { symbol: "->", _id: uuid.v4() },
-  { symbol: "B", _id: uuid.v4() },
-]
 const TXT_FONT_SIZE = 20;
 type TSelectedSymbol = typeof SYMBOLS[number] | typeof LETTERS[number]
 interface ISelectedLogicSymbol {
@@ -33,14 +27,40 @@ interface ISelectedLogicSymbol {
 function getDeleteAndMoveSelectedSymbolBtns(
   handleMovementButtonPress: (num: 1 | -1) => void,
   handleDeleteSymbolButtonPress: () => void,
-  opacity: 1 | .1
+  opacity: 1 | .1,
 ) {
   const areBtnsDisabled = opacity === .1;
 
   return [
-    <EditSelectedSymbolBtn isDisabled={areBtnsDisabled} dynamicStyles={{ opacity: opacity }} backgroundColor="transparent" Icon={<FontAwesomeIcon size={25} icon={faArrowLeft} />} handleOnPress={() => { handleMovementButtonPress(-1) }} />,
-    <EditSelectedSymbolBtn isDisabled={areBtnsDisabled} dynamicStyles={{ opacity: opacity }} backgroundColor="transparent" Icon={<FontAwesomeIcon size={25} color='red' icon={faCancel} />} handleOnPress={handleDeleteSymbolButtonPress} />,
-    <EditSelectedSymbolBtn isDisabled={areBtnsDisabled} dynamicStyles={{ opacity: opacity }} backgroundColor="transparent" Icon={<FontAwesomeIcon size={25} icon={faArrowRight} />} handleOnPress={() => { handleMovementButtonPress(1) }} />,
+    <EditSelectedSymbolBtn
+      key={1}
+      isDisabled={areBtnsDisabled}
+      dynamicStyles={{ opacity: opacity }}
+      backgroundColor="transparent"
+      Icon={<FontAwesomeIcon
+        size={25}
+        icon={faArrowLeft} />}
+      handleOnPress={() => { handleMovementButtonPress(-1) }}
+    />,
+    <EditSelectedSymbolBtn
+      key={2}
+      isDisabled={areBtnsDisabled}
+      dynamicStyles={{ opacity: opacity }}
+      backgroundColor="transparent"
+      Icon={<FontAwesomeIcon
+        size={25}
+        color='red'
+        icon={faCancel} />}
+      handleOnPress={handleDeleteSymbolButtonPress}
+    />,
+    <EditSelectedSymbolBtn
+      key={3}
+      isDisabled={areBtnsDisabled}
+      dynamicStyles={{ opacity: opacity }}
+      backgroundColor="transparent"
+      Icon={<FontAwesomeIcon size={25} icon={faArrowRight} />}
+      handleOnPress={() => { handleMovementButtonPress(1) }}
+    />,
   ]
 };
 
@@ -64,13 +84,10 @@ const GameScrnPresentation = () => {
   const rightNum = useGameScrnTabStore(state => state.right);
   const wrongNum = useGameScrnTabStore(state => state.wrong);
   const gameScrnMode = useGameScrnTabStore(state => state.mode);
-  const gettingQsStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
   const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
-  const [isModalShown, setIsModalShown] = useState(gettingQsStatus === "IN_PROGRESS");
   const question = questions[questionIndex];
   const { choices, answer, symbolOptions: symbolOptionsFromServer } = question ?? {};
   const symbolOptions = useMemo(() => [...SYMBOLS, ...symbolOptionsFromServer].map(symbol => ({
@@ -84,11 +101,7 @@ const GameScrnPresentation = () => {
     isAnswerCorrect = JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol));
   };
 
-  useEffect(() => {
-    if(isModalShown && (gettingQsStatus !== "IN_PROGRESS")){
-      setIsModalShown(false);
-    }
-  }, [gettingQsStatus])
+
 
   function handleSymbolOptPress(selectedLogicSymbol: ISelectedLogicSymbol) {
     const selectedSymbolPressed = selectedLogicSymbols.find(({ wasPressed }) => wasPressed);
@@ -264,6 +277,8 @@ const GameScrnPresentation = () => {
 
     setGameScrnTabStore(wrongNum + 1, "wrong")
   };
+
+  console.log("will render game screen")
 
   return (
     <Layout

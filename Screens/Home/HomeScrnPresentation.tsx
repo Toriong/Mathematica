@@ -1,14 +1,12 @@
 import Layout from "../../global_components/Layout";
-import { ActivityIndicator, View } from 'react-native'
+import { View } from 'react-native'
 import { PTxt } from "../../global_components/text";
 import { useNavigation } from '@react-navigation/native';
 import { TScreenNames, TStackNavigation } from "../../Navigation";
 import { useColorStore, useGameScrnTabStore } from "../../zustand";
-import Modal from "react-native-modal";
 import Button from "../../global_components/Button";
 import { Storage } from "../../utils/storage";
 import { useEffect, useState } from "react";
-import LoadingQsModal from "../GameScrn/components/LoadingQsModal";
 
 const HomeScrnPresentation = () => {
     const navigation = useNavigation<TStackNavigation>();
@@ -26,6 +24,7 @@ const HomeScrnPresentation = () => {
         await memory.setItem("isGameOn", true);
         updateGameScrnTabStore(types, "questionTypes");
         updateGameScrnTabStore("quiz", "mode");
+        console.log("yo there, will go to " + scrnName)
         navigation.navigate(scrnName)
     }
 
@@ -39,7 +38,6 @@ const HomeScrnPresentation = () => {
 
     return (
         <Layout>
-            <LoadingQsModal />
             <View style={{ display: "flex", flexDirection: 'column', flex: 1 }}>
                 <View style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <Button

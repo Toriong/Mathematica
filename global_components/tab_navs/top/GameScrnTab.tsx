@@ -2,7 +2,7 @@ import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import { View, SafeAreaView, GestureResponderEvent, Text } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import { useColorStore, useGameScrnTabStore, useQuestionsStore } from "../../../zustand";
+import { useApiQsFetchingStatusStore, useColorStore, useGameScrnTabStore, useQuestionsStore } from "../../../zustand";
 import Button from "../../Button";
 import { PTxt } from "../../text";
 import { useEffect, useState } from "react";
@@ -23,6 +23,7 @@ function getTimeForUI(millis: number) {
 
 
 const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
+    console.log("what is up meng")
     const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
     const currentTheme = useColorStore(state => state.currentTheme);
     const colorThemesObj = useColorStore(state => state.themesObj);
@@ -30,6 +31,8 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const wrongNum = useGameScrnTabStore(state => state.wrong);
     const timer = useGameScrnTabStore(state => state.timer);
     const gameScrnMode = useGameScrnTabStore(state => state.mode);
+    const isLoadingModalOn = useGameScrnTabStore(state => state.isLoadingModalOn);
+    const gettingQsResponseStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
     const questions = useQuestionsStore(state => state.questions);
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
@@ -46,21 +49,26 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         }
     };
 
+    // if the user is on the game screen and the modal is on the ui, then don't start the timer 
+    // if getting the questions is progress, then start the timer 
+
     useEffect(() => {
-        const intervalTimer = setInterval(() => {
-            setTimerObj(timerObj => {
-                if (timerObj.timerMs <= 0) {
-                    return timerObj;
-                }
+        if ((gettingQsResponseStatus !== "IN_PROGRESS") && !isLoadingModalOn) {
+            const intervalTimer = setInterval(() => {
+                setTimerObj(timerObj => {
+                    if (timerObj.timerMs <= 0) {
+                        return timerObj;
+                    }
 
-                const timerMs = timerObj.timerMs - 1_000;
-                const timerStr = getTimeForUI(timerMs);
+                    const timerMs = timerObj.timerMs - 1_000;
+                    const timerStr = getTimeForUI(timerMs);
 
-                return { timerStr, timerMs }
-            })
-        }, 1_000);
-        setIntervalTimer(intervalTimer)
-    }, []);
+                    return { timerStr, timerMs }
+                })
+            }, 1_000);
+            setIntervalTimer(intervalTimer)
+        }
+    }, [gettingQsResponseStatus, isLoadingModalOn]);
 
     useEffect(() => {
         if ((timerObj.timerMs <= 0) && (gameScrnMode === "quiz")) {
