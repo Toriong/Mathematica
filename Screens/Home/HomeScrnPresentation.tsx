@@ -1,5 +1,5 @@
 import Layout from "../../global_components/Layout";
-import { View } from 'react-native'
+import { ActivityIndicator, View } from 'react-native'
 import { PTxt } from "../../global_components/text";
 import { useNavigation } from '@react-navigation/native';
 import { TScreenNames, TStackNavigation } from "../../Navigation";
@@ -7,6 +7,7 @@ import { useColorStore, useGameScrnTabStore } from "../../zustand";
 import Modal from "react-native-modal";
 import Button from "../../global_components/Button";
 import { Storage } from "../../utils/storage";
+import { useEffect, useState } from "react";
 
 const HomeScrnPresentation = () => {
     const navigation = useNavigation<TStackNavigation>();
@@ -26,6 +27,14 @@ const HomeScrnPresentation = () => {
         updateGameScrnTabStore("quiz", "mode");
         navigation.navigate(scrnName)
     }
+
+    const [isModalVisible, setIsModalVisible] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setIsModalVisible(false)
+        }, 2000)
+    })
 
     return (
         <Layout>
