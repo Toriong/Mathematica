@@ -2,7 +2,9 @@ import GetQuestions from "./GetQuestions";
 
 const RequestComps = () => {
     return (
-        <GetQuestions />
+        <>
+            <GetQuestions />
+        </>
     )
 };
 

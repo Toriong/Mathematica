@@ -14,7 +14,8 @@ import {
 export const useQuestionsStore = create<IQuestionsForObj>(set => ({
     task: "",
     questions: [],
-    updateState: <TData>(newState: TData, fieldName: keyof IQuestionsStates) => set(() => ({ [fieldName]: newState })),
+    questionsForNextQuiz: [],
+    updateState: (newState: IQuestionsForObj[keyof IQuestionsForObj], fieldName: keyof IQuestionsStates) => set(() => ({ [fieldName]: newState })),
 }));
 
 export const useErrorsStore = create(set => ({
@@ -38,12 +39,11 @@ export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
     const gameScrnTabStore: TGameScrnTabStore = {
         right: 0,
         wrong: 0,
+        timer: 120_000,
         wasSubmitBtnPressed: false,
         isTimerPaused: false,
-        timer: 120_000,
-        mode: "finish",
         isLoadingModalOn: false,
-        
+        mode: "finish",
         questionTypes: [],
         updateState: (newState: TGameScrnTabStore[keyof TGameScrnTabStore], fieldName: keyof TGameScrnTabStore) => set(() => ({ [fieldName]: newState }))
     }
@@ -71,6 +71,7 @@ export const useApiQsFetchingStatusStore = create<TApiQsFetchingStatusStore>(set
     let store: TApiQsFetchingStatusStore = {
         willGetQs: true,
         gettingQsResponseStatus: "NOT_EXECUTING",
+        areQsReceivedForNextQuiz: false,
         updateState: (newState: IApiQsFetchingStatus[keyof IApiQsFetchingStatus], fieldName: keyof IApiQsFetchingStatus) => set(() => ({ [fieldName]: newState }))
     }
     return store;

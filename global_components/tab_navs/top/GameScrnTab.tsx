@@ -34,6 +34,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const questions = useQuestionsStore(state => state.questions);
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
+    const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const [timerObj, setTimerObj] = useState({ timerStr: getTimeForUI(timer), timerMs: timer });
     const [intervalTimer, setIntervalTimer] = useState<ReturnType<typeof setInterval> | null>(null);
     const currentThemeObj = colorThemesObj[currentTheme];
@@ -72,8 +73,19 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     useEffect(() => {
         if ((timerObj.timerMs <= 0) && (gameScrnMode === "quiz")) {
             setGameScrnTabStore("finish", 'mode');
+
+            setTimeout(() => {
+                updateApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz");
+
+                updateApiQsFetchingStatusStore(true, "willGetQs");
+
+                updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
+            }, 500);
+
             const answeredQuestions = questions.filter(question => question.userAnswer);
-            updateQuestionsStore<IQuestionOnClient[]>(answeredQuestions, "questions")
+
+            updateQuestionsStore(answeredQuestions, "questions");
+
             navigate('ResultsScreen');
         }
     }, [timerObj])

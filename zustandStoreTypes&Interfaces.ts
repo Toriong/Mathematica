@@ -18,10 +18,10 @@ interface IGameScrnTabStoreState {
     wrong: number
     timer: number
     isTimerPaused: boolean
-    mode: TMode
     isLoadingModalOn: boolean
-    questionTypes: TQuestionTypes[]
     wasSubmitBtnPressed: boolean
+    mode: TMode
+    questionTypes: TQuestionTypes[]
 }
 export interface IChoice {
     value: string
@@ -37,6 +37,7 @@ export interface IQuestionObjActions {
 export interface IQuestionsStates {
     task: string
     questions: IQuestionOnClient[]
+    questionsForNextQuiz: IQuestionOnClient[]
 }
 
 export type TUpdateStoreState<TNewState, TFieldName> = {
@@ -44,7 +45,7 @@ export type TUpdateStoreState<TNewState, TFieldName> = {
 }
 
 export type TUpdateStoreStateDynamicType = {
-    updateState: <TNewState>(newState: TNewState, fieldName: keyof IQuestionsStates) => void
+    updateState: (newState: IQuestionsStates[keyof IQuestionsStates], fieldName: keyof IQuestionsStates) => void
 }
 
 export interface IColorStore {
@@ -54,6 +55,7 @@ export interface IColorStore {
 }
 export interface IApiQsFetchingStatus {
     willGetQs: boolean
+    areQsReceivedForNextQuiz: boolean
     gettingQsResponseStatus: TResponseStatus
 }
 

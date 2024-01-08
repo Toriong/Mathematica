@@ -22,17 +22,15 @@ const ResultsPresentation = () => {
     const { navigate } = useNavigation<TStackNavigation>();
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
-    const questionTypes = useGameScrnTabStore(state => state.questionTypes);
     const updateGameScrnStore = useGameScrnTabStore(state => state.updateState);
+    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);
-    const willGetQs = useApiQsFetchingStatusStore(state => state.willGetQs);
-    const apiQsFetchingStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
-    const updateApiFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const appColors = useGetAppColors();
-    const memory = new Storage();
 
     async function handlePlayAgainBtnPress() {
-       
+        if (questionsForNextQuiz?.length) {
+            updateQuestionsStore(questionsForNextQuiz, "questions")
+        }
 
         updateGameScrnStore("quiz", "mode");
         navigate("GameScreen");

@@ -1,25 +1,27 @@
-import { useEffect, useState, Dispatch, SetStateAction } from "react";
+import { useEffect } from "react";
 import { useApiQsFetchingStatusStore, useQuestionsStore } from "../zustand";
 import { Storage } from "../utils/storage";
 import { IS_TESTING, TESTING_USER_ID } from "../globalVars";
 import { getInitialQs } from "../api_services/quiz/getInitialQs";
+import { IQuestionOnClient } from "../zustandStoreTypes&Interfaces";
 
-export function useGetInitialQs<TData>(willClearCacheOnServer?: boolean): [TData[], Dispatch<SetStateAction<TData[]>>] {
+export function useGetInitialQs(): null {
     const memory = new Storage();
     const willGetQs = useApiQsFetchingStatusStore(state => state.willGetQs);
+    const areQsReceivedForNextQuiz = useApiQsFetchingStatusStore(state => state.areQsReceivedForNextQuiz);
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);
-    const [questionsForNextQuz, setQuestionsForNextQuiz] = useState<TData[]>([]);
 
     useEffect(() => {
         if (willGetQs) {
             updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
+
             (async () => {
                 try {
                     let userId = await memory.getItem("userId");
                     userId = IS_TESTING ? TESTING_USER_ID : userId;
                     console.log("getting questions from the server...")
-                    const response = await getInitialQs(userId as string, willClearCacheOnServer);
+                    const response = await getInitialQs(userId as string, areQsReceivedForNextQuiz);
 
                     console.log("response from server in getting the initial questions: ", response)
 
@@ -27,10 +29,10 @@ export function useGetInitialQs<TData>(willClearCacheOnServer?: boolean): [TData
                         throw new Error("Failed to get the initial questions from the server.")
                     }
 
-                    if (willClearCacheOnServer) {
-                        setQuestionsForNextQuiz(response.questions as TData[])
+                    if (areQsReceivedForNextQuiz) {
+                        updateQuestionsStore(response.questions as IQuestionOnClient[], "questionsForNextQuiz")
                     } else {
-                        updateQuestionsStore(response.questions, "questions");
+                        updateQuestionsStore(response.questions as IQuestionOnClient[], "questions");
                     }
 
                     updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
@@ -44,5 +46,5 @@ export function useGetInitialQs<TData>(willClearCacheOnServer?: boolean): [TData
         }
     }, [willGetQs]);
 
-    return [questionsForNextQuz, setQuestionsForNextQuiz];
+    return null;
 }

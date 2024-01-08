@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { PTxt } from "../../../global_components/text";
 import { ActivityIndicator, View } from "react-native";
-import { useApiQsFetchingStatusStore } from "../../../zustand";
+import { useApiQsFetchingStatusStore, useQuestionsStore } from "../../../zustand";
 import { useGetAppColors } from "../../../custom_hooks/useGetAppColors";
 import Modal from "react-native-modal";
 import Button from "../../../global_components/Button";
 
 const LoadingQsModal = () => {
     const gettingQsStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
+    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
+    const updateQuestionsStore = useQuestionsStore(state => state.updateState);
     const [isModalVisible, setIsModalVisible] = useState((gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE"));
     const appColors = useGetAppColors();
 
@@ -17,15 +19,21 @@ const LoadingQsModal = () => {
         updateApiQsFetchingStatusStore(true, "willGetQs");
     }
 
+    function closeModal(millis = 1000) {
+        setTimeout(() => {
+            setIsModalVisible(false);
+        }, millis)
+    }
+
     useEffect(() => {
         if ((gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE")) {
             setIsModalVisible(true);
-        } else {
-            setTimeout(() => {
-                // start the timer when the questions has been received. 
-                setIsModalVisible(false);
-            }, 1000)
-        };
+        } else if ((gettingQsStatus === "SUCCESS") && questionsForNextQuiz.length) {
+            updateQuestionsStore(questionsForNextQuiz, "questions");
+            closeModal();
+        } else if (gettingQsStatus === "SUCCESS") {
+            closeModal();
+        }
     }, [gettingQsStatus])
 
     return (
