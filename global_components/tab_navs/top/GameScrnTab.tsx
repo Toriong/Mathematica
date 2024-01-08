@@ -21,7 +21,6 @@ function getTimeForUI(millis: number) {
     return minutes + ":" + ((parseInt(seconds) < 10) ? "0" : "") + seconds;
 };
 
-
 const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
     const currentTheme = useColorStore(state => state.currentTheme);

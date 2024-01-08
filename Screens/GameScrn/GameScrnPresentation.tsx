@@ -1,4 +1,4 @@
-
+console.log("hi")
 import React, { useMemo, useState } from 'react';
 import { TouchableOpacity } from 'react-native'
 import Layout from '../../global_components/Layout';
@@ -13,6 +13,7 @@ import uuid from 'react-native-uuid';
 import LogicSymbol from './components/LogicSymbol';
 import EditSelectedSymbolBtn from './components/EditSelectedSymbolBtn';
 import LoadingQsModal from './components/LoadingQsModal';
+import { useGetAppColors } from '../../custom_hooks/useGetAppColors';
 
 const SYMBOL_WIDTH_AND_HEIGHT = 45;
 const TXT_FONT_SIZE = 20;
@@ -22,7 +23,6 @@ interface ISelectedLogicSymbol {
   _id?: ReturnType<typeof uuid.v4>
   wasPressed?: boolean
 }
-
 
 function getDeleteAndMoveSelectedSymbolBtns(
   handleMovementButtonPress: (num: 1 | -1) => void,
@@ -72,11 +72,9 @@ function getUpdatedSelectedSymbolsArr(indexToSwitchSelectedSymbolWith: number, s
 }
 
 const GameScrnPresentation = () => {
-  const currentThemeStr = useColorStore(state => state.currentTheme);
-  const colorThemesObj = useColorStore(state => state.themesObj);
-  const currentColorsThemeObj = colorThemesObj[currentThemeStr];
   const questions = useQuestionsStore(state => state.questions);
   const task = useQuestionsStore(state => state.task);
+  const currentColorsThemeObj = useGetAppColors();
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
   const rightNum = useGameScrnTabStore(state => state.right);
   const wrongNum = useGameScrnTabStore(state => state.wrong);
@@ -85,9 +83,9 @@ const GameScrnPresentation = () => {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
-  const question = questions[questionIndex];
+  const question = questions?.length ? questions[questionIndex] : null;
   const { choices, answer, symbolOptions: symbolOptionsFromServer } = question ?? {};
-  const symbolOptions = useMemo(() => [...SYMBOLS, ...symbolOptionsFromServer].map(symbol => ({
+  const symbolOptions = useMemo(() => [...SYMBOLS, ...(Array.isArray(symbolOptionsFromServer) ? symbolOptionsFromServer : [])].map(symbol => ({
     symbol: symbol,
     wasPressed: false
   })), [questions, questionIndex]);
@@ -97,8 +95,6 @@ const GameScrnPresentation = () => {
   if (wasSubmitBtnPressed) {
     isAnswerCorrect = JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol));
   };
-
-
 
   function handleSymbolOptPress(selectedLogicSymbol: ISelectedLogicSymbol) {
     const selectedSymbolPressed = selectedLogicSymbols.find(({ wasPressed }) => wasPressed);
@@ -278,269 +274,275 @@ const GameScrnPresentation = () => {
   console.log("will render game screen")
 
   return (
-    <Layout
-      style={{
-        flex: 1,
-        width: "100%",
-        height: "100%",
-        display: 'flex',
-        alignItems: 'center',
-        flexDirection: 'column',
-        position: 'relative',
-      }}
-      backgroundColor="#343541"
-      layoutStyle={{ position: 'relative', width: '100%', height: '100%' }}
-      OverlayComp={
-        wasSubmitBtnPressed && (
-          <>
-            <View
-              style={{
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'black',
-                position: 'absolute',
-                zIndex: 1,
-                opacity: OVERLAY_OPACITY,
-              }}
-            />
-            <View
-              style={{
-                zIndex: 2,
-                width: "100%",
-                height: "100%",
-                position: 'absolute',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              <PTxt
-                fontSize={30}
-                txtColor={isAnswerCorrect ? 'green' : 'red'}
-              >
-                {isAnswerCorrect ? "CORRECT!" : "WRONG."}
-              </PTxt>
-              <PTxt fontSize={200}>
-                {isAnswerCorrect
-                  ?
-                  "✅"
-                  :
-                  "❌"
-                }
-              </PTxt>
-              <PTxt
-                fontSize={30}
-                txtColor={isAnswerCorrect ? 'green' : 'red'}
-              >
-                Correct Answer:
-              </PTxt>
+    <>
+      <Layout
+        style={{
+          flex: 1,
+          width: "100%",
+          height: "100%",
+          display: 'flex',
+          alignItems: 'center',
+          flexDirection: 'column',
+          position: 'relative',
+        }}
+        backgroundColor="#343541"
+        layoutStyle={{
+          position: 'relative',
+          width: '100%',
+          height: '100%'
+        }}
+        OverlayComp={
+          wasSubmitBtnPressed && (
+            <>
               <View
-                style={{ display: 'flex', marginTop: 10, flexDirection: 'row', gap: 10, width: "100%", justifyContent: 'center', alignItems: 'center' }}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: 'black',
+                  position: 'absolute',
+                  zIndex: 1,
+                  opacity: OVERLAY_OPACITY,
+                }}
+              />
+              <View
+                style={{
+                  zIndex: 2,
+                  width: "100%",
+                  height: "100%",
+                  position: 'absolute',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
               >
-                {correctAnswerArr.map((symbol, index) => (
-                  <PTxt
-                    key={index}
-                    fontSize={30}
-                    txtColor={isAnswerCorrect ? 'green' : 'red'}
-                  >
-                    {symbol}
-                  </PTxt>
-                ))}
+                <PTxt
+                  fontSize={30}
+                  txtColor={isAnswerCorrect ? 'green' : 'red'}
+                >
+                  {isAnswerCorrect ? "CORRECT!" : "WRONG."}
+                </PTxt>
+                <PTxt fontSize={200}>
+                  {isAnswerCorrect
+                    ?
+                    "✅"
+                    :
+                    "❌"
+                  }
+                </PTxt>
+                <PTxt
+                  fontSize={30}
+                  txtColor={isAnswerCorrect ? 'green' : 'red'}
+                >
+                  Correct Answer:
+                </PTxt>
+                <View
+                  style={{ display: 'flex', marginTop: 10, flexDirection: 'row', gap: 10, width: "100%", justifyContent: 'center', alignItems: 'center' }}
+                >
+                  {correctAnswerArr.map((symbol, index) => (
+                    <PTxt
+                      key={index}
+                      fontSize={30}
+                      txtColor={isAnswerCorrect ? 'green' : 'red'}
+                    >
+                      {symbol}
+                    </PTxt>
+                  ))}
+                </View>
               </View>
+            </>
+          )
+        }
+      >
+        <View style={{ flex: .7, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <PTxt fontSize={TXT_FONT_SIZE}>TASK: </PTxt>
+          <PTxt
+            fontSize={TXT_FONT_SIZE}
+            style={{ textAlign: 'center', transform: [{ translateY: 20 }], paddingHorizontal: 11 }}
+          >
+            {task}
+          </PTxt>
+        </View>
+        <View style={{ flex: 1, width: "100%", display: 'flex', paddingTop: 7, justifyContent: 'center', alignItems: 'center' }}>
+          <PTxt
+            fontSize={TXT_FONT_SIZE}
+            style={{ textAlign: 'center', paddingHorizontal: 7 }}
+            fontStyle='italic'
+          >
+            {question?.sentence}
+          </PTxt>
+        </View>
+        {choices?.length && (
+          <View style={{ flex: .8, width: "100%", alignItems: 'center', display: 'flex', justifyContent: 'center', paddingHorizontal: 18 }}>
+            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 5, width: "70%" }}>
+              {choices.map((choice, index, self) => (
+                <View key={index} style={{ display: 'flex', flexDirection: 'row', }}>
+                  <PTxt fontSize={TXT_FONT_SIZE}>{choice.letter} = </PTxt>
+                  <PTxt fontSize={TXT_FONT_SIZE} >{choice.value}{(index !== (self.length - 1)) ? ',' : ''}</PTxt>
+                </View>
+              ))
+              }
             </View>
-          </>
-        )
-      }
-    >
-      <LoadingQsModal />
-      <View style={{ flex: .7, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <PTxt fontSize={TXT_FONT_SIZE}>TASK: </PTxt>
-        <PTxt
-          fontSize={TXT_FONT_SIZE}
-          style={{ textAlign: 'center', transform: [{ translateY: 20 }], paddingHorizontal: 11 }}
+          </View>
+        )}
+        <View
+          style={{
+            flex: 1.3,
+            width: "100%",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
         >
-          {task}
-        </PTxt>
-      </View>
-      <View style={{ flex: 1, width: "100%", display: 'flex', paddingTop: 7, justifyContent: 'center', alignItems: 'center' }}>
-        <PTxt
-          fontSize={TXT_FONT_SIZE}
-          style={{ textAlign: 'center', paddingHorizontal: 7 }}
-          fontStyle='italic'
-        >
-          {question?.sentence}
-        </PTxt>
-      </View>
-      {choices?.length && (
-        <View style={{ flex: .8, width: "100%", alignItems: 'center', display: 'flex', justifyContent: 'center', paddingHorizontal: 18 }}>
-          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 5, width: "70%" }}>
-            {choices.map((choice, index, self) => (
-              <View key={index} style={{ display: 'flex', flexDirection: 'row', }}>
-                <PTxt fontSize={TXT_FONT_SIZE}>{choice.letter} = </PTxt>
-                <PTxt fontSize={TXT_FONT_SIZE} >{choice.value}{(index !== (self.length - 1)) ? ',' : ''}</PTxt>
-              </View>
-            ))
+          <View
+            style={{
+              width: "93%",
+              height: 70,
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: 5,
+              borderBottomWidth: 1,
+              borderBottomColor: currentColorsThemeObj.second,
+              position: 'relative',
+            }}
+          >
+            {isOnReviewMode ?
+              <></>
+              :
+              !!selectedLogicSymbols.length && selectedLogicSymbols.map(symbol => {
+                const _id = uuid.v4().toString();
+
+                return (
+                  <TouchableOpacity
+                    id={_id}
+                    key={_id}
+                    onPress={() => handleSelectedLogicSymbol(symbol)}
+                    style={{ opacity: symbol.wasPressed ? .4 : 1 }}
+                  >
+                    <LogicSymbol
+                      width="auto"
+                      height={50}
+                      txtFontSize={30}
+                      backgroundColor="transparent"
+                      pTxtStyle={(symbol.symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
+                    >
+                      {symbol.symbol === '∃' ? "E" : symbol.symbol}
+                    </LogicSymbol>
+                  </TouchableOpacity>
+                )
+              })
             }
           </View>
         </View>
-      )}
-      <View
-        style={{
-          flex: 1.3,
-          width: "100%",
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
-        <View
-          style={{
-            width: "93%",
-            height: 70,
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 5,
-            borderBottomWidth: 1,
-            borderBottomColor: currentColorsThemeObj.second,
-            position: 'relative',
-          }}
-        >
-          {/* dispalay the user answer here when on review mode */}
-          {isOnReviewMode ?
-            <></>
-            :
-            !!selectedLogicSymbols.length && selectedLogicSymbols.map(symbol => {
-              const _id = uuid.v4().toString();
-
-              return (
-                <TouchableOpacity
-                  id={_id}
-                  key={_id}
-                  onPress={() => handleSelectedLogicSymbol(symbol)}
-                  style={{ opacity: symbol.wasPressed ? .4 : 1 }}
-                >
-                  <LogicSymbol
-                    width="auto"
-                    height={50}
-                    txtFontSize={30}
-                    backgroundColor="transparent"
-                    pTxtStyle={(symbol.symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
-                  >
-                    {symbol.symbol === '∃' ? "E" : symbol.symbol}
-                  </LogicSymbol>
-                </TouchableOpacity>
-              )
-            })
-          }
-        </View>
-      </View>
-      <View style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        {!isOnReviewMode && (
+        <View style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          {!isOnReviewMode && (
+            <View style={{
+              display: "flex",
+              flexDirection: "row",
+              borderBottomWidth: 1,
+              borderBottomColor: currentColorsThemeObj.second,
+              width: "93%",
+              gap: 8,
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingVertical: 8
+            }}>
+              {directionAndDeleteButtons.map((Button, index) => (
+                <View
+                  key={index}
+                  style={{
+                    width: SYMBOL_WIDTH_AND_HEIGHT,
+                    height: SYMBOL_WIDTH_AND_HEIGHT,
+                    backgroundColor: currentColorsThemeObj.second,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    borderRadius: 5,
+                  }}>
+                  {Button}
+                </View>
+              ))}
+            </View>
+          )}
           <View style={{
-            display: "flex",
-            flexDirection: "row",
-            borderBottomWidth: 1,
-            borderBottomColor: currentColorsThemeObj.second,
-            width: "93%",
+            display: 'flex',
+            width: "80%",
+            flexDirection: 'row',
+            flexWrap: 'wrap',
             gap: 8,
             justifyContent: 'center',
             alignItems: 'center',
-            paddingVertical: 8
-          }}>
-            {directionAndDeleteButtons.map((Button, index) => (
-              <View
+            marginTop: 8
+          }}
+          >
+            {symbolOptions.map((symbolOpt, index) => (
+              <TouchableOpacity
                 key={index}
-                style={{
-                  width: SYMBOL_WIDTH_AND_HEIGHT,
-                  height: SYMBOL_WIDTH_AND_HEIGHT,
-                  backgroundColor: currentColorsThemeObj.second,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: 5,
-                }}>
-                {Button}
-              </View>
+                onPress={() => handleSymbolOptPress(symbolOpt)}
+              >
+                <LogicSymbol
+                  width={SYMBOL_WIDTH_AND_HEIGHT}
+                  height={SYMBOL_WIDTH_AND_HEIGHT}
+                  backgroundColor={currentColorsThemeObj.second}
+                  txtFontSize={24}
+                >
+                  {symbolOpt.symbol}
+                </LogicSymbol>
+              </TouchableOpacity>
             ))}
           </View>
-        )}
-        <View style={{
-          display: 'flex',
-          width: "80%",
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          gap: 8,
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: 8
-        }}
-        >
-          {symbolOptions.map((symbolOpt, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => handleSymbolOptPress(symbolOpt)}
-            >
-              <LogicSymbol
-                width={SYMBOL_WIDTH_AND_HEIGHT}
-                height={SYMBOL_WIDTH_AND_HEIGHT}
-                backgroundColor={currentColorsThemeObj.second}
-                txtFontSize={24}
-              >
-                {symbolOpt.symbol}
-              </LogicSymbol>
-            </TouchableOpacity>
-          ))}
         </View>
-      </View>
-      <View 
-      style={{ 
-        flex: 1, 
-        width: "100%", 
-        marginTop: "5%", display: 'flex', flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: 'center' }}>
-        {isOnReviewMode ?
-          <>
-            <Button
-              isDisabled={false}
-              handleOnPress={_ => { handleReviewQNavBtn(-1) }}
-              backgroundColor={currentColorsThemeObj.second}
-              dynamicStyles={{ padding: 17, borderRadius: 15 }}
+        <View
+          style={{
+            flex: 1,
+            width: "100%",
+            marginTop: "5%", display: 'flex', flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: 'center'
+          }}>
+          {isOnReviewMode ?
+            <>
+              <Button
+                isDisabled={false}
+                handleOnPress={_ => { handleReviewQNavBtn(-1) }}
+                backgroundColor={currentColorsThemeObj.second}
+                dynamicStyles={{ padding: 17, borderRadius: 15 }}
 
-            >
-              <FontAwesomeIcon icon={faArrowLeft} />
-            </Button>
-            <Button
-              isDisabled={false}
-              handleOnPress={_ => { handleReviewQNavBtn(1) }}
-              backgroundColor={currentColorsThemeObj.second}
-              dynamicStyles={{ padding: 17, borderRadius: 15 }}
+              >
+                <FontAwesomeIcon icon={faArrowLeft} />
+              </Button>
+              <Button
+                isDisabled={false}
+                handleOnPress={_ => { handleReviewQNavBtn(1) }}
+                backgroundColor={currentColorsThemeObj.second}
+                dynamicStyles={{ padding: 17, borderRadius: 15 }}
 
-            >
-              <FontAwesomeIcon icon={faArrowRight} />
-            </Button>
-          </>
-          :
-          <>
-            <Button
-              isDisabled={false}
-              handleOnPress={handleClearBtnPress}
-              backgroundColor='#FFC12F'
-              dynamicStyles={{ padding: 17, borderRadius: 15 }}
-            >
-              <PTxt>CLEAR</PTxt>
-            </Button>
-            <Button
-              backgroundColor="#4287FF"
-              isDisabled={false}
-              handleOnPress={handleSubmitBtnPress}
-              dynamicStyles={{ padding: 17, borderRadius: 15 }}
-            >
-              <PTxt>SUBMIT</PTxt>
-            </Button>
-          </>
-        }
-      </View>
-    </Layout>
+              >
+                <FontAwesomeIcon icon={faArrowRight} />
+              </Button>
+            </>
+            :
+            <>
+              <Button
+                isDisabled={false}
+                handleOnPress={handleClearBtnPress}
+                backgroundColor='#FFC12F'
+                dynamicStyles={{ padding: 17, borderRadius: 15 }}
+              >
+                <PTxt>CLEAR</PTxt>
+              </Button>
+              <Button
+                backgroundColor="#4287FF"
+                isDisabled={false}
+                handleOnPress={handleSubmitBtnPress}
+                dynamicStyles={{ padding: 17, borderRadius: 15 }}
+              >
+                <PTxt>SUBMIT</PTxt>
+              </Button>
+            </>
+          }
+        </View>
+      </Layout>
+      <LoadingQsModal />
+    </>
   );
 };
 

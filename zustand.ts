@@ -14,7 +14,7 @@ import {
 export const useQuestionsStore = create<IQuestionsForObj>(set => ({
     task: "",
     questions: [],
-    updateState: <TData, TFieldName>(newState: TData, fieldName: keyof IQuestionsStates) => set(() => ({ [fieldName as (TFieldName extends string ? string : never)]: newState })),
+    updateState: <TData>(newState: TData, fieldName: keyof IQuestionsStates) => set(() => ({ [fieldName]: newState })),
 }));
 
 export const useErrorsStore = create(set => ({

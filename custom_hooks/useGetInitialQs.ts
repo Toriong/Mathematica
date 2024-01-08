@@ -4,7 +4,6 @@ import { Storage } from "../utils/storage";
 import { IS_TESTING, TESTING_USER_ID } from "../globalVars";
 import { getInitialQs } from "../api_services/quiz/getInitialQs";
 
-// Why will it throw an error when the return type is not declare?
 export function useGetInitialQs<TData>(willClearCacheOnServer?: boolean): [TData[], Dispatch<SetStateAction<TData[]>>] {
     const memory = new Storage();
     const willGetQs = useApiQsFetchingStatusStore(state => state.willGetQs);
@@ -19,6 +18,7 @@ export function useGetInitialQs<TData>(willClearCacheOnServer?: boolean): [TData
                 try {
                     let userId = await memory.getItem("userId");
                     userId = IS_TESTING ? TESTING_USER_ID : userId;
+                    console.log("getting questions from the server...")
                     const response = await getInitialQs(userId as string, willClearCacheOnServer);
 
                     if (response.gettingQsResponseStatus === "FAILURE") {

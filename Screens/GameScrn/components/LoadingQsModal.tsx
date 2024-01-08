@@ -15,6 +15,7 @@ const LoadingQsModal = () => {
             setIsModalVisible(true);
         } else {
             setTimeout(() => {
+                // start the timer when the questions has been received. 
                 setIsModalVisible(false);
             }, 1000)
         };
