@@ -52,7 +52,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     // if getting the questions is progress, then start the timer 
 
     useEffect(() => {
-        if ((gettingQsResponseStatus !== "IN_PROGRESS") && !isLoadingModalOn) {
+        if ((gettingQsResponseStatus === "SUCCESS") && !isLoadingModalOn) {
             const intervalTimer = setInterval(() => {
                 setTimerObj(timerObj => {
                     if (timerObj.timerMs <= 0) {

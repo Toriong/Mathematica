@@ -50,37 +50,29 @@ async function getAdditionalQuestion(
   }
 
 const GameScrnContainer = () => {
-  console.log("hey there meng...")
   const memory = new Storage();
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
   const questionTypes = useGameScrnTabStore(state => state.questionTypes);
-  console.log("yo there meng...")
   const questions = useQuestionsStore(state => state.questions);
   const updateQuestionsStore = useQuestionsStore(state => state.updateState);
 
-  console.log("what is up there yo...")
+  useEffect(() => {
+    if (wasSubmitBtnPressed) {
+      (async () => {
+        try {
+          const getAdditionalQuestionResult = await getAdditionalQuestion(memory, questions, questionTypes);;
 
-  // useEffect(() => {
-  //   if (wasSubmitBtnPressed) {
-  //     (async () => {
-  //       try {
-  //         const getAdditionalQuestionResult = await getAdditionalQuestion(memory, questions, questionTypes);;
+          if (getAdditionalQuestionResult.didErrorOccur || !getAdditionalQuestionResult?.data?.length) {
+            throw new Error(`${getAdditionalQuestionResult.msg} ${!getAdditionalQuestionResult?.data?.length && 'Did not receive a question from the server.'}`);
+          }
 
-  //         console.log("getAdditionalQuestionResult: ", getAdditionalQuestionResult);
-
-  //         if (getAdditionalQuestionResult.didErrorOccur || !getAdditionalQuestionResult?.data?.length) {
-  //           throw new Error(`${getAdditionalQuestionResult.msg} ${!getAdditionalQuestionResult?.data?.length && 'Did not receive a question from the server.'}`);
-  //         }
-
-  //         console.log("Total questions received from the server: ", getAdditionalQuestionResult.data)
-
-  //         updateQuestionsStore<IQuestion[]>([...questions, ...getAdditionalQuestionResult.data], "questions")
-  //       } catch (error) {
-  //         console.error("An error has occurred in getting the next question from the server. Error message: ", error);
-  //       }
-  //     })();
-  //   }
-  // }, [wasSubmitBtnPressed]);
+          updateQuestionsStore<IQuestion[]>([...questions, ...getAdditionalQuestionResult.data], "questions")
+        } catch (error) {
+          console.error("An error has occurred in getting the next question from the server. Error message: ", error);
+        }
+      })();
+    }
+  }, [wasSubmitBtnPressed]);
 
   return <GameScrnPresentation />;
 };

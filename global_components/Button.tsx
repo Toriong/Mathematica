@@ -5,7 +5,7 @@ export type OnPressAction = (event: GestureResponderEvent, [...rest]?: any[]) =>
 interface IButton extends ViewStyle {
     dynamicStyles?: ViewStyle,
     backgroundColor: Pick<ViewStyle, 'backgroundColor'>['backgroundColor'] | "transparent",
-    isDisabled: boolean
+    isDisabled?: boolean
 }
 type ButtonCompProps = Omit<IComponentProps, "backgroundColor">
 export type ButtonProps = { handleOnPress: OnPressAction } & IButton & ButtonCompProps;

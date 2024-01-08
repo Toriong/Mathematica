@@ -1,10 +1,9 @@
 console.log("hi")
 import React, { useMemo, useState } from 'react';
-import { TouchableOpacity } from 'react-native'
 import Layout from '../../global_components/Layout';
-import { View } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { PTxt } from '../../global_components/text';
-import { useColorStore, useGameScrnTabStore, useQuestionsStore } from '../../zustand';
+import { useGameScrnTabStore, useQuestionsStore } from '../../zustand';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft, faArrowRight, faCancel } from "@fortawesome/free-solid-svg-icons";
 import { LETTERS, OVERLAY_OPACITY, SYMBOLS, structuredClone } from '../../globalVars';
@@ -232,7 +231,7 @@ const GameScrnPresentation = () => {
     let answerArrClone = structuredClone<string[]>(answer);
     const isAnswerCorrect = JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol))
 
-    // displaying the answer onto the ui by using the 'correctAnswerArr' state
+    // the values in correctAnswerArr will be displayed onto the ui by using the 'correctAnswerArr' state
     for (let index = 0; index < answerArrClone.length; ++index) {
       const currentAnswerSymbol = answerArrClone[index];
       const nextAnswerSymbol = answerArrClone[index + 1];

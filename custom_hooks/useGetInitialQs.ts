@@ -21,6 +21,8 @@ export function useGetInitialQs<TData>(willClearCacheOnServer?: boolean): [TData
                     console.log("getting questions from the server...")
                     const response = await getInitialQs(userId as string, willClearCacheOnServer);
 
+                    console.log("response from server in getting the initial questions: ", response)
+
                     if (response.gettingQsResponseStatus === "FAILURE") {
                         throw new Error("Failed to get the initial questions from the server.")
                     }

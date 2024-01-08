@@ -4,14 +4,21 @@ import { ActivityIndicator, View } from "react-native";
 import { useApiQsFetchingStatusStore } from "../../../zustand";
 import { useGetAppColors } from "../../../custom_hooks/useGetAppColors";
 import Modal from "react-native-modal";
+import Button from "../../../global_components/Button";
 
 const LoadingQsModal = () => {
     const gettingQsStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
-    const [isModalVisible, setIsModalVisible] = useState(gettingQsStatus === "IN_PROGRESS");
+    const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
+    const [isModalVisible, setIsModalVisible] = useState((gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE"));
     const appColors = useGetAppColors();
 
+    function handleOnPress() {
+        updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")
+        updateApiQsFetchingStatusStore(true, "willGetQs");
+    }
+
     useEffect(() => {
-        if (gettingQsStatus === "IN_PROGRESS") {
+        if ((gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE")) {
             setIsModalVisible(true);
         } else {
             setTimeout(() => {
@@ -43,16 +50,29 @@ const LoadingQsModal = () => {
                     <PTxt
                         fontSize={25}
                         style={{
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            paddingHorizontal: 35
                         }}
                     >
-                        {gettingQsStatus === "IN_PROGRESS"
-                            ?
-                            "Getting questions..."
-                            :
-                            "Questions received!"
-                        }
+                        {(gettingQsStatus === "IN_PROGRESS") && "Getting questions..."}
+                        {(gettingQsStatus === "SUCCESS") && "Questions received!"}
                     </PTxt>
+                    {(gettingQsStatus === "FAILURE") && (
+                        <>
+                            <PTxt
+                                fontSize={25}
+                                style={{ textAlign: 'center', padding: 17 }}
+                            >
+                                Failed to generate questions 👎.
+                            </PTxt>
+                            <PTxt
+                                fontSize={25}
+                                style={{ textAlign: 'center' }}
+                            >
+                                Please try again.
+                            </PTxt>
+                        </>
+                    )}
                     <View
                         style={{
                             display: "flex",
@@ -63,19 +83,36 @@ const LoadingQsModal = () => {
                             alignItems: 'center'
                         }}
                     >
-                        {gettingQsStatus === "IN_PROGRESS" ?
+                        {(gettingQsStatus === "IN_PROGRESS") && (
+
                             <ActivityIndicator
                                 size="large"
                                 style={{ transform: [{ scale: 2 }] }}
                             />
-                            :
+                        )}
+                        {(gettingQsStatus === "SUCCESS") && (
                             <PTxt
                                 fontSize={40}
-                                style={{ textAlign: "center", }}
+                                style={{ textAlign: "center" }}
                             >
                                 ✅
                             </PTxt>
-                        }
+                        )}
+                        {(gettingQsStatus === "FAILURE") && (
+                            <Button
+                                backgroundColor={appColors.second}
+                                handleOnPress={handleOnPress}
+                                dynamicStyles={{
+                                    padding: 17,
+                                    borderRadius: 15,
+                                    marginTop: 25
+                                }}
+                            >
+                                <PTxt fontSize={20}>
+                                    Press Get Questions.
+                                </PTxt>
+                            </Button>
+                        )}
                     </View>
                 </View>
             </View>

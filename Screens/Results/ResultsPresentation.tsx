@@ -17,7 +17,7 @@ import { Storage } from "../../utils/storage";
 const BTN_FONT_SIZE = 22;
 const PTXT_FONT_SIZE = 35;
 
-const ResultsPresentation = ({ questionsForNextQuiz }: { questionsForNextQuiz: IQuestionOnClient[] }) => {
+const ResultsPresentation = () => {
     // How to provide type checking for the navigation function for the screen names? 
     const { navigate } = useNavigation<TStackNavigation>();
     const rightNum = useGameScrnTabStore(state => state.right);
@@ -32,11 +32,7 @@ const ResultsPresentation = ({ questionsForNextQuiz }: { questionsForNextQuiz: I
     const memory = new Storage();
 
     async function handlePlayAgainBtnPress() {
-        if (questionsForNextQuiz.length) {
-            updateQuestionsStore<IQuestionsForObj["questions"]>(questionsForNextQuiz, "questions");
-        } else if ((!willGetQs || ((apiQsFetchingStatus === "FAILURE") || (apiQsFetchingStatus === "NOT_EXECUTING")))) {
-            updateApiFetchingStatusStore(true, "willGetQs");
-        }
+       
 
         updateGameScrnStore("quiz", "mode");
         navigate("GameScreen");
@@ -104,7 +100,6 @@ const ResultsPresentation = ({ questionsForNextQuiz }: { questionsForNextQuiz: I
                         </PTxt>
                     </Button>
                     <Button
-                        isDisabled={questionsForNextQuiz.length >= 0}
                         backgroundColor={SUCCESS_COLOR}
                         handleOnPress={handlePlayAgainBtnPress}
                         dynamicStyles={styles.button}

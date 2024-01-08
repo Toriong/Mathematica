@@ -12,14 +12,13 @@ interface IInitialQsGetReqResult<TData> {
 
 let apiRequestTriesNum = 0;
 
-export async function getInitialQs<TData>(userId: string, willClearCacheOnServer?: boolean): Promise<IInitialQsGetReqResult<TData>> {
+export async function getInitialQs<TData>(userId: string, willClearCacheOnServer?: boolean, tries: number = 1) {
     try {
         userId = IS_TESTING ? TESTING_USER_ID : userId;
         const responseGetPropostionalQs = getQuestions<{ questions: IQuestion[] }>(3, ["propositional"], userId as string, null, willClearCacheOnServer);
         const responseGetPredicateQs = getQuestions<{ questions: IQuestion[] }>(3, ["predicate"], userId as string, null, willClearCacheOnServer)
         const responses: Awaited<TPromiseReturnValGetQuestions<{ questions: IQuestion[] } | null>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
         let responsesFiltered = responses.filter(response => !!response.data || !!response) as IReturnObjOfAsyncFn<{ questions: IQuestion[] }>[];
-        let result: IInitialQsGetReqResult<TData> | null = null;
         responsesFiltered = responsesFiltered?.length
             ?
             responsesFiltered.filter(response => {
@@ -38,18 +37,17 @@ export async function getInitialQs<TData>(userId: string, willClearCacheOnServer
             :
             []
 
-        if (apiRequestTriesNum >= 5) {
+        if (!responsesFiltered.length && (apiRequestTriesNum >= tries)) {
             throw new CustomError("Exceeded tries of contacting api to get questions for user.", 429);
         }
 
+
         if (!responsesFiltered.length) {
             ++apiRequestTriesNum
-            result = await getInitialQs(userId);
+            return await getInitialQs(userId);
         }
 
         const questions = responsesFiltered.flatMap<unknown>(response => response.data?.questions) as TData[];
-
-        console.log("questions: ", questions)
 
         return { gettingQsResponseStatus: 'SUCCESS', questions: questions }
     } catch (error) {
