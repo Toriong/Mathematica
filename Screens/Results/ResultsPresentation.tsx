@@ -41,6 +41,7 @@ const ResultsPresentation = () => {
     };
 
     function handleReviewBtnPress() {
+        updateQuestionsStore(0, "questionIndex");
         updateGameScrnStore("review", "mode");
         navigate("GameScreen");
     };

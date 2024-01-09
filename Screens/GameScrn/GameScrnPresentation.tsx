@@ -1,7 +1,7 @@
 console.log("hi")
 import React, { useMemo, useState } from 'react';
 import Layout from '../../global_components/Layout';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, TextStyle } from 'react-native';
 import { PTxt } from '../../global_components/text';
 import { useGameScrnTabStore, useQuestionsStore } from '../../zustand';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -103,8 +103,9 @@ const GameScrnPresentation = () => {
   const rightNum = useGameScrnTabStore(state => state.right);
   const wrongNum = useGameScrnTabStore(state => state.wrong);
   const gameScrnMode = useGameScrnTabStore(state => state.mode);
+  const questionIndex = useQuestionsStore(state => state.questionIndex);
+  const updateQuestionsStore = useQuestionsStore(state => state.updateState);
   const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
-  const [questionIndex, setQuestionIndex] = useState(0);
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
   console.log("questions what is up there: ", questions)
@@ -196,17 +197,19 @@ const GameScrnPresentation = () => {
   }
 
   function handleReviewQNavBtn(num: 1 | -1) {
-    setQuestionIndex(index => {
-      if ((index === 0) && (num === -1)) {
-        return questions.length - 1
+    return () => {
+      let questionIndexUpdated = questionIndex + num;
+
+      if ((questionIndex === 0) && (num === -1)) {
+        questionIndexUpdated = questions.length - 1
       };
 
-      if ((index === (questions.length - 1)) && (num === 1)) {
-        return 0;
+      if ((questionIndex === (questions.length - 1)) && (num === 1)) {
+        questionIndexUpdated = 0;
       }
 
-      return index + num
-    });
+      updateQuestionsStore(questionIndexUpdated, "questionIndex")
+    }
   }
 
   const pressedSelectedSymbol = selectedLogicSymbols ? selectedLogicSymbols.find(({ wasPressed }) => wasPressed) : null;
@@ -302,7 +305,7 @@ const GameScrnPresentation = () => {
 
       setGameScrnTabStore(false, 'wasSubmitBtnPressed');
 
-      setQuestionIndex(questionIndex => questionIndex + 1);
+      updateQuestionsStore(questionIndex + 1, "questionIndex");
 
       setGameScrnTabStore(false, 'isTimerPaused');
     }, 2000);
@@ -460,9 +463,9 @@ const GameScrnPresentation = () => {
                 }}
               >
                 <PTxt
-                  style={{ 
+                  style={{
                     fontSize: TXT_FONT_SIZE,
-                    color: isAnswerCorrectOnReviewMode ? "green" : "red"  
+                    color: isAnswerCorrectOnReviewMode ? "green" : "red"
                   }}
                 >
                   Your Answer:
@@ -477,21 +480,31 @@ const GameScrnPresentation = () => {
                   justifyContent: "center",
                   flexDirection: "row",
                   alignItems: "center",
-                  width: "100%"
+                  width: "100%",
+                  gap: 8
                 }}
               >
-                {reviewModeCorrectAnswerArr.map((symbol, index) => (
-                  <LogicSymbol
-                    key={index}
-                    width="auto"
-                    height={50}
-                    txtFontSize={30}
-                    backgroundColor="transparent"
-                    pTxtStyle={(symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
-                  >
-                    {symbol}
-                  </LogicSymbol>
-                ))}
+                {reviewModeCorrectAnswerArr.map((symbol, index) => {
+                  let _pTxtStyle: TextStyle = { color: isAnswerCorrectOnReviewMode ? "green" : "red" }
+
+                  if (symbol === "∃") {
+                    _pTxtStyle = { ..._pTxtStyle, transform: [{ rotateY: "180deg" }] };
+                  }
+
+                  return (
+                    <LogicSymbol
+                      key={index}
+                      width="auto"
+                      height={50}
+                      txtFontSize={30}
+                      backgroundColor="transparent"
+                      pTxtStyle={(symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
+                    >
+                      {symbol}
+                    </LogicSymbol>
+                  )
+                }
+                )}
               </View>
               :
               !!selectedLogicSymbols.length && selectedLogicSymbols.map(symbol => {
@@ -549,30 +562,58 @@ const GameScrnPresentation = () => {
               ))}
             </View>
           )}
-          <View style={{
-            display: 'flex',
-            width: "80%",
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: 8,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: 8
-          }}
+          {isOnReviewMode && (
+            <View
+              style={{
+                display: 'flex',
+                width: "80%",
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <PTxt
+                fontSize={TXT_FONT_SIZE}
+                txtColor={isAnswerCorrectOnReviewMode ? "green" : "red"}
+              >
+                Correct Answer:
+              </PTxt>
+            </View>
+          )}
+          <View
+            style={{
+              display: 'flex',
+              width: "80%",
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              gap: 8,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 8
+            }}
           >
             {isOnReviewMode ?
               <>
-                {correctAnswerArr.map((symbol, index) => (
-                  <LogicSymbol
-                    key={index}
-                    width={SYMBOL_WIDTH_AND_HEIGHT}
-                    height={SYMBOL_WIDTH_AND_HEIGHT}
-                    backgroundColor={currentColorsThemeObj.second}
-                    txtFontSize={24}
-                  >
-                    {symbol}
-                  </LogicSymbol>
-                ))}
+                {(answer as string[]).map((symbol, index) => {
+                  let _pTxtStyle: TextStyle = { color: isAnswerCorrectOnReviewMode ? "green" : "red" }
+
+                  if (symbol === "∃") {
+                    _pTxtStyle = { ..._pTxtStyle, transform: [{ rotateY: "180deg" }] };
+                  }
+
+                  return (
+                    <LogicSymbol
+                      key={index}
+                      width={isOnReviewMode ? "auto" : SYMBOL_WIDTH_AND_HEIGHT}
+                      height={isOnReviewMode ? "auto" : SYMBOL_WIDTH_AND_HEIGHT}
+                      backgroundColor="transparent"
+                      txtFontSize={30}
+                      pTxtStyle={_pTxtStyle}
+                    >
+                      {symbol}
+                    </LogicSymbol>
+                  )
+                })}
               </>
               :
               symbolOptions.map((symbolOpt, index) => (
@@ -597,7 +638,12 @@ const GameScrnPresentation = () => {
           style={{
             flex: 1,
             width: "100%",
-            marginTop: "5%", display: 'flex', flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: 'center'
+            marginTop: "5%",
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 10,
+            alignItems: "center",
+            justifyContent: 'center'
           }}>
           {isOnReviewMode ?
             <View
@@ -615,7 +661,7 @@ const GameScrnPresentation = () => {
                 }}
               >
                 <Button
-                  handleOnPress={_ => { handleReviewQNavBtn(-1) }}
+                  handleOnPress={handleReviewQNavBtn(-1)}
                   backgroundColor={currentColorsThemeObj.second}
                   dynamicStyles={{ padding: 17, borderRadius: 15 }}
 
@@ -623,7 +669,7 @@ const GameScrnPresentation = () => {
                   <FontAwesomeIcon icon={faArrowLeft} />
                 </Button>
                 <Button
-                  handleOnPress={_ => { handleReviewQNavBtn(1) }}
+                  handleOnPress={handleReviewQNavBtn(1)}
                   backgroundColor={currentColorsThemeObj.second}
                   dynamicStyles={{ padding: 17, borderRadius: 15 }}
 
