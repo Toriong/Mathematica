@@ -13,6 +13,8 @@ import LogicSymbol from './components/LogicSymbol';
 import EditSelectedSymbolBtn from './components/EditSelectedSymbolBtn';
 import LoadingQsModal from './components/LoadingQsModal';
 import { useGetAppColors } from '../../custom_hooks/useGetAppColors';
+import { useNavigation } from '@react-navigation/native';
+import { TStackNavigation } from '../../Navigation';
 
 const SYMBOL_WIDTH_AND_HEIGHT = 45;
 const TXT_FONT_SIZE = 20;
@@ -93,6 +95,7 @@ function getUpdatedSelectedSymbolsArr(indexToSwitchSelectedSymbolWith: number, s
 }
 
 const GameScrnPresentation = () => {
+  const navigation = useNavigation<TStackNavigation>();
   const questions = useQuestionsStore(state => state.questions);
   const task = useQuestionsStore(state => state.task);
   const currentColorsThemeObj = useGetAppColors();
@@ -104,16 +107,19 @@ const GameScrnPresentation = () => {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
+  console.log("questions what is up there: ", questions)
   const question = questions?.length ? questions[questionIndex] : null;
-  const { choices, answer, symbolOptions: symbolOptionsFromServer } = question ?? {};
+  console.log("question, sup meng: ", question);
+  console.log('questionIndex: ', questionIndex)
+  const { choices, answer, symbolOptions: symbolOptionsFromServer, userAnswer } = question ?? {};
   let isAnswerCorrect: boolean | null = null;
+  let isAnswerCorrectOnReviewMode: boolean | null = null;
   const isOnReviewMode = gameScrnMode === "review";
   const symbolOptions = useMemo(() => [...SYMBOLS, ...(Array.isArray(symbolOptionsFromServer) ? symbolOptionsFromServer : [])].map(symbol => ({
     symbol: symbol,
     wasPressed: false
   })), [questions, questionIndex]);
-  // GOAL: generate the correct answer arr for the ui when the user is on the review mode
-  // have the below function be computed when the user changes the indexes
+  console.log("answer hey there meng: ", answer)
   const reviewModeCorrectAnswerArr = useMemo(() => {
     if (isOnReviewMode && answer) {
       return getCorrectAnswerArrForUI(answer)
@@ -121,8 +127,12 @@ const GameScrnPresentation = () => {
 
     return [];
   }, [questionIndex]);
-
   console.log("reviewModeCorrectAnswerArr: ", reviewModeCorrectAnswerArr)
+
+  if (isOnReviewMode) {
+    const userAnswerARrAfterEmptyCheck = userAnswer?.length ? userAnswer : [];
+    isAnswerCorrectOnReviewMode = userAnswer?.length ? false : JSON.stringify(answer) === JSON.stringify(userAnswerARrAfterEmptyCheck);
+  }
 
   if (wasSubmitBtnPressed) {
     isAnswerCorrect = JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol));
@@ -183,6 +193,10 @@ const GameScrnPresentation = () => {
   function handleDeleteSelectedSymbolBtnPress() {
     setSelectedLogicSymbols(selectedLogicSymbols => selectedLogicSymbols.filter(({ wasPressed }) => !wasPressed));
   };
+
+  function handleToResultScrnBtnPress() {
+    navigation.navigate("ResultsScreen")
+  }
 
   function handleReviewQNavBtn(num: 1 | -1) {
     setQuestionIndex(index => {
@@ -430,7 +444,7 @@ const GameScrnPresentation = () => {
               width: "93%",
               height: 70,
               display: 'flex',
-              flexDirection: 'row',
+              flexDirection: isOnReviewMode ? 'column' : 'row',
               justifyContent: 'center',
               alignItems: 'center',
               gap: 5,
@@ -439,19 +453,49 @@ const GameScrnPresentation = () => {
               position: 'relative',
             }}
           >
-            {isOnReviewMode ?
-              reviewModeCorrectAnswerArr.map((symbol, index) => (
-                <LogicSymbol
-                  key={index}
-                  width="auto"
-                  height={50}
-                  txtFontSize={30}
-                  backgroundColor="transparent"
-                  pTxtStyle={(symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
+            {isOnReviewMode && (
+              <View
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%"
+                }}
+              >
+                <PTxt
+                  style={{ 
+                    fontSize: TXT_FONT_SIZE,
+                    color: isAnswerCorrectOnReviewMode ? "green" : "red"  
+                  }}
                 >
-                  {symbol}
-                </LogicSymbol>
-              ))
+                  Your Answer:
+                </PTxt>
+              </View>
+            )
+            }
+            {isOnReviewMode ?
+              <View
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  width: "100%"
+                }}
+              >
+                {reviewModeCorrectAnswerArr.map((symbol, index) => (
+                  <LogicSymbol
+                    key={index}
+                    width="auto"
+                    height={50}
+                    txtFontSize={30}
+                    backgroundColor="transparent"
+                    pTxtStyle={(symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
+                  >
+                    {symbol}
+                  </LogicSymbol>
+                ))}
+              </View>
               :
               !!selectedLogicSymbols.length && selectedLogicSymbols.map(symbol => {
                 const _id = uuid.v4().toString();
@@ -559,26 +603,52 @@ const GameScrnPresentation = () => {
             marginTop: "5%", display: 'flex', flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: 'center'
           }}>
           {isOnReviewMode ?
-            <>
-              <Button
-                isDisabled={false}
-                handleOnPress={_ => { handleReviewQNavBtn(-1) }}
-                backgroundColor={currentColorsThemeObj.second}
-                dynamicStyles={{ padding: 17, borderRadius: 15 }}
-
+            <View
+              style={{
+                flexDirection: "column"
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 10,
+                  transform: [{ translateY: -10 }]
+                }}
               >
-                <FontAwesomeIcon icon={faArrowLeft} />
-              </Button>
-              <Button
-                isDisabled={false}
-                handleOnPress={_ => { handleReviewQNavBtn(1) }}
-                backgroundColor={currentColorsThemeObj.second}
-                dynamicStyles={{ padding: 17, borderRadius: 15 }}
+                <Button
+                  handleOnPress={_ => { handleReviewQNavBtn(-1) }}
+                  backgroundColor={currentColorsThemeObj.second}
+                  dynamicStyles={{ padding: 17, borderRadius: 15 }}
 
+                >
+                  <FontAwesomeIcon icon={faArrowLeft} />
+                </Button>
+                <Button
+                  handleOnPress={_ => { handleReviewQNavBtn(1) }}
+                  backgroundColor={currentColorsThemeObj.second}
+                  dynamicStyles={{ padding: 17, borderRadius: 15 }}
+
+                >
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </Button>
+              </View>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
               >
-                <FontAwesomeIcon icon={faArrowRight} />
-              </Button>
-            </>
+                <Button
+                  handleOnPress={handleToResultScrnBtnPress}
+                  backgroundColor={currentColorsThemeObj.second}
+                  dynamicStyles={{ padding: 17, borderRadius: 15 }}
+                >
+                  <PTxt>To Results Screen</PTxt>
+                </Button>
+              </View>
+            </View>
             :
             <>
               <Button

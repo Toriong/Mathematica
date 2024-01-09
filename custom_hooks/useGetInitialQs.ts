@@ -27,7 +27,9 @@ export function useGetInitialQs(): null {
 
                     if (response.gettingQsResponseStatus === "FAILURE") {
                         throw new Error("Failed to get the initial questions from the server.")
-                    }
+                    };
+
+                    console.log("areQsReceivedForNextQuiz: ", areQsReceivedForNextQuiz)
 
                     if (areQsReceivedForNextQuiz) {
                         updateQuestionsStore(response.questions as IQuestionOnClient[], "questionsForNextQuiz")
