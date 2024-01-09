@@ -1,5 +1,5 @@
 import { DEFAULT_THIRD_COLOR, IAppColor, IComponentProps, TAppColors, TFirstColor, TSecondColor, TThirdColor } from "../../../globalTypes&Interfaces"
-import { View, ViewStyle } from 'react-native';
+import { TextStyle, View, ViewStyle } from 'react-native';
 import { PTxt } from "../../../global_components/text";
 
 interface ISymbol {
@@ -9,7 +9,7 @@ interface ISymbol {
     txtFontSize?: number
     opacity?: number
     pTxtStyle?: ViewStyle
-    pTxtColor?: TAppColors | typeof DEFAULT_THIRD_COLOR
+    pTxtColor?: TextStyle["color"]
 }
 
 const LogicSymbol = ({
@@ -21,6 +21,7 @@ const LogicSymbol = ({
     pTxtColor = DEFAULT_THIRD_COLOR,
     pTxtStyle = {}
 }: Omit<IComponentProps, 'backgroundColor'> & ISymbol) => {
+    
     return (
         <View
             style={{

@@ -128,8 +128,10 @@ const GameScrnPresentation = () => {
   }, [questionIndex]);
 
   if (isOnReviewMode) {
-    const userAnswerARrAfterEmptyCheck = userAnswer?.length ? userAnswer : [];
-    isAnswerCorrectOnReviewMode = userAnswer?.length ? false : JSON.stringify(answer) === JSON.stringify(userAnswerARrAfterEmptyCheck);
+    console.log("userAnswer: ", userAnswer)
+    const userAnswerArrAfterEmptyCheck = userAnswer?.length ? userAnswer : [];
+    console.log("userAnswerArrAfterEmptyCheck: ", userAnswerArrAfterEmptyCheck)
+    isAnswerCorrectOnReviewMode = userAnswer?.length ? false : JSON.stringify(answer) === JSON.stringify(userAnswerArrAfterEmptyCheck);
   }
 
   if (wasSubmitBtnPressed) {
@@ -463,10 +465,8 @@ const GameScrnPresentation = () => {
                 }}
               >
                 <PTxt
-                  style={{
-                    fontSize: TXT_FONT_SIZE,
-                    color: isAnswerCorrectOnReviewMode ? "green" : "red"
-                  }}
+                  fontSize={TXT_FONT_SIZE}
+                  txtColor={isAnswerCorrectOnReviewMode ? "green" : "red"}
                 >
                   Your Answer:
                 </PTxt>
@@ -485,12 +485,6 @@ const GameScrnPresentation = () => {
                 }}
               >
                 {reviewModeCorrectAnswerArr.map((symbol, index) => {
-                  let _pTxtStyle: TextStyle = { color: isAnswerCorrectOnReviewMode ? "green" : "red" }
-
-                  if (symbol === "∃") {
-                    _pTxtStyle = { ..._pTxtStyle, transform: [{ rotateY: "180deg" }] };
-                  }
-
                   return (
                     <LogicSymbol
                       key={index}
@@ -498,6 +492,7 @@ const GameScrnPresentation = () => {
                       height={50}
                       txtFontSize={30}
                       backgroundColor="transparent"
+                      pTxtColor={isAnswerCorrectOnReviewMode ? "green" : "red"}
                       pTxtStyle={(symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
                     >
                       {symbol}
@@ -524,7 +519,7 @@ const GameScrnPresentation = () => {
                       backgroundColor="transparent"
                       pTxtStyle={(symbol.symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
                     >
-                      {symbol.symbol === '∃' ? "E" : symbol.symbol}
+                      {(symbol.symbol === '∃') ? "E" : symbol.symbol}
                     </LogicSymbol>
                   </TouchableOpacity>
                 )
@@ -532,7 +527,15 @@ const GameScrnPresentation = () => {
             }
           </View>
         </View>
-        <View style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <View
+          style={{
+            flex: 1,
+            width: "100%",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
           {!isOnReviewMode && (
             <View style={{
               display: "flex",
@@ -595,10 +598,10 @@ const GameScrnPresentation = () => {
             {isOnReviewMode ?
               <>
                 {(answer as string[]).map((symbol, index) => {
-                  let _pTxtStyle: TextStyle = { color: isAnswerCorrectOnReviewMode ? "green" : "red" }
+                  let _pTxtStyle = {};
 
                   if (symbol === "∃") {
-                    _pTxtStyle = { ..._pTxtStyle, transform: [{ rotateY: "180deg" }] };
+                    _pTxtStyle = { transform: [{ rotateY: "180deg" }] };
                   }
 
                   return (
@@ -609,6 +612,7 @@ const GameScrnPresentation = () => {
                       backgroundColor="transparent"
                       txtFontSize={30}
                       pTxtStyle={_pTxtStyle}
+                      pTxtColor={isAnswerCorrectOnReviewMode ? "green" : "red"}
                     >
                       {symbol}
                     </LogicSymbol>
