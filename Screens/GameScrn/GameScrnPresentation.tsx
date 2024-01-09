@@ -15,6 +15,7 @@ import LoadingQsModal from './components/LoadingQsModal';
 import { useGetAppColors } from '../../custom_hooks/useGetAppColors';
 import { useNavigation } from '@react-navigation/native';
 import { TStackNavigation } from '../../Navigation';
+import { IQuestionOnClient } from '../../zustandStoreTypes&Interfaces';
 
 const SYMBOL_WIDTH_AND_HEIGHT = 45;
 const TXT_FONT_SIZE = 20;
@@ -278,6 +279,11 @@ const GameScrnPresentation = () => {
     setGameScrnTabStore(true, 'isTimerPaused');
     let correctAnswerArr: string[] = [];
     let answerArrClone = structuredClone<string[]>(answer);
+    const currentQuestionUpdated = {
+      ...questions[questionIndex],
+      userAnswer: selectedLogicSymbols
+    } as IQuestionOnClient;
+    const questionsUpdated = questions.toSpliced(questionIndex, 1, currentQuestionUpdated);
     const isAnswerCorrect = JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol))
 
     // the values in correctAnswerArr will be displayed onto the ui by using the 'correctAnswerArr' state
