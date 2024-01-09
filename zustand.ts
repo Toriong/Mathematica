@@ -16,6 +16,7 @@ export const useQuestionsStore = create<IQuestionsForObj>(set => ({
     task: "",
     questions: [],
     questionsForNextQuiz: [],
+    questionIndex: 0,
     updateState: (newState: IQuestionsForObj[keyof IQuestionsForObj], fieldName: keyof IQuestionsStates) => set(() => ({ [fieldName]: newState })),
 }));
 

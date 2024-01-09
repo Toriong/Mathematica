@@ -110,7 +110,6 @@ const GameScrnPresentation = () => {
   console.log("questions what is up there: ", questions)
   const question = questions?.length ? questions[questionIndex] : null;
   console.log("question, sup meng: ", question);
-  console.log('questionIndex: ', questionIndex)
   const { choices, answer, symbolOptions: symbolOptionsFromServer, userAnswer } = question ?? {};
   let isAnswerCorrect: boolean | null = null;
   let isAnswerCorrectOnReviewMode: boolean | null = null;
@@ -119,7 +118,6 @@ const GameScrnPresentation = () => {
     symbol: symbol,
     wasPressed: false
   })), [questions, questionIndex]);
-  console.log("answer hey there meng: ", answer)
   const reviewModeCorrectAnswerArr = useMemo(() => {
     if (isOnReviewMode && answer) {
       return getCorrectAnswerArrForUI(answer)
@@ -127,7 +125,6 @@ const GameScrnPresentation = () => {
 
     return [];
   }, [questionIndex]);
-  console.log("reviewModeCorrectAnswerArr: ", reviewModeCorrectAnswerArr)
 
   if (isOnReviewMode) {
     const userAnswerARrAfterEmptyCheck = userAnswer?.length ? userAnswer : [];

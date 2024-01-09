@@ -38,12 +38,12 @@ export interface IQuestionsStates {
     task: string
     questions: IQuestionOnClient[]
     questionsForNextQuiz: IQuestionOnClient[]
+    questionIndex: number
 }
 
 export type TUpdateStoreState<TNewState, TFieldName> = {
     updateState: (newState: TNewState, fieldName: TFieldName) => void
 }
-
 export type TUpdateStoreStateDynamicType = {
     updateState: (newState: IQuestionsStates[keyof IQuestionsStates], fieldName: keyof IQuestionsStates) => void
 }
