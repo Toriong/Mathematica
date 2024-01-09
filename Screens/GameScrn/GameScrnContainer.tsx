@@ -7,15 +7,15 @@ import { getUserId } from '../../utils/generalFns';
 import { IQuestion, TQuestionTypes } from '../../sharedInterfaces&TypesWithBackend';
 import { IReturnObjOfAsyncFn } from '../../api_services/globalApiVars';
 import { Storage, TStorageInstance } from '../../utils/storage';
-import { IQuestionsStates } from '../../zustandStoreTypes&Interfaces';
+import { IQuestionOnClient, IQuestionsStates } from '../../zustandStoreTypes&Interfaces';
 
-type TQuestionFromSever = { questions: [IQuestion] }
+type TQuestionFromSever = { questions: [IQuestionOnClient] }
 
 async function getAdditionalQuestion(
   memory: TStorageInstance, 
-  questions:IQuestion[], 
+  questions:IQuestionOnClient[], 
   questionTypes: TQuestionTypes[] 
-  ): Promise<IReturnObjOfAsyncFn<[IQuestion] | null>> {
+  ): Promise<IReturnObjOfAsyncFn<[IQuestionOnClient] | null>> {
     try {
       const userId = (await getUserId()) as string;
       const isGameOn = await memory.getItem<boolean>("isGameOn") as boolean;
@@ -66,7 +66,9 @@ const GameScrnContainer = () => {
             throw new Error(`${getAdditionalQuestionResult.msg} ${!getAdditionalQuestionResult?.data?.length && 'Did not receive a question from the server.'}`);
           }
 
-          updateQuestionsStore<IQuestion[]>([...questions, ...getAdditionalQuestionResult.data], "questions")
+          const questionsUpdated = [...questions, ...getAdditionalQuestionResult.data];
+
+          updateQuestionsStore(questionsUpdated, "questions")
         } catch (error) {
           console.error("An error has occurred in getting the next question from the server. Error message: ", error);
         }

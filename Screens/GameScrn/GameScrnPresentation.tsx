@@ -23,6 +23,28 @@ interface ISelectedLogicSymbol {
   wasPressed?: boolean
 }
 
+function getCorrectAnswerArrForUI(answerArrSymbols: string[]) {
+  let answerArrClone = structuredClone<string[]>(answerArrSymbols);
+  let answerArrUpdated: string[] = [];
+
+  for (let index = 0; index < answerArrClone.length; ++index) {
+    const currentAnswerSymbol = answerArrClone[index];
+    const nextAnswerSymbol = answerArrClone[index + 1];
+
+    if ((currentAnswerSymbol !== "~") || !nextAnswerSymbol) {
+      answerArrUpdated.push(currentAnswerSymbol);
+      continue
+    }
+
+    // putting the negation symbol and the next symbol into one string
+    let newAnswerSymbol = `${currentAnswerSymbol}${nextAnswerSymbol}`;
+    answerArrClone.splice(index + 1, 1);
+    answerArrUpdated.push(newAnswerSymbol);
+  };
+
+  return answerArrUpdated;
+}
+
 function getDeleteAndMoveSelectedSymbolBtns(
   handleMovementButtonPress: (num: 1 | -1) => void,
   handleDeleteSymbolButtonPress: () => void,
@@ -84,12 +106,23 @@ const GameScrnPresentation = () => {
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
   const question = questions?.length ? questions[questionIndex] : null;
   const { choices, answer, symbolOptions: symbolOptionsFromServer } = question ?? {};
+  let isAnswerCorrect: boolean | null = null;
+  const isOnReviewMode = gameScrnMode === "review";
   const symbolOptions = useMemo(() => [...SYMBOLS, ...(Array.isArray(symbolOptionsFromServer) ? symbolOptionsFromServer : [])].map(symbol => ({
     symbol: symbol,
     wasPressed: false
   })), [questions, questionIndex]);
-  let isAnswerCorrect: boolean | null = null;
-  const isOnReviewMode = gameScrnMode === "review";
+  // GOAL: generate the correct answer arr for the ui when the user is on the review mode
+  // have the below function be computed when the user changes the indexes
+  const reviewModeCorrectAnswerArr = useMemo(() => {
+    if (isOnReviewMode && answer) {
+      return getCorrectAnswerArrForUI(answer)
+    };
+
+    return [];
+  }, [questionIndex]);
+
+  console.log("reviewModeCorrectAnswerArr: ", reviewModeCorrectAnswerArr)
 
   if (wasSubmitBtnPressed) {
     isAnswerCorrect = JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol));
@@ -241,6 +274,7 @@ const GameScrnPresentation = () => {
         continue
       }
 
+      // putting the negation symbol and the next symbol into one string
       let newAnswerSymbol = `${currentAnswerSymbol}${nextAnswerSymbol}`;
       answerArrClone.splice(index + 1, 1);
       correctAnswerArr.push(newAnswerSymbol);
@@ -406,7 +440,18 @@ const GameScrnPresentation = () => {
             }}
           >
             {isOnReviewMode ?
-              <></>
+              reviewModeCorrectAnswerArr.map((symbol, index) => (
+                <LogicSymbol
+                  key={index}
+                  width="auto"
+                  height={50}
+                  txtFontSize={30}
+                  backgroundColor="transparent"
+                  pTxtStyle={(symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
+                >
+                  {symbol}
+                </LogicSymbol>
+              ))
               :
               !!selectedLogicSymbols.length && selectedLogicSymbols.map(symbol => {
                 const _id = uuid.v4().toString();
@@ -474,21 +519,37 @@ const GameScrnPresentation = () => {
             marginTop: 8
           }}
           >
-            {symbolOptions.map((symbolOpt, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => handleSymbolOptPress(symbolOpt)}
-              >
-                <LogicSymbol
-                  width={SYMBOL_WIDTH_AND_HEIGHT}
-                  height={SYMBOL_WIDTH_AND_HEIGHT}
-                  backgroundColor={currentColorsThemeObj.second}
-                  txtFontSize={24}
+            {isOnReviewMode ?
+              <>
+                {correctAnswerArr.map((symbol, index) => (
+                  <LogicSymbol
+                    key={index}
+                    width={SYMBOL_WIDTH_AND_HEIGHT}
+                    height={SYMBOL_WIDTH_AND_HEIGHT}
+                    backgroundColor={currentColorsThemeObj.second}
+                    txtFontSize={24}
+                  >
+                    {symbol}
+                  </LogicSymbol>
+                ))}
+              </>
+              :
+              symbolOptions.map((symbolOpt, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => handleSymbolOptPress(symbolOpt)}
                 >
-                  {symbolOpt.symbol}
-                </LogicSymbol>
-              </TouchableOpacity>
-            ))}
+                  <LogicSymbol
+                    width={SYMBOL_WIDTH_AND_HEIGHT}
+                    height={SYMBOL_WIDTH_AND_HEIGHT}
+                    backgroundColor={currentColorsThemeObj.second}
+                    txtFontSize={24}
+                  >
+                    {symbolOpt.symbol}
+                  </LogicSymbol>
+                </TouchableOpacity>
+              ))
+            }
           </View>
         </View>
         <View

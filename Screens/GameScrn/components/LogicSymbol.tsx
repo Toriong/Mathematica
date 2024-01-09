@@ -3,10 +3,10 @@ import { View, ViewStyle } from 'react-native';
 import { PTxt } from "../../../global_components/text";
 
 interface ISymbol {
-    width: number | "auto"
-    height: number | "auto"
-    backgroundColor: TAppColors | "transparent"
-    txtFontSize: number
+    width?: number | "auto"
+    height?: number | "auto"
+    backgroundColor?: TAppColors | "transparent"
+    txtFontSize?: number
     opacity?: number
     pTxtStyle?: ViewStyle
 }

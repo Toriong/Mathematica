@@ -11,14 +11,28 @@ export class Storage {
     storage = AsyncStorage;
 
     async getItem<TData>(key: keyof IStorage): Promise<TData | null | string> {
-        return await this.storage.getItem(key);
+        try {
+            return await this.storage.getItem(key);
+        } catch(error){
+            console.error("Failed to get itme from storage. Error message: ", error);
+
+            return null;
+        }
     };
 
     async setItem(key: keyof IStorage, value: IStorage[keyof IStorage]) {
-        await this.storage.setItem(key, JSON.stringify(value));
+        try {
+            await this.storage.setItem(key, JSON.stringify(value));
+        } catch(error){
+            console.error("Failed to set the storage. Error message: ", error);
+        }
     }
 
     async deleteItem(key: keyof IStorage) {
-        await this.storage.removeItem(key);
+        try {
+            await this.storage.removeItem(key);
+        } catch(error){
+            console.error("Failed to delete the item from storage. Error message: ", error)
+        }
     }
 }
