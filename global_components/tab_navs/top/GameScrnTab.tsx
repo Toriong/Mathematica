@@ -72,7 +72,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
 
     useEffect(() => {
         if ((timerObj.timerMs <= 0) && (gameScrnMode === "quiz")) {
-            setGameScrnTabStore("finish", 'mode');
+            setGameScrnTabStore("finished", 'mode');
 
             setTimeout(() => {
                 updateApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz");

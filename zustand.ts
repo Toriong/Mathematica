@@ -45,7 +45,7 @@ export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
         wasSubmitBtnPressed: false,
         isTimerPaused: false,
         isLoadingModalOn: false,
-        mode: "finish",
+        mode: "finished",
         questionTypes: [],
         updateState: (newState: TGameScrnTabStore[keyof TGameScrnTabStore], fieldName: keyof TGameScrnTabStore) => set(() => ({ [fieldName]: newState }))
     }

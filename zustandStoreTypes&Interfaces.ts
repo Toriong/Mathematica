@@ -12,7 +12,7 @@ interface IErrorStore {
     didAnErrorOccurInGettingQs: boolean,
     didAnErrorOccurInUserAuth: boolean,
 }
-type TMode = "quiz" | "review" | "finish";
+type TMode = "quiz" | "review" | "finished";
 interface IGameScrnTabStoreState {
     right: number
     wrong: number

@@ -19,6 +19,7 @@ const ResultsPresentation = () => {
     const { navigate } = useNavigation<TStackNavigation>();
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
+    const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
     const questionsFromPreviousQuiz = useQuestionsStore(state => state.questions);
     const updateGameScrnStore = useGameScrnTabStore(state => state.updateState);
@@ -27,8 +28,14 @@ const ResultsPresentation = () => {
 
     function handlePlayAgainBtnPress() {
         if (questionsForNextQuiz?.length) {
-            updateQuestionsStore(questionsForNextQuiz, "questions")
+            updateQuestionsStore(questionsForNextQuiz, "questions");
+            updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
+        } else {
+            updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
         }
+
+        // if the questions for the next quiz has not been retrieved then change gettingQsStatus global state 
+        // to IN_PROGRESS
 
         updateGameScrnStore("quiz", "mode");
         navigate("GameScreen");
@@ -38,13 +45,8 @@ const ResultsPresentation = () => {
         navigate("Home")
     };
 
-    // Notes: 
-    // the values in the questions array does not have the userAnswer field
-
     function handleReviewBtnPress() {
         updateQuestionsStore(0, "questionIndex");
-        console.log("questionsFromPreviousQuiz: ", questionsFromPreviousQuiz);
-        // updateQuestionsStore(questionsFromPreviousQuiz.filter(question => question.userAnswer), "questions");
         updateGameScrnStore("review", "mode");
         navigate("GameScreen");
     };

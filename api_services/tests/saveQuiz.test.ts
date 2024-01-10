@@ -33,6 +33,8 @@ describe("Testing the saving of user quiz into the db.", () => {
                 expect(1).to.equal(2, "Test failed. An error has occurred in saving quiz into the db.")
                 throw new CustomError(`Failed to save the quiz into the db. Message from server: ${response.msg}`, 500);
             }
+
+            console.log("Test passed. Quiz was saved!")
         } catch (error) {
             console.error("An error has occurred in saving the quiz into the database. Error: ", error);
             expect(1).to.equal(2)

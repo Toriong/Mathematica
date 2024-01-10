@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import { PTxt } from "../../../global_components/text";
 import { ActivityIndicator, View } from "react-native";
-import { useApiQsFetchingStatusStore, useQuestionsStore } from "../../../zustand";
+import { useApiQsFetchingStatusStore, useGameScrnTabStore } from "../../../zustand";
 import { useGetAppColors } from "../../../custom_hooks/useGetAppColors";
 import Modal from "react-native-modal";
 import Button from "../../../global_components/Button";
 
 const LoadingQsModal = () => {
     const gettingQsStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
-    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
-    const updateQuestionsStore = useQuestionsStore(state => state.updateState);
+    const mode = useGameScrnTabStore(state => state.mode);
     const [isModalVisible, setIsModalVisible] = useState((gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE"));
     const appColors = useGetAppColors();
 
@@ -22,19 +21,16 @@ const LoadingQsModal = () => {
     function closeModal(millis = 1000) {
         setTimeout(() => {
             setIsModalVisible(false);
-        }, millis)
+        }, millis);
     }
 
     useEffect(() => {
-        if ((gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE")) {
+        if ((mode === "quiz") && (gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE")) {
             setIsModalVisible(true);
-        } else if ((gettingQsStatus === "SUCCESS") && questionsForNextQuiz.length) {
-            updateQuestionsStore(questionsForNextQuiz, "questions");
-            closeModal();
-        } else if (gettingQsStatus === "SUCCESS") {
+        } else if ((mode === "quiz") && (gettingQsStatus === "SUCCESS") && isModalVisible) {
             closeModal();
         }
-    }, [gettingQsStatus])
+    }, [gettingQsStatus, mode])
 
     return (
         <Modal

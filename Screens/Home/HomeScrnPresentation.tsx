@@ -24,17 +24,8 @@ const HomeScrnPresentation = () => {
         await memory.setItem("isGameOn", true);
         updateGameScrnTabStore(types, "questionTypes");
         updateGameScrnTabStore("quiz", "mode");
-        console.log("yo there, will go to " + scrnName)
         navigation.navigate(scrnName)
     }
-
-    const [isModalVisible, setIsModalVisible] = useState(true);
-
-    useEffect(() => {
-        setTimeout(() => {
-            setIsModalVisible(false)
-        }, 2000)
-    })
 
     return (
         <Layout>

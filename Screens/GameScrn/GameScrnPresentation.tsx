@@ -109,13 +109,8 @@ const GameScrnPresentation = () => {
   const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
-  console.log("questions what is up there: ", questions[questionIndex])
   const question = questions?.length ? questions[questionIndex] : null;
-  console.log("question, sup meng: ", question);
   const { choices, answer, symbolOptions: symbolOptionsFromServer, userAnswer } = question ?? {};
-  console.log("what is up there meng: ", answer);
-  console.log("userAnswer: ", userAnswer)
-  
   let isAnswerCorrect: boolean | null = null;
   let isAnswerCorrectOnReviewMode: boolean | null = null;
   const isOnReviewMode = gameScrnMode === "review";
@@ -132,10 +127,8 @@ const GameScrnPresentation = () => {
   }, [questionIndex]);
 
   if (isOnReviewMode) {
-    console.log("userAnswer: ", userAnswer)
     const userAnswerArrAfterEmptyCheck = userAnswer?.length ? userAnswer : [];
-    console.log("userAnswerArrAfterEmptyCheck: ", userAnswerArrAfterEmptyCheck)
-    isAnswerCorrectOnReviewMode = userAnswer?.length ? false : JSON.stringify(answer) === JSON.stringify(userAnswerArrAfterEmptyCheck);
+    isAnswerCorrectOnReviewMode = !userAnswer?.length ? false : JSON.stringify(answer) === JSON.stringify(userAnswerArrAfterEmptyCheck);
   }
 
   if (wasSubmitBtnPressed) {
@@ -278,10 +271,6 @@ const GameScrnPresentation = () => {
     setSelectedLogicSymbols([]);
   };
 
-  useEffect(() => {
-    console.log("questions: ", questions)
-  }, [wasSubmitBtnPressed])
-
   function handleSubmitBtnPress() {
     setGameScrnTabStore(true, 'isTimerPaused');
     let answerArrClone = structuredClone<string[]>(answer);
@@ -291,7 +280,7 @@ const GameScrnPresentation = () => {
       userAnswer: selectedLogicSymbols.map(selectedLogicSymbol => selectedLogicSymbol.symbol)
     } satisfies IQuestionOnClient;
     const questionsUpdated = questions.map((question, index) => {
-      if(questionIndex === index) return currentQuestionUpdated 
+      if (questionIndex === index) return currentQuestionUpdated
 
       return question;
     });
@@ -339,6 +328,12 @@ const GameScrnPresentation = () => {
 
     setGameScrnTabStore(wrongNum + 1, "wrong")
   };
+
+  useEffect(() => {
+    if (gameScrnMode === "finished") {
+      setSelectedLogicSymbols([]);
+    }
+  }, [gameScrnMode])
 
   return (
     <>
@@ -397,7 +392,7 @@ const GameScrnPresentation = () => {
                 </PTxt>
                 <PTxt
                   fontSize={30}
-                  txtColor={isAnswerCorrect ? 'green' : 'red'}
+                  txtColor={isAnswerCorrect ? "green" : "red"}
                 >
                   Correct Answer:
                 </PTxt>
@@ -408,7 +403,7 @@ const GameScrnPresentation = () => {
                     <PTxt
                       key={index}
                       fontSize={30}
-                      txtColor={isAnswerCorrect ? 'green' : 'red'}
+                      txtColor='green'
                     >
                       {symbol}
                     </PTxt>
@@ -491,7 +486,7 @@ const GameScrnPresentation = () => {
               </View>
             )
             }
-            {isOnReviewMode && !!userAnswer?.length ?
+            {isOnReviewMode ?
               <View
                 style={{
                   display: "flex",
@@ -499,25 +494,33 @@ const GameScrnPresentation = () => {
                   flexDirection: "row",
                   alignItems: "center",
                   width: "100%",
-                  gap: 8
+                  gap: 3
                 }}
               >
-                {userAnswer.map((symbol, index) => {
-                  return (
-                    <LogicSymbol
-                      key={index}
-                      width="auto"
-                      height={50}
-                      txtFontSize={30}
-                      backgroundColor="transparent"
-                      pTxtColor={isAnswerCorrectOnReviewMode ? "green" : "red"}
-                      pTxtStyle={(symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
-                    >
-                      {symbol}
-                    </LogicSymbol>
-                  )
+                {userAnswer?.length ?
+                  userAnswer.map((symbol, index) => {
+                    return (
+                      <LogicSymbol
+                        key={index}
+                        width="auto"
+                        height={50}
+                        txtFontSize={30}
+                        backgroundColor="transparent"
+                        pTxtColor={isAnswerCorrectOnReviewMode ? "green" : "red"}
+                        // pTxtStyle={(symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
+                      >
+                        {symbol}
+                      </LogicSymbol>
+                    )
+                  })
+                  :
+                  <PTxt
+                    fontSize={TXT_FONT_SIZE}
+                    txtColor="red"
+                  >
+                    None Provided.
+                  </PTxt>
                 }
-                )}
               </View>
               :
               (!!selectedLogicSymbols.length && !isOnReviewMode) && selectedLogicSymbols.map(symbol => {
@@ -551,7 +554,7 @@ const GameScrnPresentation = () => {
             width: "100%",
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
           }}
         >
           {!isOnReviewMode && (
@@ -595,7 +598,7 @@ const GameScrnPresentation = () => {
             >
               <PTxt
                 fontSize={TXT_FONT_SIZE}
-                txtColor={isAnswerCorrectOnReviewMode ? "green" : "red"}
+                txtColor="green"
               >
                 Correct Answer:
               </PTxt>
@@ -607,7 +610,7 @@ const GameScrnPresentation = () => {
               width: "80%",
               flexDirection: 'row',
               flexWrap: 'wrap',
-              gap: 8,
+              gap: 3,
               justifyContent: 'center',
               alignItems: 'center',
               marginTop: 8
@@ -618,9 +621,9 @@ const GameScrnPresentation = () => {
                 {reviewModeCorrectAnswerArr.map((symbol, index) => {
                   let _pTxtStyle = {};
 
-                  if (symbol === "∃") {
-                    _pTxtStyle = { transform: [{ rotateY: "180deg" }] };
-                  }
+                  // if (symbol === "∃") {
+                  //   _pTxtStyle = { transform: [{ rotateY: "180deg" }] };
+                  // }
 
                   return (
                     <LogicSymbol
@@ -630,7 +633,7 @@ const GameScrnPresentation = () => {
                       backgroundColor="transparent"
                       txtFontSize={30}
                       pTxtStyle={_pTxtStyle}
-                      pTxtColor={isAnswerCorrectOnReviewMode ? "green" : "red"}
+                      pTxtColor="green"
                     >
                       {symbol}
                     </LogicSymbol>
@@ -683,22 +686,40 @@ const GameScrnPresentation = () => {
                 }}
               >
                 <Button
+                  isDisabled={questionIndex === 0}
                   handleOnPress={handleReviewQNavBtn(-1)}
                   backgroundColor={currentColorsThemeObj.second}
-                  dynamicStyles={{ padding: 17, borderRadius: 15 }}
-
+                  dynamicStyles={{
+                    padding: 14,
+                    borderRadius: 15,
+                    opacity: (questionIndex === 0) ? .4 : 1
+                  }}
                 >
                   <FontAwesomeIcon icon={faArrowLeft} />
                 </Button>
                 <Button
+                  isDisabled={questionIndex === (questions.length - 1)}
                   handleOnPress={handleReviewQNavBtn(1)}
                   backgroundColor={currentColorsThemeObj.second}
-                  dynamicStyles={{ padding: 17, borderRadius: 15 }}
+                  dynamicStyles={{
+                    padding: 14,
+                    borderRadius: 15,
+                    opacity: (questionIndex === (questions.length - 1)) ? .4 : 1
+                  }}
 
                 >
                   <FontAwesomeIcon icon={faArrowRight} />
                 </Button>
               </View>
+              {isOnReviewMode && (
+                <View style={{ marginBottom: 8, justifyContent: "center", alignItems: "center" }}>
+                  <PTxt
+                    fontSize={TXT_FONT_SIZE}
+                  >
+                    {questionIndex + 1}/{questions.length}
+                  </PTxt>
+                </View>
+              )}
               <View
                 style={{
                   justifyContent: "center",
@@ -708,7 +729,7 @@ const GameScrnPresentation = () => {
                 <Button
                   handleOnPress={handleToResultScrnBtnPress}
                   backgroundColor={currentColorsThemeObj.second}
-                  dynamicStyles={{ padding: 17, borderRadius: 15 }}
+                  dynamicStyles={{ padding: 15, borderRadius: 15 }}
                 >
                   <PTxt>To Results Screen</PTxt>
                 </Button>
