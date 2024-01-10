@@ -82,7 +82,11 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                 updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
             }, 500);
 
+            console.log("the quiz has ended, questions: ", questions)
+
             const answeredQuestions = questions.filter(question => question.userAnswer);
+
+            console.log("answeredQuestions: ", answeredQuestions)
 
             updateQuestionsStore(answeredQuestions, "questions");
 

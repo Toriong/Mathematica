@@ -10,9 +10,6 @@ import { IQuestion } from "../../sharedInterfaces&TypesWithBackend";
 import { IQuestionOnClient, IQuestionsForObj } from "../../zustandStoreTypes&Interfaces";
 import { useNavigation } from "@react-navigation/native";
 import { TStackNavigation } from "../../Navigation";
-import { getQuestions } from "../../api_services/quiz/getQuestions";
-import { getInitialQs } from "../../api_services/quiz/getInitialQs";
-import { Storage } from "../../utils/storage";
 
 const BTN_FONT_SIZE = 22;
 const PTXT_FONT_SIZE = 35;
@@ -22,12 +19,13 @@ const ResultsPresentation = () => {
     const { navigate } = useNavigation<TStackNavigation>();
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
-    const updateGameScrnStore = useGameScrnTabStore(state => state.updateState);
     const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
+    const questionsFromPreviousQuiz = useQuestionsStore(state => state.questions);
+    const updateGameScrnStore = useGameScrnTabStore(state => state.updateState);
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);
     const appColors = useGetAppColors();
 
-    async function handlePlayAgainBtnPress() {
+    function handlePlayAgainBtnPress() {
         if (questionsForNextQuiz?.length) {
             updateQuestionsStore(questionsForNextQuiz, "questions")
         }
@@ -40,8 +38,13 @@ const ResultsPresentation = () => {
         navigate("Home")
     };
 
+    // Notes: 
+    // the values in the questions array does not have the userAnswer field
+
     function handleReviewBtnPress() {
         updateQuestionsStore(0, "questionIndex");
+        console.log("questionsFromPreviousQuiz: ", questionsFromPreviousQuiz);
+        // updateQuestionsStore(questionsFromPreviousQuiz.filter(question => question.userAnswer), "questions");
         updateGameScrnStore("review", "mode");
         navigate("GameScreen");
     };

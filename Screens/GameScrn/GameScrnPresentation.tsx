@@ -1,5 +1,5 @@
 console.log("hi")
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Layout from '../../global_components/Layout';
 import { View, TouchableOpacity, TextStyle } from 'react-native';
 import { PTxt } from '../../global_components/text';
@@ -109,10 +109,13 @@ const GameScrnPresentation = () => {
   const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
-  console.log("questions what is up there: ", questions)
+  console.log("questions what is up there: ", questions[questionIndex])
   const question = questions?.length ? questions[questionIndex] : null;
   console.log("question, sup meng: ", question);
   const { choices, answer, symbolOptions: symbolOptionsFromServer, userAnswer } = question ?? {};
+  console.log("what is up there meng: ", answer);
+  console.log("userAnswer: ", userAnswer)
+  
   let isAnswerCorrect: boolean | null = null;
   let isAnswerCorrectOnReviewMode: boolean | null = null;
   const isOnReviewMode = gameScrnMode === "review";
@@ -275,16 +278,27 @@ const GameScrnPresentation = () => {
     setSelectedLogicSymbols([]);
   };
 
+  useEffect(() => {
+    console.log("questions: ", questions)
+  }, [wasSubmitBtnPressed])
+
   function handleSubmitBtnPress() {
     setGameScrnTabStore(true, 'isTimerPaused');
-    let correctAnswerArr: string[] = [];
     let answerArrClone = structuredClone<string[]>(answer);
+    let correctAnswerArr: string[] = [];
     const currentQuestionUpdated = {
       ...questions[questionIndex],
-      userAnswer: selectedLogicSymbols
-    } as IQuestionOnClient;
-    const questionsUpdated = questions.toSpliced(questionIndex, 1, currentQuestionUpdated);
+      userAnswer: selectedLogicSymbols.map(selectedLogicSymbol => selectedLogicSymbol.symbol)
+    } satisfies IQuestionOnClient;
+    const questionsUpdated = questions.map((question, index) => {
+      if(questionIndex === index) return currentQuestionUpdated 
+
+      return question;
+    });
+    console.log("questionsUpdated: ", questionsUpdated)
     const isAnswerCorrect = JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol))
+
+    updateQuestionsStore(questionsUpdated, "questions");
 
     // the values in correctAnswerArr will be displayed onto the ui by using the 'correctAnswerArr' state
     for (let index = 0; index < answerArrClone.length; ++index) {
@@ -325,8 +339,6 @@ const GameScrnPresentation = () => {
 
     setGameScrnTabStore(wrongNum + 1, "wrong")
   };
-
-  console.log("will render game screen")
 
   return (
     <>
@@ -479,7 +491,7 @@ const GameScrnPresentation = () => {
               </View>
             )
             }
-            {isOnReviewMode ?
+            {isOnReviewMode && !!userAnswer?.length ?
               <View
                 style={{
                   display: "flex",
@@ -490,7 +502,7 @@ const GameScrnPresentation = () => {
                   gap: 8
                 }}
               >
-                {reviewModeCorrectAnswerArr.map((symbol, index) => {
+                {userAnswer.map((symbol, index) => {
                   return (
                     <LogicSymbol
                       key={index}
@@ -508,7 +520,7 @@ const GameScrnPresentation = () => {
                 )}
               </View>
               :
-              !!selectedLogicSymbols.length && selectedLogicSymbols.map(symbol => {
+              (!!selectedLogicSymbols.length && !isOnReviewMode) && selectedLogicSymbols.map(symbol => {
                 const _id = uuid.v4().toString();
 
                 return (
@@ -603,7 +615,7 @@ const GameScrnPresentation = () => {
           >
             {isOnReviewMode ?
               <>
-                {(answer as string[]).map((symbol, index) => {
+                {reviewModeCorrectAnswerArr.map((symbol, index) => {
                   let _pTxtStyle = {};
 
                   if (symbol === "∃") {

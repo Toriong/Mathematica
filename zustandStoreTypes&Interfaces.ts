@@ -27,7 +27,8 @@ export interface IChoice {
     value: string
     letter: string
 }
-export interface IQuestionOnClient extends IQuestion {
+export interface IQuestionOnClient extends Omit<IQuestion, "_id"> {
+    _id: string
     symbolOptions: string[]
 }
 export interface IQuestionObjActions {
