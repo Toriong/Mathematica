@@ -1,15 +1,13 @@
-import Layout from "../../global_components/Layout";
 import { View, StyleSheet } from 'react-native';
 import { HeadingTxt, PTxt } from "../../global_components/text";
 import { useApiQsFetchingStatusStore, useGameScrnTabStore, useQuestionsStore } from "../../zustand";
-import Button from "../../global_components/Button";
 import { useGetAppColors } from "../../custom_hooks/useGetAppColors";
 import { BORDER_RADIUS_NUM, PRIMARY_COLOR, SUCCESS_COLOR, WARNING_COLOR } from "../../globalVars";
-import { useEffect } from "react";
-import { IQuestion } from "../../sharedInterfaces&TypesWithBackend";
-import { IQuestionOnClient, IQuestionsForObj } from "../../zustandStoreTypes&Interfaces";
 import { useNavigation } from "@react-navigation/native";
 import { TStackNavigation } from "../../Navigation";
+import { useResetLogicQs } from '../../custom_hooks/useResetLogicQs';
+import Layout from "../../global_components/Layout";
+import Button from "../../global_components/Button";
 
 const BTN_FONT_SIZE = 22;
 const PTXT_FONT_SIZE = 35;
@@ -17,14 +15,15 @@ const PTXT_FONT_SIZE = 35;
 const ResultsPresentation = () => {
     // How to provide type checking for the navigation function for the screen names? 
     const { navigate } = useNavigation<TStackNavigation>();
+    const resetLogicQs = useResetLogicQs();
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
-    const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
     const questionsFromPreviousQuiz = useQuestionsStore(state => state.questions);
+    const appColors = useGetAppColors();
+    const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const updateGameScrnStore = useGameScrnTabStore(state => state.updateState);
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);
-    const appColors = useGetAppColors();
 
     function handlePlayAgainBtnPress() {
         if (questionsForNextQuiz?.length) {
@@ -42,10 +41,13 @@ const ResultsPresentation = () => {
     };
 
     function handleHomeBtnPress() {
-        navigate("Home")
+        resetLogicQs();
+        navigate("Home");
     };
 
     function handleReviewBtnPress() {
+        const unansweredQsFilterOut = questionsFromPreviousQuiz.filter(question => !!question.userAnswer);
+        updateQuestionsStore(unansweredQsFilterOut, "questions");
         updateQuestionsStore(0, "questionIndex");
         updateGameScrnStore("review", "mode");
         navigate("GameScreen");

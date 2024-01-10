@@ -10,6 +10,10 @@ import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
 import { OVERLAY_OPACITY } from "../../../globalVars";
 import { TStackNavigationProp } from "../../../Navigation";
 import { IQuestionOnClient } from "../../../zustandStoreTypes&Interfaces";
+import { saveQuiz } from "../../../api_services/quiz/saveQuiz";
+import { CustomError, ICustomError } from "../../../utils/errors";
+import uuid from 'react-native-uuid';
+import { getUserId } from "../../../utils/generalFns";
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
@@ -32,16 +36,20 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const isLoadingModalOn = useGameScrnTabStore(state => state.isLoadingModalOn);
     const gettingQsResponseStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
     const questions = useQuestionsStore(state => state.questions);
-    const updateQuestionsStore = useQuestionsStore(state => state.updateState);
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
-    const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
+    const setQuestionsStore = useQuestionsStore(state => state.updateState);
+    const setApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const [timerObj, setTimerObj] = useState({ timerStr: getTimeForUI(timer), timerMs: timer });
     const [intervalTimer, setIntervalTimer] = useState<ReturnType<typeof setInterval> | null>(null);
     const currentThemeObj = colorThemesObj[currentTheme];
 
     function handleBtnPress() {
-        // reset the questions when the user goes to the Home screen
+        setGameScrnTabStore("finished", "mode");
+        setGameScrnTabStore(0, "right")
+        setGameScrnTabStore(0, "wrong")
+        setQuestionsStore([], "questions");
         navigate("Home");
+        setApiQsFetchingStatusStore(true, "willGetQs")
 
         if (intervalTimer) {
             clearInterval(intervalTimer);
@@ -70,25 +78,52 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         }
     }, [gettingQsResponseStatus, isLoadingModalOn]);
 
+    async function saveQuizAfterQuizIsDone() {
+        let userId: string = ""
+
+        try {
+            userId = (await getUserId()) as string;
+        } catch (error) {
+            console.error("An error in getting the id of the user from storage: ", error);
+        }
+
+        const quizObj: Parameters<typeof saveQuiz>[0] = {
+            _id: uuid.v4().toString(),
+            finishedQuizAtMs: Date.now(),
+            userId: userId as string,
+            questions: questions
+        };
+
+        // GOAL: clear the cache on the server, when saving the quiz.
+        saveQuiz(quizObj)
+            .then(response => {
+                if (!response.wasOperationSuccessful) {
+                    throw new CustomError(response.msg ?? "Failed to save quiz. No message was provided from the server.", response.status ?? 500)
+                }
+
+                console.log("Quiz was saved into the database.")
+            })
+            .catch((error) => {
+                console.error('Failed to save quiz into the database: ', error)
+            })
+    }
+
     useEffect(() => {
         if ((timerObj.timerMs <= 0) && (gameScrnMode === "quiz")) {
+            saveQuizAfterQuizIsDone();
             setGameScrnTabStore("finished", 'mode');
 
             setTimeout(() => {
-                updateApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz");
+                setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz");
 
-                updateApiQsFetchingStatusStore(true, "willGetQs");
+                setApiQsFetchingStatusStore(true, "willGetQs");
 
-                updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
+                setApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
             }, 500);
-
-            console.log("the quiz has ended, questions: ", questions)
 
             const answeredQuestions = questions.filter(question => question.userAnswer);
 
-            console.log("answeredQuestions: ", answeredQuestions)
-
-            updateQuestionsStore(answeredQuestions, "questions");
+            setQuestionsStore(answeredQuestions, "questions");
 
             navigate('ResultsScreen');
         }
@@ -125,7 +160,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                 {/* present the loading ui here */}
                 <View style={{ display: 'flex', flexDirection: 'row', width: "100%", paddingTop: "3%" }}>
                     <View style={{ width: "30%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <Button isDisabled={false} backgroundColor='none' handleOnPress={handleBtnPress}>
+                        <Button backgroundColor='none' handleOnPress={handleBtnPress}>
                             <View style={{ borderWidth: 3, borderColor: currentThemeObj.second, borderRadius: 50, padding: 8 }}>
                                 <FontAwesomeIcon icon={faArrowLeft} size={50} color={currentThemeObj.second} />
                             </View>

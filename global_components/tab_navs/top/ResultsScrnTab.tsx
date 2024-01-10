@@ -7,15 +7,12 @@ import { PTxt } from "../../text";
 import { APP_NAME } from "../../../globalVars";
 import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { TStackNavigationProp } from "../../../Navigation";
+import BackToMainScrBtn from "../tab_navs_btns/BackToMainScrn";
 
 const FONT_SIZE_TITLE = 32;
 
 const ResultsScrnTab = ({ navigate }:TStackNavigationProp) => {
     const currentThemeObj = useGetAppColors();
-
-    function handleBackBtnPress() {
-
-    }
 
     function handlePlayAgainBtnPress() {
 
@@ -34,11 +31,7 @@ const ResultsScrnTab = ({ navigate }:TStackNavigationProp) => {
         >
             <View style={{ display: 'flex', flexDirection: 'row', width: "100%", paddingTop: "3%" }}>
                 <View style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Button backgroundColor='none' handleOnPress={handleBackBtnPress}>
-                        <View style={{ borderWidth: 3, borderColor: currentThemeObj.second, borderRadius: 50, padding: 8 }}>
-                            <FontAwesomeIcon icon={faArrowLeft} size={50} color={currentThemeObj.second} />
-                        </View>
-                    </Button>
+                    <BackToMainScrBtn />
                 </View>
                 <View style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', paddingTop: 7 }}>
                     <PTxt fontSize={FONT_SIZE_TITLE} fontStyle="italic" style={{ textAlign: 'center', width: "100%" }}>{APP_NAME}</PTxt>

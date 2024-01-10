@@ -5,6 +5,28 @@ import { IS_TESTING, TESTING_USER_ID } from "../globalVars";
 import { getInitialQs } from "../api_services/quiz/getInitialQs";
 import { IQuestionOnClient } from "../zustandStoreTypes&Interfaces";
 
+function getRandomIndex<TData>(arr: TData[], incorrectVal: any = undefined) {
+    let randomIndex = Math.floor(Math.random() * arr.length);
+
+    while (!(arr[randomIndex] === incorrectVal)) {
+        randomIndex = Math.floor(Math.random() * arr.length)
+    };
+
+    return randomIndex
+}
+
+function sortRandomly<TData>(arr: TData[]) {
+    let arrSortedRandomly = Array.from({ length: arr.length });
+
+
+    for (let val of arr) {
+        const randomIndex = getRandomIndex(arrSortedRandomly);
+        arrSortedRandomly[randomIndex] = val
+    };
+
+    return arrSortedRandomly;
+};
+
 export function useGetInitialQs(): null {
     const memory = new Storage();
     const willGetQs = useApiQsFetchingStatusStore(state => state.willGetQs);
@@ -20,22 +42,22 @@ export function useGetInitialQs(): null {
                 try {
                     let userId = await memory.getItem("userId");
                     userId = IS_TESTING ? TESTING_USER_ID : userId;
-                    console.log("getting questions from the server...")
-                    const response = await getInitialQs(userId as string, areQsReceivedForNextQuiz);
+                    const response = await getInitialQs<IQuestionOnClient>(userId as string, areQsReceivedForNextQuiz);
 
-                    console.log("response from server in getting the initial questions: ", response)
+                    console.log("response.questions: ", response.questions);
 
                     if (response.gettingQsResponseStatus === "FAILURE") {
                         throw new Error("Failed to get the initial questions from the server.")
                     };
 
-                    console.log("areQsReceivedForNextQuiz: ", areQsReceivedForNextQuiz)
+                    const questionsRandomlySorted = (response.questions?.length > 1) ? sortRandomly<IQuestionOnClient>(response.questions) : response.questions; 
 
                     if (areQsReceivedForNextQuiz) {
-                        updateQuestionsStore(response.questions as IQuestionOnClient[], "questionsForNextQuiz")
+                        updateQuestionsStore(questionsRandomlySorted as IQuestionOnClient[], "questionsForNextQuiz")
+                        updateApiQsFetchingStatusStore(false, "areQsReceivedForNextQuiz");
                     } else {
-                        updateQuestionsStore(response.questions as IQuestionOnClient[], "questions");
-                    }
+                        updateQuestionsStore(questionsRandomlySorted as IQuestionOnClient[], "questions");
+                    };
 
                     updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
                 } catch (error) {

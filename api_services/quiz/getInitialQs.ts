@@ -18,7 +18,7 @@ export async function getInitialQs<TData>(userId: string, willClearCacheOnServer
         const responseGetPropostionalQs = getQuestions<{ questions: IQuestion[] }>(3, ["propositional"], userId as string, null, willClearCacheOnServer);
         const responseGetPredicateQs = getQuestions<{ questions: IQuestion[] }>(3, ["predicate"], userId as string, null, willClearCacheOnServer)
         const responses: Awaited<TPromiseReturnValGetQuestions<{ questions: IQuestion[] } | null>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
-        let responsesFiltered = responses.filter(response => !!response.data || !!response) as IReturnObjOfAsyncFn<{ questions: IQuestion[] }>[];
+        let responsesFiltered = responses.filter(response => !!response) as IReturnObjOfAsyncFn<{ questions: IQuestion[] }>[];
         responsesFiltered = responsesFiltered?.length
             ?
             responsesFiltered.filter(response => {
@@ -35,7 +35,9 @@ export async function getInitialQs<TData>(userId: string, willClearCacheOnServer
                 });
             })
             :
-            []
+            [];
+
+        console.log("responsesFiltered, hey there: ", responsesFiltered);
 
         if (!responsesFiltered.length && (apiRequestTriesNum >= tries)) {
             throw new CustomError("Exceeded tries of contacting api to get questions for user.", 429);

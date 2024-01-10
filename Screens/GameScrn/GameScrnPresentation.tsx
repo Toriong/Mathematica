@@ -397,13 +397,21 @@ const GameScrnPresentation = () => {
                   Correct Answer:
                 </PTxt>
                 <View
-                  style={{ display: 'flex', marginTop: 10, flexDirection: 'row', gap: 10, width: "100%", justifyContent: 'center', alignItems: 'center' }}
+                  style={{
+                    display: 'flex',
+                    marginTop: 10,
+                    flexDirection: 'row',
+                    gap: 10,
+                    width: "100%",
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}
                 >
                   {correctAnswerArr.map((symbol, index) => (
                     <PTxt
                       key={index}
                       fontSize={30}
-                      txtColor='green'
+                      txtColor={isAnswerCorrect ? "green" : "red"}
                     >
                       {symbol}
                     </PTxt>
@@ -507,7 +515,7 @@ const GameScrnPresentation = () => {
                         txtFontSize={30}
                         backgroundColor="transparent"
                         pTxtColor={isAnswerCorrectOnReviewMode ? "green" : "red"}
-                        // pTxtStyle={(symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
+                      // pTxtStyle={(symbol === "∃") ? { transform: [{ rotateY: "180deg" }] } : {}}
                       >
                         {symbol}
                       </LogicSymbol>

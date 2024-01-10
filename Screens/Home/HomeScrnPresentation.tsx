@@ -6,7 +6,6 @@ import { TScreenNames, TStackNavigation } from "../../Navigation";
 import { useColorStore, useGameScrnTabStore } from "../../zustand";
 import Button from "../../global_components/Button";
 import { Storage } from "../../utils/storage";
-import { useEffect, useState } from "react";
 
 const HomeScrnPresentation = () => {
     const navigation = useNavigation<TStackNavigation>();
