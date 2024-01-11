@@ -5,17 +5,32 @@ import { useApiQsFetchingStatusStore, useGameScrnTabStore } from "../../../zusta
 import { useGetAppColors } from "../../../custom_hooks/useGetAppColors";
 import Modal from "react-native-modal";
 import Button from "../../../global_components/Button";
+import { useNavigation } from "@react-navigation/native";
+import { TStackNavigationProp } from "../../../Navigation";
 
 const LoadingQsModal = () => {
+    const navigation = useNavigation<TStackNavigationProp>()
     const gettingQsStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
-    const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const mode = useGameScrnTabStore(state => state.mode);
+    const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
+    const updateGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
     const [isModalVisible, setIsModalVisible] = useState((gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE"));
     const appColors = useGetAppColors();
 
-    function handleOnPress() {
+    function handleGetMoreQsBtnPress() {
         updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")
         updateApiQsFetchingStatusStore(true, "willGetQs");
+    }
+
+    function handleOnGoBackMainScrnBtnPress(){
+        setIsModalVisible(false);
+        navigation.navigate("Home");
+
+        setTimeout(() => {
+            updateApiQsFetchingStatusStore(true, "willGetQs");
+            updateGameScrnTabStore("finished", "mode");
+            updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
+        }, 800)
     }
 
     function closeModal(millis = 1000) {
@@ -83,6 +98,7 @@ const LoadingQsModal = () => {
                             width: "100%",
                             marginTop: 10,
                             height: 100,
+                            flex: .5,
                             justifyContent: "center",
                             alignItems: 'center'
                         }}
@@ -103,19 +119,42 @@ const LoadingQsModal = () => {
                             </PTxt>
                         )}
                         {(gettingQsStatus === "FAILURE") && (
-                            <Button
-                                backgroundColor={appColors.second}
-                                handleOnPress={handleOnPress}
-                                dynamicStyles={{
-                                    padding: 17,
-                                    borderRadius: 15,
-                                    marginTop: 25
-                                }}
+                            <View
+                                style={{ flexDirection: "column", justifyContent: 'center', alignItems: "center", width: "100%" }}
                             >
-                                <PTxt fontSize={20}>
-                                    Press Get Questions.
-                                </PTxt>
-                            </Button>
+                                <Button
+                                    backgroundColor={appColors.second}
+                                    handleOnPress={handleGetMoreQsBtnPress}
+                                    dynamicStyles={{
+                                        padding: 17,
+                                        borderRadius: 15,
+                                        marginTop: 25
+                                    }}
+                                >
+                                    <PTxt fontSize={20}>
+                                        Press to get questions.
+                                    </PTxt>
+                                </Button>
+                                <Button
+                                    backgroundColor={appColors.second}
+                                    handleOnPress={handleOnGoBackMainScrnBtnPress}
+                                    dynamicStyles={{
+                                        padding: 17,
+                                        width: 170,
+                                        borderRadius: 15,
+                                        marginTop: 25
+                                    }}
+                                >
+                                    <PTxt 
+                                    fontSize={20}
+                                    style={{
+                                        textAlign: "center"
+                                    }}
+                                    >
+                                        Back to main menu.
+                                    </PTxt>
+                                </Button>
+                            </View>
                         )}
                     </View>
                 </View>

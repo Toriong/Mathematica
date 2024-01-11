@@ -1,4 +1,4 @@
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { HeadingTxt, PTxt } from "../../global_components/text";
 import { useApiQsFetchingStatusStore, useGameScrnTabStore, useQuestionsStore } from "../../zustand";
 import { useGetAppColors } from "../../custom_hooks/useGetAppColors";
@@ -6,6 +6,8 @@ import { BORDER_RADIUS_NUM, PRIMARY_COLOR, SUCCESS_COLOR, WARNING_COLOR } from "
 import { useNavigation } from "@react-navigation/native";
 import { TStackNavigation } from "../../Navigation";
 import { useResetLogicQs } from '../../custom_hooks/useResetLogicQs';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faLock } from "@fortawesome/free-solid-svg-icons";
 import Layout from "../../global_components/Layout";
 import Button from "../../global_components/Button";
 
@@ -35,7 +37,8 @@ const ResultsPresentation = () => {
 
         // if the questions for the next quiz has not been retrieved then change gettingQsStatus global state 
         // to IN_PROGRESS
-
+        updateGameScrnStore(0, "right");
+        updateGameScrnStore(0, "wrong");
         updateGameScrnStore("quiz", "mode");
         navigate("GameScreen");
     };
@@ -52,6 +55,10 @@ const ResultsPresentation = () => {
         updateGameScrnStore("review", "mode");
         navigate("GameScreen");
     };
+
+    function handleLeaderBoardBtnPress(){
+        Alert.alert("This feature has not been implemented. Please try some other time.")
+    }
 
     return (
         <Layout>
@@ -122,10 +129,9 @@ const ResultsPresentation = () => {
                 </View>
                 <View style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', gap: 15 }}>
                     <Button
-                        isDisabled={false}
                         backgroundColor={PRIMARY_COLOR}
-                        handleOnPress={handleHomeBtnPress}
-                        dynamicStyles={styles.button}
+                        handleOnPress={handleLeaderBoardBtnPress}
+                        dynamicStyles={{ ...styles.button, opacity: .4, flexDirection: 'column' }}
                     >
                         <PTxt
                             fontSize={BTN_FONT_SIZE}
@@ -133,6 +139,13 @@ const ResultsPresentation = () => {
                             style={{ textAlign: 'center' }}
                         >
                             Leaderboard
+                        </PTxt>
+                        <PTxt
+                            fontSize={BTN_FONT_SIZE}
+                            txtColor={appColors.third}
+                            style={{ textAlign: 'center', marginTop: 6 }}
+                        >
+                            <FontAwesomeIcon icon={faLock} color="white" />
                         </PTxt>
                     </Button>
                     <Button

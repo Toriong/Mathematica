@@ -30,8 +30,8 @@ export async function getQuestions<TData>(
     willClearUserSentenceTxtsCache?: boolean | null
 ): TPromiseReturnValGetQuestions<TData> {
     try {
-        console.log("what is up...")
         const getQuestionsApiUrl = new URL(`${SERVER_ORIGIN}/${getQuestionsApiPath}`);
+        console.log("getQuestionsApiUrl: ", getQuestionsApiUrl);
         // const userId: string | null = await (IS_TESTING ? new Promise(() => TESTING_USER_ID) : memory.getItem("userId"))
         let params: TPath[] = [
             { name: "questionsToGetNum", value: questionsToGetNum },

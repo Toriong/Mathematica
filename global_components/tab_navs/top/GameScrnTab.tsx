@@ -61,9 +61,14 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     // if getting the questions is progress, then start the timer 
 
     useEffect(() => {
+        console.log("hey there, gettingQsResponseStatus: ", gettingQsResponseStatus);
+        console.log("isLoadingModalOn, yo there meng: ", isLoadingModalOn)
         if ((gettingQsResponseStatus === "SUCCESS") && !isLoadingModalOn) {
+            console.log("The timer is being executed now...");
+
             const intervalTimer = setInterval(() => {
                 setTimerObj(timerObj => {
+                    console.log("bacon meng: ", timerObj.timerMs)
                     if (timerObj.timerMs <= 0) {
                         return timerObj;
                     }
@@ -124,6 +129,12 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
             const answeredQuestions = questions.filter(question => question.userAnswer);
 
             setQuestionsStore(answeredQuestions, "questions");
+
+            if (intervalTimer) {
+                console.log("will clear interval timer...")
+                clearInterval(intervalTimer);
+                setIntervalTimer(null);
+            }
 
             navigate('ResultsScreen');
         }

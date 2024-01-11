@@ -148,11 +148,11 @@ const GameScrnPresentation = () => {
           };
 
           return logicSymbol;
-        })
+        });
       }
 
       return [...selectedLogicSymbols, newSelectedSymbol]
-    })
+    });
   };
 
   function handleMovementSymbolBtnPress(numToIncreaseSelectedIndexBy: -1 | 1) {
@@ -401,7 +401,7 @@ const GameScrnPresentation = () => {
                     display: 'flex',
                     marginTop: 10,
                     flexDirection: 'row',
-                    gap: 10,
+                    gap: 6,
                     width: "100%",
                     justifyContent: 'center',
                     alignItems: 'center'
@@ -422,15 +422,6 @@ const GameScrnPresentation = () => {
           )
         }
       >
-        <View style={{ flex: .7, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <PTxt fontSize={TXT_FONT_SIZE}>TASK: </PTxt>
-          <PTxt
-            fontSize={TXT_FONT_SIZE}
-            style={{ textAlign: 'center', transform: [{ translateY: 20 }], paddingHorizontal: 11 }}
-          >
-            {task}
-          </PTxt>
-        </View>
         <View style={{ flex: 1, width: "100%", display: 'flex', paddingTop: 7, justifyContent: 'center', alignItems: 'center' }}>
           <PTxt
             fontSize={TXT_FONT_SIZE}
