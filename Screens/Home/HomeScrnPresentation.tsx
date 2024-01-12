@@ -6,8 +6,17 @@ import { TScreenNames, TStackNavigation } from "../../Navigation";
 import { useColorStore, useGameScrnTabStore } from "../../zustand";
 import Button from "../../global_components/Button";
 import { Storage } from "../../utils/storage";
+import {
+    GoogleSignin,
+    GoogleSigninButton,
+    statusCodes,
+} from '@react-native-google-signin/google-signin';
+import Constants from 'expo-constants'
+
+// GoogleSignin.configure()
 
 const HomeScrnPresentation = () => {
+    console.log("Constants.executionEnvironment: ", Constants.executionEnvironment)
     const navigation = useNavigation<TStackNavigation>();
     const updateGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
     const appColors = useColorStore();

@@ -2047,6 +2047,11 @@
     prompts "^2.4.0"
     semver "^7.5.2"
 
+"@react-native-google-signin/google-signin@^11.0.0":
+  version "11.0.0"
+  resolved "https://registry.npmjs.org/@react-native-google-signin/google-signin/-/google-signin-11.0.0.tgz"
+  integrity sha512-J8BFFGr5HcEWE2gRaVSJ0rQN8ztxYIr2wdWMG4PS1vhQZJqUzmRr6vpu12O1GppItq8ai7AA0rl/ja7hSytSXA==
+
 "@react-native/assets-registry@^0.72.0":
   version "0.72.0"
   resolved "https://registry.npmjs.org/@react-native/assets-registry/-/assets-registry-0.72.0.tgz"
@@ -3788,7 +3793,7 @@ expo-status-bar@~1.6.0:
   resolved "https://registry.npmjs.org/expo-status-bar/-/expo-status-bar-1.6.0.tgz"
   integrity sha512-e//Oi2WPdomMlMDD3skE4+1ZarKCJ/suvcB4Jo/nO427niKug5oppcPNYO+csR6y3ZglGuypS+3pp/hJ+Xp6fQ==
 
-expo@*, expo@~49.0.15:
+expo@*, expo@>=47.0.0, expo@~49.0.15:
   version "49.0.21"
   resolved "https://registry.npmjs.org/expo/-/expo-49.0.21.tgz"
   integrity sha512-JpHL6V0yt8/fzsmkAdPdtsah+lU6Si4ac7MDklLYvzEil7HAFEsN/pf06wQ21ax4C+BL27hI6JJoD34tzXUCJA==
@@ -6398,6 +6403,11 @@ react-native-animatable@1.3.3:
   integrity sha512-2ckIxZQAsvWn25Ho+DK3d1mXIgj7tITkrS4pYDvx96WyOttSvzzFeQnM2od0+FUMzILbdHDsDEqZvnz1DYNQ1w==
   dependencies:
     prop-types "^15.7.2"
+
+react-native-device-info@^8.4.9:
+  version "8.4.9"
+  resolved "https://registry.npmjs.org/react-native-device-info/-/react-native-device-info-8.4.9.tgz"
+  integrity sha512-EEdeoaBhaLTOZmCy5xtfepVAfvodteiDHoIxBPUgnNe5p0JLv90BLKtVytbJhlllWScUO48+2u9S7M6WNYsXDQ==
 
 react-native-draggable-flatlist@^4.0.1:
   version "4.0.1"

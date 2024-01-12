@@ -5,7 +5,7 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useApiQsFetchingStatusStore, useColorStore, useGameScrnTabStore, useQuestionsStore } from "../../../zustand";
 import Button from "../../Button";
 import { PTxt } from "../../text";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
 import { OVERLAY_OPACITY } from "../../../globalVars";
 import { TStackNavigationProp } from "../../../Navigation";
@@ -40,8 +40,8 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const setQuestionsStore = useQuestionsStore(state => state.updateState);
     const setApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const [timerObj, setTimerObj] = useState({ timerStr: getTimeForUI(timer), timerMs: timer });
-    const [intervalTimer, setIntervalTimer] = useState<ReturnType<typeof setInterval> | null>(null);
     const currentThemeObj = colorThemesObj[currentTheme];
+    const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     function handleBtnPress() {
         setGameScrnTabStore("finished", "mode");
@@ -51,9 +51,9 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         navigate("Home");
         setApiQsFetchingStatusStore(true, "willGetQs")
 
-        if (intervalTimer) {
-            clearInterval(intervalTimer);
-            setIntervalTimer(null);
+        if (timerIntervalRef.current) {
+            clearInterval(timerIntervalRef.current);
+            timerIntervalRef.current = null;
         }
     };
 
@@ -61,14 +61,10 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     // if getting the questions is progress, then start the timer 
 
     useEffect(() => {
-        console.log("hey there, gettingQsResponseStatus: ", gettingQsResponseStatus);
-        console.log("isLoadingModalOn, yo there meng: ", isLoadingModalOn)
         if ((gettingQsResponseStatus === "SUCCESS") && !isLoadingModalOn) {
-            console.log("The timer is being executed now...");
-
-            const intervalTimer = setInterval(() => {
+            console.log("what is up")
+            timerIntervalRef.current = setInterval(() => {
                 setTimerObj(timerObj => {
-                    console.log("bacon meng: ", timerObj.timerMs)
                     if (timerObj.timerMs <= 0) {
                         return timerObj;
                     }
@@ -79,7 +75,6 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                     return { timerStr, timerMs }
                 })
             }, 1_000);
-            setIntervalTimer(intervalTimer)
         }
     }, [gettingQsResponseStatus, isLoadingModalOn]);
 
@@ -130,10 +125,9 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
 
             setQuestionsStore(answeredQuestions, "questions");
 
-            if (intervalTimer) {
-                console.log("will clear interval timer...")
-                clearInterval(intervalTimer);
-                setIntervalTimer(null);
+            if (timerIntervalRef.current) {
+                console.log('Will stop interval timer.')
+                clearInterval(timerIntervalRef.current)
             }
 
             navigate('ResultsScreen');
