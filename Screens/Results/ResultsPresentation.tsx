@@ -49,6 +49,11 @@ const ResultsPresentation = () => {
     };
 
     function handleReviewBtnPress() {
+        if((rightNum + wrongNum) === 0){
+            Alert.alert("You can't review this quiz because you didn't answer any of the questions.")
+            return;
+        }
+
         const unansweredQsFilterOut = questionsFromPreviousQuiz.filter(question => !!question.userAnswer);
         updateQuestionsStore(unansweredQsFilterOut, "questions");
         updateQuestionsStore(0, "questionIndex");
@@ -105,8 +110,7 @@ const ResultsPresentation = () => {
                     <Button
                         backgroundColor={appColors.second}
                         handleOnPress={handleReviewBtnPress}
-                        dynamicStyles={styles.button}
-                        isDisabled={false}
+                        dynamicStyles={{...styles.button, opacity: ((rightNum + wrongNum) === 0) ? .4 : 1}}
                     >
                         <PTxt fontSize={BTN_FONT_SIZE} txtColor={appColors.third}>
                             Review

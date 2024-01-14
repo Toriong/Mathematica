@@ -14,6 +14,7 @@ import { saveQuiz } from "../../../api_services/quiz/saveQuiz";
 import { CustomError, ICustomError } from "../../../utils/errors";
 import uuid from 'react-native-uuid';
 import { getUserId } from "../../../utils/generalFns";
+import { Alert } from "react-native";
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
@@ -94,7 +95,6 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
             questions: questions
         };
 
-        // GOAL: clear the cache on the server, when saving the quiz.
         saveQuiz(quizObj)
             .then(response => {
                 if (!response.wasOperationSuccessful) {
@@ -110,7 +110,6 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
 
     useEffect(() => {
         if ((timerObj.timerMs <= 0) && (gameScrnMode === "quiz")) {
-            saveQuizAfterQuizIsDone();
             setGameScrnTabStore("finished", 'mode');
 
             setTimeout(() => {
@@ -123,7 +122,15 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
 
             const answeredQuestions = questions.filter(question => question.userAnswer);
 
-            setQuestionsStore(answeredQuestions, "questions");
+            // the user didn't answer any questions
+            if (!answeredQuestions.length) {
+                setQuestionsStore([], "questions");
+                Alert.alert("Looks like you didn't answer a question. This quiz will not be saved.")
+            } else {
+                saveQuizAfterQuizIsDone();
+                setQuestionsStore(answeredQuestions, "questions");
+            }
+
 
             if (timerIntervalRef.current) {
                 console.log('Will stop interval timer.')
