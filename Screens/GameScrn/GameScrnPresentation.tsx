@@ -155,6 +155,12 @@ const GameScrnPresentation = () => {
     });
   };
 
+  function handleSkipBtnPress(){
+    if(!questions[questionIndex + 1]){
+    
+    }
+  }
+
   function handleMovementSymbolBtnPress(numToIncreaseSelectedIndexBy: -1 | 1) {
     try {
       const selectedSymbolIndex = selectedLogicSymbols.findIndex(({ wasPressed }) => wasPressed);
