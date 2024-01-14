@@ -1,7 +1,7 @@
 import { NavigationContainer, NavigationProp, ParamListBase, Route, useNavigation } from '@react-navigation/native';
 import { View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-import GameScrnContainer from './Screens/GameScrn/GameScrnContainer';
+import GameScrnContainer from './Screens/GameScrn/GameScrnLogicQsContainer';
 import GameScrnTab from './global_components/tab_navs/top/GameScrnTab';
 import ResultContainer from './Screens/Results/ResultsContainer';
 import ResultsScrnTab from './global_components/tab_navs/top/ResultsScrnTab';
