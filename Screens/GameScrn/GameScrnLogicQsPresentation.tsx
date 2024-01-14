@@ -96,7 +96,15 @@ function getUpdatedSelectedSymbolsArr(indexToSwitchSelectedSymbolWith: number, s
   return selectedLogicSymbolsClone;
 }
 
-const GameScrnPresentation = ({ setWasSkipBtnPressed }: { setWasSkipBtnPressed: TStateSetter<boolean> }) => {
+const GameScrnPresentation = ({
+  _wasSkipBtnPressed,
+  _isSkipBtnDisabled,
+  setWillIncrementQIndex
+}: {
+  _isSkipBtnDisabled: [boolean,TStateSetter<boolean>]
+  _wasSkipBtnPressed: [boolean,TStateSetter<boolean>]
+  setWillIncrementQIndex: TStateSetter<boolean>
+}) => {
   const navigation = useNavigation<TStackNavigation>();
   const questions = useQuestionsStore(state => state.questions);
   const task = useQuestionsStore(state => state.task);
@@ -111,6 +119,8 @@ const GameScrnPresentation = ({ setWasSkipBtnPressed }: { setWasSkipBtnPressed: 
   const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
+  const [wasSkipBtnPressed, setWasSkipBtnPressed] = _wasSkipBtnPressed;
+  const [isSkipBtnDisabled, setIsSkipBtnDisabled] = _isSkipBtnDisabled;
   console.log("questions: ", questions)
   console.log("questions[questionIndex]: ", questions[questionIndex])
   const question = questions?.length ? questions[questionIndex] : null;
@@ -159,18 +169,18 @@ const GameScrnPresentation = ({ setWasSkipBtnPressed }: { setWasSkipBtnPressed: 
     });
   };
 
-  function handleSkipBtnPress() {
-    setWasSkipBtnPressed(true);
+  
 
+  
+
+  function handleSkipBtnPress() {
     if (!questions[questionIndex + 1]) {
       updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
-      updateApiQsFetchingStatusStore(true, "willGetQs");
-      setTimeout(() => {
-          updateQuestionsStore(questionIndex + 1, "questionIndex");
-      }, 800);
+      setIsSkipBtnDisabled(true);      
       return;
     };
 
+    setWasSkipBtnPressed(true);
     updateQuestionsStore(questionIndex + 1, "questionIndex");
   }
 
@@ -760,6 +770,7 @@ const GameScrnPresentation = ({ setWasSkipBtnPressed }: { setWasSkipBtnPressed: 
                 <PTxt>CLEAR</PTxt>
               </Button>
               <Button
+                isDisabled={isSkipBtnDisabled}
                 backgroundColor="#616771"
                 handleOnPress={handleSkipBtnPress}
                 dynamicStyles={{ padding: 17, borderRadius: 15 }}
@@ -777,9 +788,9 @@ const GameScrnPresentation = ({ setWasSkipBtnPressed }: { setWasSkipBtnPressed: 
               </Button>
             </View>
           }
-      </View>
-    </Layout >
-      <LoadingQsModal />
+        </View>
+      </Layout >
+      <LoadingQsModal _wasSkipBtnPressed={[wasSkipBtnPressed, setWasSkipBtnPressed]} />
     </>
   );
 };

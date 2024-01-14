@@ -46,6 +46,7 @@ const ResultsPresentation = () => {
     };
 
     function handleHomeBtnPress() {
+        updateQuestionsStore(0, "questionIndex");
         resetLogicQs();
         navigate("Home");
     };

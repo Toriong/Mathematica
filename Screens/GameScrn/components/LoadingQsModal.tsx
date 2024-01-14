@@ -5,19 +5,27 @@ import { useApiQsFetchingStatusStore, useGameScrnTabStore } from "../../../zusta
 import { useGetAppColors } from "../../../custom_hooks/useGetAppColors";
 import Modal from "react-native-modal";
 import Button from "../../../global_components/Button";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { TStackNavigationProp } from "../../../Navigation";
+import { TStateSetter } from "../../../globalTypes&Interfaces";
 
-const LoadingQsModal = () => {
-    const navigation = useNavigation<TStackNavigationProp>()
+const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean,TStateSetter<boolean>] }) => {
+    const navigation = useNavigation<TStackNavigationProp>();
+    // make the route name type safe
+    const route = useRoute();
     const gettingQsStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
     const mode = useGameScrnTabStore(state => state.mode);
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const updateGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
     const [isModalVisible, setIsModalVisible] = useState((gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE"));
     const appColors = useGetAppColors();
+    const [wasSkipBtnPressed, setWasSkipBtnPressed] = _wasSkipBtnPressed;
 
     function handleGetMoreQsBtnPress() {
+        if(wasSkipBtnPressed){
+            setWasSkipBtnPressed(true);
+        }
+
         updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")
         updateApiQsFetchingStatusStore(true, "willGetQs");
     }
@@ -39,13 +47,15 @@ const LoadingQsModal = () => {
         }, millis);
     }
 
+    console.log("route.name: ", route.name)
+
     useEffect(() => {
-        if ((mode === "quiz") && (gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE")) {
+        if (((mode === "quiz") && (route.name === "GameScreen")) && (gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE")) {
             setIsModalVisible(true);
-        } else if ((mode === "quiz") && (gettingQsStatus === "SUCCESS") && isModalVisible) {
+        } else if (((mode === "quiz") || (route.name !== "GameScreen")) && (gettingQsStatus === "SUCCESS") && isModalVisible) {
             closeModal();
         }
-    }, [gettingQsStatus, mode])
+    }, [gettingQsStatus, mode, route.name])
 
     return (
         <Modal

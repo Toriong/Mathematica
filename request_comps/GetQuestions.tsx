@@ -1,9 +1,9 @@
 import { useGetInitialQs } from "../custom_hooks/useGetInitialQs"
 
 const GetQuestions = () => {
-    useGetInitialQs()
+    useGetInitialQs();
 
-    return null
+    return null;
 };
 
 export default GetQuestions
