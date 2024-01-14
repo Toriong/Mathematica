@@ -28,6 +28,8 @@ const ResultsPresentation = () => {
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);
 
     function handlePlayAgainBtnPress() {
+        updateQuestionsStore(0, "questionIndex");
+        
         if (questionsForNextQuiz?.length) {
             updateQuestionsStore(questionsForNextQuiz, "questions");
             updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
