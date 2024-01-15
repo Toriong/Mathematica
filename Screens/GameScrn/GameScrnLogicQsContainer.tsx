@@ -53,7 +53,6 @@ const GameScrnContainer = () => {
   const memory = new Storage();
   const [wasSkipBtnPressed, setWasSkipBtnPressed] = useState(false);
   const [willIncrementQIndex, setWillIncrementQIndex] = useState(false);
-  const [isSkipBtnDisabled, setIsSkipBtnDisabled] = useState(false);
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
   const questionTypes = useGameScrnTabStore(state => state.questionTypes);
   const questions = useQuestionsStore(state => state.questions);
@@ -84,12 +83,11 @@ const GameScrnContainer = () => {
             updateQuestionsStore(newQuestionIndex, "questionIndex")
             updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus")
             setWillIncrementQIndex(false);
-            setIsSkipBtnDisabled(false);
           }
         } catch (error) {
           console.error("An error has occurred in getting the next question from the server. Error message: ", error);
 
-          if(willIncrementQIndex){
+          if (willIncrementQIndex) {
             updateApiQsFetchingStatusStore("FAILURE", "gettingQsResponseStatus")
           }
         } finally {
@@ -99,7 +97,7 @@ const GameScrnContainer = () => {
     }
   }, [wasSubmitBtnPressed, wasSkipBtnPressed]);
 
-  return <GameScrnPresentation _isSkipBtnDisabled={[isSkipBtnDisabled, setIsSkipBtnDisabled]} _wasSkipBtnPressed={[wasSkipBtnPressed, setWasSkipBtnPressed]} setWillIncrementQIndex={setWillIncrementQIndex} />;
+  return <GameScrnPresentation _wasSkipBtnPressed={[wasSkipBtnPressed, setWasSkipBtnPressed]} setWillIncrementQIndex={setWillIncrementQIndex} />;
 };
 
 export default GameScrnContainer;

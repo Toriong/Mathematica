@@ -17,6 +17,8 @@ import { useNavigation } from '@react-navigation/native';
 import { TStackNavigation } from '../../Navigation';
 import { IQuestionOnClient } from '../../zustandStoreTypes&Interfaces';
 import { TStateSetter } from '../../globalTypes&Interfaces';
+import { getAdditionalQuestion } from './GameScrnLogicQsContainer';
+import { Storage } from '../../utils/storage';
 
 const SYMBOL_WIDTH_AND_HEIGHT = 45;
 const TXT_FONT_SIZE = 20;
@@ -98,16 +100,13 @@ function getUpdatedSelectedSymbolsArr(indexToSwitchSelectedSymbolWith: number, s
 
 const GameScrnPresentation = ({
   _wasSkipBtnPressed,
-  _isSkipBtnDisabled,
   setWillIncrementQIndex
 }: {
-  _isSkipBtnDisabled: [boolean,TStateSetter<boolean>]
-  _wasSkipBtnPressed: [boolean,TStateSetter<boolean>]
+  _wasSkipBtnPressed: [boolean, TStateSetter<boolean>]
   setWillIncrementQIndex: TStateSetter<boolean>
 }) => {
   const navigation = useNavigation<TStackNavigation>();
   const questions = useQuestionsStore(state => state.questions);
-  const task = useQuestionsStore(state => state.task);
   const currentColorsThemeObj = useGetAppColors();
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
   const rightNum = useGameScrnTabStore(state => state.right);
@@ -120,9 +119,6 @@ const GameScrnPresentation = ({
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
   const [wasSkipBtnPressed, setWasSkipBtnPressed] = _wasSkipBtnPressed;
-  const [isSkipBtnDisabled, setIsSkipBtnDisabled] = _isSkipBtnDisabled;
-  console.log("questions: ", questions)
-  console.log("questions[questionIndex]: ", questions[questionIndex])
   const question = questions?.length ? questions[questionIndex] : null;
   const { choices, answer, symbolOptions: symbolOptionsFromServer, userAnswer } = question ?? {};
   let isAnswerCorrect: boolean | null = null;
@@ -169,18 +165,14 @@ const GameScrnPresentation = ({
     });
   };
 
-  
-
-  
-
-  function handleSkipBtnPress() {
+  async function handleSkipBtnPress() {
     if (!questions[questionIndex + 1]) {
       updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
-      setIsSkipBtnDisabled(true);      
+      setWillIncrementQIndex(true);
+      setWasSkipBtnPressed(true);
       return;
     };
 
-    setWasSkipBtnPressed(true);
     updateQuestionsStore(questionIndex + 1, "questionIndex");
   }
 
@@ -770,7 +762,7 @@ const GameScrnPresentation = ({
                 <PTxt>CLEAR</PTxt>
               </Button>
               <Button
-                isDisabled={isSkipBtnDisabled}
+                isDisabled={wasSkipBtnPressed}
                 backgroundColor="#616771"
                 handleOnPress={handleSkipBtnPress}
                 dynamicStyles={{ padding: 17, borderRadius: 15 }}

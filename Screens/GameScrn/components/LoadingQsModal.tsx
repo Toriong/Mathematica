@@ -8,8 +8,9 @@ import Button from "../../../global_components/Button";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { TStackNavigationProp } from "../../../Navigation";
 import { TStateSetter } from "../../../globalTypes&Interfaces";
+import { TQuestionTypes } from "../../../sharedInterfaces&TypesWithBackend";
 
-const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean,TStateSetter<boolean>] }) => {
+const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean, TStateSetter<boolean>] }) => {
     const navigation = useNavigation<TStackNavigationProp>();
     // make the route name type safe
     const route = useRoute();
@@ -22,7 +23,7 @@ const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean,T
     const [wasSkipBtnPressed, setWasSkipBtnPressed] = _wasSkipBtnPressed;
 
     function handleGetMoreQsBtnPress() {
-        if(wasSkipBtnPressed){
+        if (wasSkipBtnPressed) {
             setWasSkipBtnPressed(true);
         }
 
@@ -30,7 +31,7 @@ const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean,T
         updateApiQsFetchingStatusStore(true, "willGetQs");
     }
 
-    function handleOnGoBackMainScrnBtnPress(){
+    function handleOnGoBackMainScrnBtnPress() {
         setIsModalVisible(false);
         navigation.navigate("Home");
 
@@ -47,13 +48,16 @@ const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean,T
         }, millis);
     }
 
-    console.log("route.name: ", route.name)
-
     useEffect(() => {
         if (((mode === "quiz") && (route.name === "GameScreen")) && (gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE")) {
             setIsModalVisible(true);
-        } else if (((mode === "quiz") || (route.name !== "GameScreen")) && (gettingQsStatus === "SUCCESS") && isModalVisible) {
-            closeModal();
+        } else if (
+            (["quiz", "finished"].includes(mode) || (route.name !== "GameScreen")) &&
+            (["FAILURE", "SUCCESS"].includes(gettingQsStatus) && isModalVisible)
+        ) {
+            setTimeout(() => {
+                setIsModalVisible(false);
+            }, 1000);
         }
     }, [gettingQsStatus, mode, route.name])
 
@@ -155,11 +159,11 @@ const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean,T
                                         marginTop: 25
                                     }}
                                 >
-                                    <PTxt 
-                                    fontSize={20}
-                                    style={{
-                                        textAlign: "center"
-                                    }}
+                                    <PTxt
+                                        fontSize={20}
+                                        style={{
+                                            textAlign: "center"
+                                        }}
                                     >
                                         Back to main menu.
                                     </PTxt>
