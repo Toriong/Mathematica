@@ -3,7 +3,7 @@ import { View } from 'react-native'
 import { PTxt } from "../../global_components/text";
 import { useNavigation } from '@react-navigation/native';
 import { TScreenNames, TStackNavigation } from "../../Navigation";
-import { useColorStore, useGameScrnTabStore } from "../../zustand";
+import { useColorStore, useGameScrnTabStore, useQuestionsStore } from "../../zustand";
 import Button from "../../global_components/Button";
 import { Storage } from "../../utils/storage";
 import {
@@ -11,14 +11,11 @@ import {
     GoogleSigninButton,
     statusCodes,
 } from '@react-native-google-signin/google-signin';
-import Constants from 'expo-constants'
-
-// GoogleSignin.configure()
 
 const HomeScrnPresentation = () => {
-    console.log("Constants.executionEnvironment: ", Constants.executionEnvironment)
     const navigation = useNavigation<TStackNavigation>();
     const updateGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
+    const updateQuestionStore = useQuestionsStore(state => state.updateState);
     const appColors = useColorStore();
     const memory = new Storage();
     const currentAppColors = appColors.themesObj[appColors.currentTheme];
@@ -29,10 +26,13 @@ const HomeScrnPresentation = () => {
     ) {
         // when get more questions after the user responds to a question, check if the test is still going when a recursive call is being
         // implemented
-        await memory.setItem("isGameOn", true);
-        updateGameScrnTabStore(types, "questionTypes");
-        updateGameScrnTabStore("quiz", "mode");
-        navigation.navigate(scrnName)
+        if(scrnName === "GameScreen"){
+            await memory.setItem("isGameOn", true);
+            updateGameScrnTabStore(types, "questionTypes");
+            updateGameScrnTabStore("quiz", "mode");
+            updateQuestionStore(0, "questionIndex")
+            navigation.navigate(scrnName)
+        }
     }
 
     return (

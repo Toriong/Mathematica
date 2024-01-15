@@ -1,4 +1,3 @@
-import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import { View, SafeAreaView, GestureResponderEvent, Text } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -6,15 +5,15 @@ import { useApiQsFetchingStatusStore, useColorStore, useGameScrnTabStore, useQue
 import Button from "../../Button";
 import { PTxt } from "../../text";
 import { useEffect, useRef, useState } from "react";
-import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
 import { OVERLAY_OPACITY } from "../../../globalVars";
 import { TStackNavigationProp } from "../../../Navigation";
-import { IQuestionOnClient } from "../../../zustandStoreTypes&Interfaces";
 import { saveQuiz } from "../../../api_services/quiz/saveQuiz";
-import { CustomError, ICustomError } from "../../../utils/errors";
-import uuid from 'react-native-uuid';
+import { CustomError } from "../../../utils/errors";
+import { CountdownCircleTimer } from "react-native-countdown-circle-timer"
 import { getUserId } from "../../../utils/generalFns";
 import { Alert } from "react-native";
+import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
+import uuid from 'react-native-uuid';
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
@@ -25,6 +24,14 @@ function getTimeForUI(millis: number) {
 
     return minutes + ":" + ((parseInt(seconds) < 10) ? "0" : "") + seconds;
 };
+
+const RemainingTime = ({ timerMs }: { timerMs: number }) => {
+    const remainingTimeMmSs = getTimeForUI(timerMs);
+
+    console.log("remainingTimeMmSs: ", remainingTimeMmSs);
+
+    return <PTxt>{remainingTimeMmSs}</PTxt>
+}
 
 const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
@@ -61,37 +68,29 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     // if the user is on the game screen and the modal is on the ui, then don't start the timer 
     // if getting the questions is progress, then start the timer 
 
-    useEffect(() => {
-        if ((gettingQsResponseStatus === "SUCCESS") && !isLoadingModalOn) {
-            console.log("what is up")
-            timerIntervalRef.current = setInterval(() => {
-                setTimerObj(timerObj => {
-                    if (timerObj.timerMs <= 0) {
-                        return timerObj;
-                    }
+    // useEffect(() => {
+    //     if ((gettingQsResponseStatus === "SUCCESS") && !isLoadingModalOn) {
+    //         console.log("what is up")
+    //         timerIntervalRef.current = setInterval(() => {
+    //             setTimerObj(timerObj => {
+    //                 if (timerObj.timerMs <= 0) {
+    //                     return timerObj;
+    //                 }
 
-                    const timerMs = timerObj.timerMs - 1_000;
-                    const timerStr = getTimeForUI(timerMs);
+    //                 const timerMs = timerObj.timerMs - 1_000;
+    //                 const timerStr = getTimeForUI(timerMs);
 
-                    return { timerStr, timerMs }
-                })
-            }, 1_000);
-        }
-    }, [gettingQsResponseStatus, isLoadingModalOn]);
+    //                 return { timerStr, timerMs }
+    //             })
+    //         }, 1_000);
+    //     }
+    // }, [gettingQsResponseStatus, isLoadingModalOn]);
 
     async function saveQuizAfterQuizIsDone() {
-        let userId: string = ""
-
-        try {
-            userId = (await getUserId()) as string;
-        } catch (error) {
-            console.error("An error in getting the id of the user from storage: ", error);
-        }
-
         const quizObj: Parameters<typeof saveQuiz>[0] = {
             _id: uuid.v4().toString(),
             finishedQuizAtMs: Date.now(),
-            userId: userId as string,
+            userId: (await getUserId()) as string,
             questions: questions
         };
 
@@ -188,12 +187,15 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                             </PTxt>
                         </View>
                         <View style={{ width: '100%', marginTop: 15, paddingRight: "16%", display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', flexDirection: 'row' }}>
-                            <PTxt style={{ width: "auto" }} fontSize={FONT_SIZE_NON_SCORE_TXT}>
-                                TIME:
-                            </PTxt>
-                            <PTxt style={{ width: 57, display: 'flex', justifyContent: 'flex-end', textAlign: 'right' }} fontSize={FONT_SIZE_NON_SCORE_TXT}>
-                                {timerObj.timerStr}
-                            </PTxt>
+                            <CountdownCircleTimer
+                                isPlaying
+                                duration={120}
+                                colors={['#004777', '#F7B801', '#A30000', '#A30000']}
+                                colorsTime={[7, 5, 2, 0]}
+                                size={60}
+                            >
+                                {({ remainingTime }) => <RemainingTime timerMs={remainingTime * 1_000} />}
+                            </CountdownCircleTimer>
                         </View>
                     </View>
                 </View>
