@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faLock } from "@fortawesome/free-solid-svg-icons";
 import Layout from "../../global_components/Layout";
 import Button from "../../global_components/Button";
+import { IQuestionOnClient } from '../../zustandStoreTypes&Interfaces';
 
 const BTN_FONT_SIZE = 22;
 const PTXT_FONT_SIZE = 35;
@@ -31,9 +32,10 @@ const ResultsPresentation = () => {
 
     function handlePlayAgainBtnPress() {
         updateQuestionsStore(0, "questionIndex");
-        
-        if (questionsForNextQuiz?.length) {
-            updateQuestionsStore(questionsForNextQuiz, "questions");
+        const questionsForNextQuizUpdated = structuredClone<IQuestionOnClient[]>((questions.length === 0) ? questionsForNextQuiz.slice(1) : questionsForNextQuiz);
+
+        if (questionsForNextQuizUpdated?.length) {
+            updateQuestionsStore(questionsForNextQuizUpdated, "questions");
             updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
         } else if (!willGetQs && (gettingQsResponseStatus === "FAILURE")) {
             updateApiQsFetchingStatusStore(true, "willGetQs");
@@ -58,24 +60,23 @@ const ResultsPresentation = () => {
     const setApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
 
     function handleHomeBtnPress() {
-        console.log("questions: ", questions)
-        let unansweredQs = (questionIndex === 0) ? questions.slice(1) : questions.filter(question => !question.userAnswer);
-        console.log("unansweredQs: ", unansweredQs);
-        console.log("questionsForNextQuiz: ", questionsForNextQuiz)
-        unansweredQs = structuredClone(unansweredQs)
-        const questionsForNextQuizUpdated = questionsForNextQuiz?.length ? [...unansweredQs, ...questionsForNextQuiz] : unansweredQs;
+        const questionsForNextQuizUpdated = structuredClone<IQuestionOnClient[]>((questions.length === 0) ? questionsForNextQuiz.slice(1) : questionsForNextQuiz);
 
         if (questionsForNextQuizUpdated.length) {
+            console.log("updating questionsForNextQuiz...")
             setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");
         } else {
+            console.log("will get questions...")
             setApiQsFetchingStatusStore(true, "willGetQs")
+        }
+
+        if(questions.length > 0){
+            setQuestionsStore([], "questions");
         }
 
         setGameScrnTabStore("finished", "mode");
         setGameScrnTabStore(0, "right")
         setGameScrnTabStore(0, "wrong")
-        setQuestionsStore([], "questions");
-        updateQuestionsStore(0, "questionIndex");
         navigate("Home");
     };
 
