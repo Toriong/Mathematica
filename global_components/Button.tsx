@@ -2,11 +2,11 @@ import { GestureResponderEvent, TouchableOpacity, StyleProp, ViewStyle } from "r
 import { IComponentProps } from "../globalTypes&Interfaces"
 
 export type OnPressAction = (event: GestureResponderEvent, [...rest]?: any[]) => void
-interface IButton extends ViewStyle {
-    dynamicStyles?: ViewStyle,
+type IButton = Partial<{
+    dynamicStyles: ViewStyle,
     backgroundColor: Pick<ViewStyle, 'backgroundColor'>['backgroundColor'] | "transparent",
-    isDisabled?: boolean
-}
+    isDisabled: boolean
+}> & ViewStyle
 type ButtonCompProps = Omit<IComponentProps, "backgroundColor">
 export type ButtonProps = { handleOnPress: OnPressAction } & IButton & ButtonCompProps;
 

@@ -25,29 +25,19 @@ function getTimeForUI(millis: number) {
     return minutes + ":" + ((parseInt(seconds) < 10) ? "0" : "") + seconds;
 };
 
-const RemainingTime = ({ timerMs }: { timerMs: number }) => {
-    const remainingTimeMmSs = getTimeForUI(timerMs);
-
-    console.log("remainingTimeMmSs: ", remainingTimeMmSs);
-
-    return <PTxt>{remainingTimeMmSs}</PTxt>
-}
-
 const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
     const currentTheme = useColorStore(state => state.currentTheme);
     const colorThemesObj = useColorStore(state => state.themesObj);
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
-    const timer = useGameScrnTabStore(state => state.timer);
-    const gameScrnMode = useGameScrnTabStore(state => state.mode);
-    const isLoadingModalOn = useGameScrnTabStore(state => state.isLoadingModalOn);
+    const mode = useGameScrnTabStore(state => state.mode);
     const gettingQsResponseStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
     const questions = useQuestionsStore(state => state.questions);
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
     const setQuestionsStore = useQuestionsStore(state => state.updateState);
     const setApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
-    const [timerObj, setTimerObj] = useState({ timerStr: getTimeForUI(timer), timerMs: timer });
+    const [isPlaying, setIsPlaying] = useState(false);
     const currentThemeObj = colorThemesObj[currentTheme];
     const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -65,27 +55,6 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         }
     };
 
-    // if the user is on the game screen and the modal is on the ui, then don't start the timer 
-    // if getting the questions is progress, then start the timer 
-
-    // useEffect(() => {
-    //     if ((gettingQsResponseStatus === "SUCCESS") && !isLoadingModalOn) {
-    //         console.log("what is up")
-    //         timerIntervalRef.current = setInterval(() => {
-    //             setTimerObj(timerObj => {
-    //                 if (timerObj.timerMs <= 0) {
-    //                     return timerObj;
-    //                 }
-
-    //                 const timerMs = timerObj.timerMs - 1_000;
-    //                 const timerStr = getTimeForUI(timerMs);
-
-    //                 return { timerStr, timerMs }
-    //             })
-    //         }, 1_000);
-    //     }
-    // }, [gettingQsResponseStatus, isLoadingModalOn]);
-
     async function saveQuizAfterQuizIsDone() {
         const quizObj: Parameters<typeof saveQuiz>[0] = {
             _id: uuid.v4().toString(),
@@ -96,6 +65,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
 
         saveQuiz(quizObj)
             .then(response => {
+                console.log("Response for saving quiz into the database.")
                 if (!response.wasOperationSuccessful) {
                     throw new CustomError(response.msg ?? "Failed to save quiz. No message was provided from the server.", response.status ?? 500)
                 }
@@ -107,38 +77,46 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
             })
     }
 
-    useEffect(() => {
-        if ((timerObj.timerMs <= 0) && (gameScrnMode === "quiz")) {
-            setGameScrnTabStore("finished", 'mode');
+    function handleOnComplete() {
+        setGameScrnTabStore("finished", 'mode');
 
-            setTimeout(() => {
-                setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz");
+        setTimeout(() => {
+            setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz");
 
-                setApiQsFetchingStatusStore(true, "willGetQs");
+            setApiQsFetchingStatusStore(true, "willGetQs");
 
-                setApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
-            }, 500);
+            setApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
+        }, 400);
 
-            const answeredQuestions = questions.filter(question => question.userAnswer);
+        const answeredQuestions = questions.filter(question => question.userAnswer);
 
-            // the user didn't answer any questions
-            if (!answeredQuestions.length) {
-                setQuestionsStore([], "questions");
-                Alert.alert("Looks like you didn't answer a question. This quiz will not be saved.")
-            } else {
-                saveQuizAfterQuizIsDone();
-                setQuestionsStore(answeredQuestions, "questions");
-            }
-
-
-            if (timerIntervalRef.current) {
-                console.log('Will stop interval timer.')
-                clearInterval(timerIntervalRef.current)
-            }
-
-            navigate('ResultsScreen');
+        // the user didn't answer any questions
+        if (!answeredQuestions.length) {
+            setQuestionsStore([], "questions");
+            Alert.alert("Looks like you didn't answer a question. This quiz will not be saved.")
+        } else {
+            saveQuizAfterQuizIsDone();
+            setQuestionsStore(answeredQuestions, "questions");
         }
-    }, [timerObj])
+
+
+        if (timerIntervalRef.current) {
+            console.log('Will stop interval timer.')
+            clearInterval(timerIntervalRef.current)
+        }
+
+        navigate('ResultsScreen');
+    };
+
+    useEffect(() => {
+        if (gettingQsResponseStatus === "SUCCESS") {
+            setTimeout(() => {
+                setIsPlaying(true);
+            }, 400)
+        } else if ((gettingQsResponseStatus === "IN_PROGRESS") || (gettingQsResponseStatus === "FAILURE")) {
+            setIsPlaying(false);
+        }
+    }, [gettingQsResponseStatus]);
 
     return (
         <SafeAreaViewWrapper
@@ -168,7 +146,6 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                     borderWidth: 1
                 }}
             >
-                {/* present the loading ui here */}
                 <View style={{ display: 'flex', flexDirection: 'row', width: "100%", paddingTop: "3%" }}>
                     <View style={{ width: "30%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <Button backgroundColor='none' handleOnPress={handleBtnPress}>
@@ -186,17 +163,23 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                                 Wrong: {wrongNum}
                             </PTxt>
                         </View>
-                        <View style={{ width: '100%', marginTop: 15, paddingRight: "16%", display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', flexDirection: 'row' }}>
-                            <CountdownCircleTimer
-                                isPlaying
-                                duration={120}
-                                colors={['#004777', '#F7B801', '#A30000', '#A30000']}
-                                colorsTime={[7, 5, 2, 0]}
-                                size={60}
-                            >
-                                {({ remainingTime }) => <RemainingTime timerMs={remainingTime * 1_000} />}
-                            </CountdownCircleTimer>
-                        </View>
+                        {(mode === "quiz") && (
+                            <View style={{ width: '100%', marginTop: 15, paddingRight: "16%", display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', flexDirection: 'row' }}>
+                                <CountdownCircleTimer
+                                    isPlaying={isPlaying}
+                                    duration={120}
+                                    colors={['#004777', '#F7B801', '#A30000', '#A30000']}
+                                    colorsTime={[7, 5, 2, 0]}
+                                    size={71}
+                                    onComplete={handleOnComplete}
+                                >
+                                    {({ remainingTime, color }) => (
+                                        <PTxt style={{ color, fontSize: 17 }}>{getTimeForUI(remainingTime * 1000)}</PTxt>
+                                    )}
+                                </CountdownCircleTimer>
+                            </View>
+                        )
+                        }
                     </View>
                 </View>
                 <View style={{ marginTop: "3%", paddingBottom: 10, position: 'relative' }}>

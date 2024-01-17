@@ -29,6 +29,11 @@ const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean, 
 
         updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")
         updateApiQsFetchingStatusStore(true, "willGetQs");
+    };
+
+    function handleBackToMainScreenBtnPress() {
+        setIsModalVisible(false);
+        navigation.navigate("Home")
     }
 
     function handleOnGoBackMainScrnBtnPress() {
@@ -49,7 +54,10 @@ const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean, 
     }
 
     useEffect(() => {
-        if (((mode === "quiz") && (route.name === "GameScreen")) && (gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE")) {
+        if (
+            ((mode === "quiz") && (route.name === "GameScreen")) && (gettingQsStatus === "IN_PROGRESS") ||
+            (gettingQsStatus === "FAILURE")
+        ) {
             setIsModalVisible(true);
         } else if (
             (["quiz", "finished"].includes(mode) || (route.name !== "GameScreen")) &&
@@ -105,6 +113,15 @@ const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean, 
                                 Please try again.
                             </PTxt>
                         </>
+                    )}
+                    {(gettingQsStatus === "IN_PROGRESS") && (
+                        <Button
+                            handleOnPress={handleBackToMainScreenBtnPress}
+                        >
+                            <PTxt>
+                                Back to main screen.
+                            </PTxt>
+                        </Button>
                     )}
                     <View
                         style={{
@@ -165,7 +182,7 @@ const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean, 
                                             textAlign: "center"
                                         }}
                                     >
-                                        Back to main menu.
+                                        Back to main screen.
                                     </PTxt>
                                 </Button>
                             </View>

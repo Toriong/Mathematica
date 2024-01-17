@@ -23,6 +23,8 @@ const ResultsPresentation = () => {
     const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
     const questionsFromPreviousQuiz = useQuestionsStore(state => state.questions);
     const appColors = useGetAppColors();
+    const willGetQs = useApiQsFetchingStatusStore(state => state.willGetQs);
+    const gettingQsResponseStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const updateGameScrnStore = useGameScrnTabStore(state => state.updateState);
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);
@@ -33,7 +35,8 @@ const ResultsPresentation = () => {
         if (questionsForNextQuiz?.length) {
             updateQuestionsStore(questionsForNextQuiz, "questions");
             updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
-        } else {
+        } else if (!willGetQs && (gettingQsResponseStatus === "FAILURE")) {
+            updateApiQsFetchingStatusStore(true, "willGetQs");
             updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
         }
 
@@ -52,7 +55,7 @@ const ResultsPresentation = () => {
     };
 
     function handleReviewBtnPress() {
-        if((rightNum + wrongNum) === 0){
+        if ((rightNum + wrongNum) === 0) {
             Alert.alert("You can't review this quiz because you didn't answer any of the questions.")
             return;
         }
@@ -64,7 +67,7 @@ const ResultsPresentation = () => {
         navigate("GameScreen");
     };
 
-    function handleLeaderBoardBtnPress(){
+    function handleLeaderBoardBtnPress() {
         Alert.alert("This feature has not been implemented. Please try some other time.")
     }
 
@@ -113,7 +116,7 @@ const ResultsPresentation = () => {
                     <Button
                         backgroundColor={appColors.second}
                         handleOnPress={handleReviewBtnPress}
-                        dynamicStyles={{...styles.button, opacity: ((rightNum + wrongNum) === 0) ? .4 : 1}}
+                        dynamicStyles={{ ...styles.button, opacity: ((rightNum + wrongNum) === 0) ? .4 : 1 }}
                     >
                         <PTxt fontSize={BTN_FONT_SIZE} txtColor={appColors.third}>
                             Review
