@@ -107,11 +107,12 @@ const GameScrnPresentation = ({
 }) => {
   const navigation = useNavigation<TStackNavigation>();
   const questions = useQuestionsStore(state => state.questions);
+  const gameScrnMode = useGameScrnTabStore(state => state.mode);
+  const questionsLength = (gameScrnMode === "review") ? questions.filter(question => question.answer).length : 0
   const currentColorsThemeObj = useGetAppColors();
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
   const rightNum = useGameScrnTabStore(state => state.right);
   const wrongNum = useGameScrnTabStore(state => state.wrong);
-  const gameScrnMode = useGameScrnTabStore(state => state.mode);
   const questionIndex = useQuestionsStore(state => state.questionIndex);
   const updateQuestionsStore = useQuestionsStore(state => state.updateState);
   const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
@@ -733,7 +734,7 @@ const GameScrnPresentation = ({
                   <PTxt
                     fontSize={TXT_FONT_SIZE}
                   >
-                    {questionIndex + 1}/{questions.length}
+                    {questionIndex + 1}/{questionsLength}
                   </PTxt>
                 </View>
               )}

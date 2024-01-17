@@ -18,12 +18,11 @@ function getRandomIndex<TData>(arr: TData[], incorrectVal: any = undefined) {
 function sortRandomly<TData>(arr: TData[]) {
     let arrSortedRandomly = Array.from({ length: arr.length });
 
-
-    for (let val of arr) {
+    arr.forEach(val => {
         const randomIndex = getRandomIndex(arrSortedRandomly);
         arrSortedRandomly[randomIndex] = val
-    };
-
+    })
+    
     return arrSortedRandomly;
 };
 
