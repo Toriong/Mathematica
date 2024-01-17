@@ -5,7 +5,7 @@ import { useApiQsFetchingStatusStore, useColorStore, useGameScrnTabStore, useQue
 import Button from "../../Button";
 import { PTxt } from "../../text";
 import { useEffect, useRef, useState } from "react";
-import { OVERLAY_OPACITY } from "../../../globalVars";
+import { OVERLAY_OPACITY, structuredClone } from "../../../globalVars";
 import { TStackNavigationProp } from "../../../Navigation";
 import { saveQuiz } from "../../../api_services/quiz/saveQuiz";
 import { CustomError } from "../../../utils/errors";
@@ -14,6 +14,7 @@ import { getUserId } from "../../../utils/generalFns";
 import { Alert } from "react-native";
 import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
 import uuid from 'react-native-uuid';
+import { IQuestionOnClient } from '../../../zustandStoreTypes&Interfaces';
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
@@ -31,11 +32,11 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const colorThemesObj = useColorStore(state => state.themesObj);
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
+    const qustionIndex = useQuestionsStore(state => state.questionIndex);
     const mode = useGameScrnTabStore(state => state.mode);
     const timer = useGameScrnTabStore(state => state.timer);
     const gettingQsResponseStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
     const questions = useQuestionsStore(state => state.questions);
-    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
     const setQuestionsStore = useQuestionsStore(state => state.updateState);
     const setApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
@@ -43,10 +44,18 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const currentThemeObj = colorThemesObj[currentTheme];
 
     function handleBtnPress() {
+        const unansweredQs = structuredClone<IQuestionOnClient[]>((qustionIndex === 0) ? questions.slice(1) : questions.filter(question => !question.userAnswer));
+
         setGameScrnTabStore("finished", "mode");
         setGameScrnTabStore(0, "right")
         setGameScrnTabStore(0, "wrong")
         setQuestionsStore([], "questions");
+        
+        if (unansweredQs.length) {
+            setQuestionsStore(unansweredQs, "questionsForNextQuiz");
+            return;
+        }
+        
         navigate("Home");
         setApiQsFetchingStatusStore(true, "willGetQs")
     };
@@ -87,7 +96,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         const answeredQs = questions.filter(question => question.userAnswer);
         const unansweredQs = questions.filter(question => !question.userAnswer)
 
-        if(unansweredQs.length){
+        if (unansweredQs.length) {
             setQuestionsStore(unansweredQs, "questionsForNextQuiz")
         }
 
@@ -103,7 +112,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         navigate('ResultsScreen');
     };
 
-    
+
 
     useEffect(() => {
         if (gettingQsResponseStatus === "SUCCESS") {
@@ -180,7 +189,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                     </View>
                 </View>
                 <View style={{ marginTop: "3%", paddingBottom: 10, position: 'relative' }}>
-                    <View style={{ width:  mode === "review" ?  "100%" : "37%", display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                    <View style={{ width: mode === "review" ? "100%" : "37%", display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
                         <PTxt fontSize={FONT_SIZE_SCORE_TXT} fontStyle="italic">Score: </PTxt>
                         <PTxt fontSize={FONT_SIZE_SCORE_TXT}>{rightNum}</PTxt>
                     </View>

@@ -16,6 +16,8 @@ const HomeScrnPresentation = () => {
     const navigation = useNavigation<TStackNavigation>();
     const updateGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
     const updateQuestionStore = useQuestionsStore(state => state.updateState);
+    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
+    const setQuestionsStore = useQuestionsStore(state => state.updateState);
     const appColors = useColorStore();
     const memory = new Storage();
     const currentAppColors = appColors.themesObj[appColors.currentTheme];
@@ -26,12 +28,23 @@ const HomeScrnPresentation = () => {
     ) {
         // when get more questions after the user responds to a question, check if the test is still going when a recursive call is being
         // implemented
-        if(scrnName === "GameScreen"){
+        if((scrnName === "GameScreen") && questionsForNextQuiz.length){
             await memory.setItem("isGameOn", true);
             updateGameScrnTabStore(types, "questionTypes");
             updateGameScrnTabStore("quiz", "mode");
-            updateQuestionStore(0, "questionIndex")
-            navigation.navigate(scrnName)
+            updateQuestionStore(0, "questionIndex");
+            setQuestionsStore(questionsForNextQuiz, "questions");
+            navigation.navigate(scrnName);
+            return;
+        }
+
+        if((scrnName === "GameScreen")){
+            await memory.setItem("isGameOn", true);
+            updateGameScrnTabStore(types, "questionTypes");
+            updateGameScrnTabStore("quiz", "mode");
+            updateQuestionStore(0, "questionIndex");
+            navigation.navigate(scrnName);
+            return;
         }
     }
 

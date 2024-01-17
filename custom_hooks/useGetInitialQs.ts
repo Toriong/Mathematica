@@ -60,6 +60,7 @@ export function useGetInitialQs(): null {
                         updateQuestionsStore(questionsForNextQUpdated as IQuestionOnClient[], "questionsForNextQuiz")
                     } else {
                         updateQuestionsStore(questionsRandomlySorted as IQuestionOnClient[], "questions");
+                        updateQuestionsStore([], "questionsForNextQuiz")
                     };
 
                     updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
