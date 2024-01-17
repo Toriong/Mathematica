@@ -47,13 +47,9 @@ const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean, 
         }, 800)
     }
 
-    function closeModal(millis = 1000) {
-        setTimeout(() => {
-            setIsModalVisible(false);
-        }, millis);
-    }
-
     useEffect(() => {
+        console.log("gettingQsStatus: ", gettingQsStatus);
+
         if (
             ((mode === "quiz") && (route.name === "GameScreen")) && (gettingQsStatus === "IN_PROGRESS") ||
             (gettingQsStatus === "FAILURE")

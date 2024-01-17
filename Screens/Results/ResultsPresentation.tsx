@@ -38,6 +38,7 @@ const ResultsPresentation = () => {
         } else if (!willGetQs && (gettingQsResponseStatus === "FAILURE")) {
             updateApiQsFetchingStatusStore(true, "willGetQs");
             updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
+            updateQuestionsStore([], "questions");
         }
 
         // if the questions for the next quiz has not been retrieved then change gettingQsStatus global state 
