@@ -30,6 +30,7 @@ export function useGetInitialQs(): null {
     const memory = new Storage();
     const willGetQs = useApiQsFetchingStatusStore(state => state.willGetQs);
     const areQsReceivedForNextQuiz = useApiQsFetchingStatusStore(state => state.areQsReceivedForNextQuiz);
+    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);
 
@@ -50,10 +51,13 @@ export function useGetInitialQs(): null {
                     };
 
                     const questionsRandomlySorted = (response.questions?.length > 1) ? sortRandomly<IQuestionOnClient>(response.questions) : response.questions; 
+                    console.log("areQsReceivedForNextQuiz: ", areQsReceivedForNextQuiz)
+                    console.log("questionsRandomlySorted hey there: ", questionsRandomlySorted);
+
 
                     if (areQsReceivedForNextQuiz) {
-                        updateQuestionsStore(questionsRandomlySorted as IQuestionOnClient[], "questionsForNextQuiz")
-                        updateApiQsFetchingStatusStore(false, "areQsReceivedForNextQuiz");
+                        const questionsForNextQUpdated = questionsForNextQuiz?.length ? [...questionsForNextQuiz, ...questionsRandomlySorted] : questionsRandomlySorted
+                        updateQuestionsStore(questionsForNextQUpdated as IQuestionOnClient[], "questionsForNextQuiz")
                     } else {
                         updateQuestionsStore(questionsRandomlySorted as IQuestionOnClient[], "questions");
                     };
@@ -64,6 +68,7 @@ export function useGetInitialQs(): null {
                     updateApiQsFetchingStatusStore("FAILURE", "gettingQsResponseStatus");
                 } finally {
                     updateApiQsFetchingStatusStore(false, "willGetQs");
+                    updateApiQsFetchingStatusStore(false, "areQsReceivedForNextQuiz");
                 }
             })();
         }

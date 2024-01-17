@@ -40,7 +40,8 @@ export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
     const gameScrnTabStore: TGameScrnTabStore = {
         right: 0,
         wrong: 0,
-        timer: 120_000,
+        // timer: 120_000,
+        timer: 10,
         wasSubmitBtnPressed: false,
         isTimerPaused: false,
         isLoadingModalOn: false,

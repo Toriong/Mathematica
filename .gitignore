@@ -2,11 +2,15 @@
 
 # dependencies
 node_modules/
+notes.task
+
 
 # Expo
 .expo/
 dist/
 web-build/
+
+notes.txt
 
 testingQs.json
 testingRequest.js

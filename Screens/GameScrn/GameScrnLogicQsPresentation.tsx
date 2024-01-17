@@ -13,7 +13,7 @@ import LogicSymbol from './components/LogicSymbol';
 import EditSelectedSymbolBtn from './components/EditSelectedSymbolBtn';
 import LoadingQsModal from './components/LoadingQsModal';
 import { useGetAppColors } from '../../custom_hooks/useGetAppColors';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused, useNavigation } from '@react-navigation/native';
 import { TStackNavigation } from '../../Navigation';
 import { IQuestionOnClient } from '../../zustandStoreTypes&Interfaces';
 import { TStateSetter } from '../../globalTypes&Interfaces';
@@ -108,7 +108,7 @@ const GameScrnPresentation = ({
   const navigation = useNavigation<TStackNavigation>();
   const questions = useQuestionsStore(state => state.questions);
   const gameScrnMode = useGameScrnTabStore(state => state.mode);
-  const questionsLength = (gameScrnMode === "review") ? questions.filter(question => question.answer).length : 0
+  const questionsLength = (gameScrnMode === "review") ? questions.filter(question => question.userAnswer).length : 0
   const currentColorsThemeObj = useGetAppColors();
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
   const rightNum = useGameScrnTabStore(state => state.right);
@@ -119,6 +119,7 @@ const GameScrnPresentation = ({
   const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
+  const isFocused = useIsFocused();
   const [wasSkipBtnPressed, setWasSkipBtnPressed] = _wasSkipBtnPressed;
   const question = questions?.length ? questions[questionIndex] : null;
   const { choices, answer, symbolOptions: symbolOptionsFromServer, userAnswer } = question ?? {};
@@ -352,7 +353,19 @@ const GameScrnPresentation = ({
     if (gameScrnMode === "finished") {
       setSelectedLogicSymbols([]);
     }
-  }, [gameScrnMode])
+  }, [gameScrnMode]);
+
+  useEffect(() => {
+    navigation.addListener('focus', () => {
+      setGameScrnTabStore(false, "wasSubmitBtnPressed")
+    });
+
+    navigation.addListener('beforeRemove', () => {
+      if(wasSubmitBtnPressed){
+        setGameScrnTabStore(false, "wasSubmitBtnPressed")
+      }
+    })
+  }, [])
 
   return (
     <>

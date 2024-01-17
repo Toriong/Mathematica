@@ -39,7 +39,9 @@ const ResultsPresentation = () => {
             updateApiQsFetchingStatusStore(true, "willGetQs");
             updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
             updateQuestionsStore([], "questions");
-        }
+        };
+
+        console.log("questionsFromPreviousQuiz: ", questionsFromPreviousQuiz)
 
         // if the questions for the next quiz has not been retrieved then change gettingQsStatus global state 
         // to IN_PROGRESS
@@ -61,7 +63,7 @@ const ResultsPresentation = () => {
             return;
         }
 
-        const unansweredQsFilterOut = questionsFromPreviousQuiz.filter(question => !!question.userAnswer);
+        const unansweredQsFilterOut = questionsFromPreviousQuiz.filter(question => question.userAnswer);
         updateQuestionsStore(unansweredQsFilterOut, "questions");
         updateQuestionsStore(0, "questionIndex");
         updateGameScrnStore("review", "mode");

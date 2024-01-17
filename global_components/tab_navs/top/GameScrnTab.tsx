@@ -32,14 +32,15 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
     const mode = useGameScrnTabStore(state => state.mode);
+    const timer = useGameScrnTabStore(state => state.timer);
     const gettingQsResponseStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
     const questions = useQuestionsStore(state => state.questions);
+    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
     const setQuestionsStore = useQuestionsStore(state => state.updateState);
     const setApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const [isPlaying, setIsPlaying] = useState(false);
     const currentThemeObj = colorThemesObj[currentTheme];
-    const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     function handleBtnPress() {
         setGameScrnTabStore("finished", "mode");
@@ -48,11 +49,6 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         setQuestionsStore([], "questions");
         navigate("Home");
         setApiQsFetchingStatusStore(true, "willGetQs")
-
-        if (timerIntervalRef.current) {
-            clearInterval(timerIntervalRef.current);
-            timerIntervalRef.current = null;
-        }
     };
 
     async function saveQuizAfterQuizIsDone() {
@@ -88,25 +84,26 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
             setApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
         }, 400);
 
-        const answeredQuestions = questions.filter(question => question.userAnswer);
+        const answeredQs = questions.filter(question => question.userAnswer);
+        const unansweredQs = questions.filter(question => !question.userAnswer)
+
+        if(unansweredQs.length){
+            setQuestionsStore(unansweredQs, "questionsForNextQuiz")
+        }
 
         // the user didn't answer any questions
-        if (!answeredQuestions.length) {
+        if (!answeredQs.length) {
             setQuestionsStore([], "questions");
             Alert.alert("Looks like you didn't answer a question. This quiz will not be saved.")
         } else {
             saveQuizAfterQuizIsDone();
-            setQuestionsStore(answeredQuestions, "questions");
-        }
-
-
-        if (timerIntervalRef.current) {
-            console.log('Will stop interval timer.')
-            clearInterval(timerIntervalRef.current)
+            setQuestionsStore(answeredQs, "questions");
         }
 
         navigate('ResultsScreen');
     };
+
+    
 
     useEffect(() => {
         if (gettingQsResponseStatus === "SUCCESS") {
@@ -167,7 +164,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                             <View style={{ width: '100%', marginTop: 15, paddingRight: "16%", display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', flexDirection: 'row' }}>
                                 <CountdownCircleTimer
                                     isPlaying={isPlaying}
-                                    duration={120}
+                                    duration={timer}
                                     colors={['#004777', '#F7B801', '#A30000', '#A30000']}
                                     colorsTime={[7, 5, 2, 0]}
                                     size={71}
@@ -183,7 +180,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                     </View>
                 </View>
                 <View style={{ marginTop: "3%", paddingBottom: 10, position: 'relative' }}>
-                    <View style={{ width: "37%", display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                    <View style={{ width:  mode === "review" ?  "100%" : "37%", display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
                         <PTxt fontSize={FONT_SIZE_SCORE_TXT} fontStyle="italic">Score: </PTxt>
                         <PTxt fontSize={FONT_SIZE_SCORE_TXT}>{rightNum}</PTxt>
                     </View>
