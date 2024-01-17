@@ -15,6 +15,7 @@ import { Alert } from "react-native";
 import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
 import uuid from 'react-native-uuid';
 import { IQuestionOnClient } from '../../../zustandStoreTypes&Interfaces';
+import { useResetLogicQs } from '../../../custom_hooks/useResetLogicQs';
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
@@ -29,10 +30,10 @@ function getTimeForUI(millis: number) {
 const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
     const currentTheme = useColorStore(state => state.currentTheme);
+    const resetLogicQs = useResetLogicQs();
     const colorThemesObj = useColorStore(state => state.themesObj);
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
-    const qustionIndex = useQuestionsStore(state => state.questionIndex);
     const mode = useGameScrnTabStore(state => state.mode);
     const timer = useGameScrnTabStore(state => state.timer);
     const gettingQsResponseStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
@@ -42,22 +43,26 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const setApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const [isPlaying, setIsPlaying] = useState(false);
     const currentThemeObj = colorThemesObj[currentTheme];
+    const questionIndex = useQuestionsStore(state => state.questionIndex)
+    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz)
 
     function handleBtnPress() {
-        const unansweredQs = structuredClone<IQuestionOnClient[]>((qustionIndex === 0) ? questions.slice(1) : questions.filter(question => !question.userAnswer));
+        let unansweredQs = (questionIndex === 0) ? questions.slice(1) : questions.filter(question => !question.userAnswer);
+        unansweredQs = structuredClone(unansweredQs)
+        const questionsForNextQuizUpdated = questionsForNextQuiz?.length ? [...unansweredQs, ...questionsForNextQuiz] : unansweredQs;
+
+        if (questionsForNextQuizUpdated.length) {
+            setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");
+        } else {
+            setApiQsFetchingStatusStore(true, "willGetQs")
+        }
 
         setGameScrnTabStore("finished", "mode");
         setGameScrnTabStore(0, "right")
         setGameScrnTabStore(0, "wrong")
         setQuestionsStore([], "questions");
-        
-        if (unansweredQs.length) {
-            setQuestionsStore(unansweredQs, "questionsForNextQuiz");
-            return;
-        }
-        
         navigate("Home");
-        setApiQsFetchingStatusStore(true, "willGetQs")
+
     };
 
     async function saveQuizAfterQuizIsDone() {

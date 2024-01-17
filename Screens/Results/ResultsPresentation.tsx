@@ -2,7 +2,7 @@ import { View, StyleSheet, Alert } from 'react-native';
 import { HeadingTxt, PTxt } from "../../global_components/text";
 import { useApiQsFetchingStatusStore, useGameScrnTabStore, useQuestionsStore } from "../../zustand";
 import { useGetAppColors } from "../../custom_hooks/useGetAppColors";
-import { BORDER_RADIUS_NUM, PRIMARY_COLOR, SUCCESS_COLOR, WARNING_COLOR } from "../../globalVars";
+import { BORDER_RADIUS_NUM, PRIMARY_COLOR, SUCCESS_COLOR, WARNING_COLOR, structuredClone } from "../../globalVars";
 import { useNavigation } from "@react-navigation/native";
 import { TStackNavigation } from "../../Navigation";
 import { useResetLogicQs } from '../../custom_hooks/useResetLogicQs';
@@ -51,9 +51,31 @@ const ResultsPresentation = () => {
         navigate("GameScreen");
     };
 
+    const questionIndex = useQuestionsStore(state => state.questionIndex);
+    const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
+    const setQuestionsStore = useQuestionsStore(state => state.updateState);
+    const questions = useQuestionsStore(state => state.questions);
+    const setApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
+
     function handleHomeBtnPress() {
+        console.log("questions: ", questions)
+        let unansweredQs = (questionIndex === 0) ? questions.slice(1) : questions.filter(question => !question.userAnswer);
+        console.log("unansweredQs: ", unansweredQs);
+        console.log("questionsForNextQuiz: ", questionsForNextQuiz)
+        unansweredQs = structuredClone(unansweredQs)
+        const questionsForNextQuizUpdated = questionsForNextQuiz?.length ? [...unansweredQs, ...questionsForNextQuiz] : unansweredQs;
+
+        if (questionsForNextQuizUpdated.length) {
+            setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");
+        } else {
+            setApiQsFetchingStatusStore(true, "willGetQs")
+        }
+
+        setGameScrnTabStore("finished", "mode");
+        setGameScrnTabStore(0, "right")
+        setGameScrnTabStore(0, "wrong")
+        setQuestionsStore([], "questions");
         updateQuestionsStore(0, "questionIndex");
-        resetLogicQs();
         navigate("Home");
     };
 

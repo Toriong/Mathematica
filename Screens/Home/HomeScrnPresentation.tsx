@@ -28,6 +28,8 @@ const HomeScrnPresentation = () => {
     ) {
         // when get more questions after the user responds to a question, check if the test is still going when a recursive call is being
         // implemented
+
+        console.log("questionsForNextQuiz hey there: ", questionsForNextQuiz)
         if((scrnName === "GameScreen") && questionsForNextQuiz.length){
             await memory.setItem("isGameOn", true);
             updateGameScrnTabStore(types, "questionTypes");
