@@ -100,15 +100,19 @@ function getUpdatedSelectedSymbolsArr(indexToSwitchSelectedSymbolWith: number, s
 
 const GameScrnPresentation = ({
   _wasSkipBtnPressed,
+  _getMoreQsNum,
   setWillIncrementQIndex
 }: {
   _wasSkipBtnPressed: [boolean, TStateSetter<boolean>]
+  _getMoreQsNum: [null | number, TStateSetter<null | number>]
   setWillIncrementQIndex: TStateSetter<boolean>
 }) => {
   const navigation = useNavigation<TStackNavigation>();
   const questions = useQuestionsStore(state => state.questions);
   const gameScrnMode = useGameScrnTabStore(state => state.mode);
-  const questionsLength = (gameScrnMode === "review") ? questions.filter(question => question.userAnswer).length : 0
+  const isOnReviewMode = gameScrnMode === "review";
+  const questionsToReview = gameScrnMode === "review" ? questions.filter(question => question.userAnswer) : [];
+  const questionsLength = (gameScrnMode === "review") ? questionsToReview.length : 0
   const currentColorsThemeObj = useGetAppColors();
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
   const rightNum = useGameScrnTabStore(state => state.right);
@@ -119,13 +123,13 @@ const GameScrnPresentation = ({
   const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
-  const isFocused = useIsFocused();
   const [wasSkipBtnPressed, setWasSkipBtnPressed] = _wasSkipBtnPressed;
-  const question = questions?.length ? questions[questionIndex] : null;
+  const [getMoreQsNum, setGetMoreQsNum] = _getMoreQsNum;
+
+  const question = questions?.length ? (isOnReviewMode ? questionsToReview : questions)[questionIndex] : null;
   const { choices, answer, symbolOptions: symbolOptionsFromServer, userAnswer } = question ?? {};
   let isAnswerCorrect: boolean | null = null;
   let isAnswerCorrectOnReviewMode: boolean | null = null;
-  const isOnReviewMode = gameScrnMode === "review";
   const symbolOptions = useMemo(() => [...SYMBOLS, ...(Array.isArray(symbolOptionsFromServer) ? symbolOptionsFromServer : [])].map(symbol => ({
     symbol: symbol,
     wasPressed: false
@@ -308,7 +312,6 @@ const GameScrnPresentation = ({
 
       return question;
     });
-    console.log("questionsUpdated: ", questionsUpdated)
     const isAnswerCorrect = JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol))
 
     updateQuestionsStore(questionsUpdated, "questions");
@@ -361,11 +364,17 @@ const GameScrnPresentation = ({
     });
 
     navigation.addListener('beforeRemove', () => {
-      if(wasSubmitBtnPressed){
+      if (wasSubmitBtnPressed) {
         setGameScrnTabStore(false, "wasSubmitBtnPressed")
       }
     })
   }, [])
+
+  useEffect(() => {
+    if ((gameScrnMode === "quiz") && (questionIndex === questions.length)) {
+      setGetMoreQsNum(3);
+    }
+  }, [questionIndex]);
 
   return (
     <>
@@ -652,10 +661,6 @@ const GameScrnPresentation = ({
                 {reviewModeCorrectAnswerArr.map((symbol, index) => {
                   let _pTxtStyle = {};
 
-                  // if (symbol === "∃") {
-                  //   _pTxtStyle = { transform: [{ rotateY: "180deg" }] };
-                  // }
-
                   return (
                     <LogicSymbol
                       key={index}
@@ -729,13 +734,13 @@ const GameScrnPresentation = ({
                   <FontAwesomeIcon icon={faArrowLeft} />
                 </Button>
                 <Button
-                  isDisabled={questionIndex === (questions.length - 1)}
+                  isDisabled={questionIndex === (questionsToReview.length - 1)}
                   handleOnPress={handleReviewQNavBtn(1)}
                   backgroundColor={currentColorsThemeObj.second}
                   dynamicStyles={{
                     padding: 14,
                     borderRadius: 15,
-                    opacity: (questionIndex === (questions.length - 1)) ? .4 : 1
+                    opacity: (questionIndex === (questionsToReview.length - 1)) ? .4 : 1
                   }}
 
                 >
@@ -796,7 +801,7 @@ const GameScrnPresentation = ({
           }
         </View>
       </Layout >
-      <LoadingQsModal _wasSkipBtnPressed={[wasSkipBtnPressed, setWasSkipBtnPressed]} />
+      <LoadingQsModal _wasSkipBtnPressed={[wasSkipBtnPressed, setWasSkipBtnPressed]} isThereAQToDisplay={!!question} />
     </>
   );
 };

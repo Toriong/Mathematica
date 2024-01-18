@@ -62,6 +62,7 @@ const ResultsPresentation = () => {
     function handleHomeBtnPress() {
         const questionsForNextQuizUpdated = structuredClone<IQuestionOnClient[]>((questions.length === 0) ? questionsForNextQuiz.slice(1) : questionsForNextQuiz);
 
+        console.log("questionsForNextQuizUpdated.length yo there mengg: ", questionsForNextQuizUpdated.length)
         if (questionsForNextQuizUpdated.length) {
             console.log("updating questionsForNextQuiz...")
             setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");

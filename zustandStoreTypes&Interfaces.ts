@@ -1,4 +1,4 @@
-import { TQuestionTypes } from "./Screens/GameScrn/typesAndInterfaces"
+import { TQuestionTypes } from './Screens/GameScrn/typesAndInterfaces';
 import { TResponseStatus } from "./api_services/globalApiVars"
 import { IThemeColors } from "./globalTypes&Interfaces"
 import { IQuestion } from "./sharedInterfaces&TypesWithBackend"
@@ -21,6 +21,7 @@ interface IGameScrnTabStoreState {
     isLoadingModalOn: boolean
     wasSubmitBtnPressed: boolean
     mode: TMode
+    willNotShowLoadingModal: boolean
     questionTypes: TQuestionTypes[]
 }
 export interface IChoice {
@@ -35,11 +36,14 @@ export interface IQuestionObjActions {
     setQuestions: (questions: IQuestionOnClient[]) => void
     setTask: (task: string) => void
 }
+export type TNumberToGetForEachQuestionType = Partial<Record<TQuestionTypes, number>>;
 export interface IQuestionsStates {
     task: string
     questions: IQuestionOnClient[]
     questionsForNextQuiz: IQuestionOnClient[]
     questionIndex: number
+    numberToGetForEachQuestionType: TNumberToGetForEachQuestionType
+    
 }
 
 export type TUpdateStoreState<TNewState, TFieldName> = {

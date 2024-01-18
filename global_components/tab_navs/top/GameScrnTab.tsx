@@ -51,10 +51,16 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         unansweredQs = structuredClone(unansweredQs)
         const questionsForNextQuizUpdated = questionsForNextQuiz?.length ? [...unansweredQs, ...questionsForNextQuiz] : unansweredQs;
 
+        console.log("questionsForNextQuizUpdated.length: ", questionsForNextQuizUpdated.length);
+
         if (questionsForNextQuizUpdated.length) {
             setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");
+            // setQuestionsStore({ predicate: 1, propositional: 1 }, "numberToGetForEachQuestionType")
+            // setGameScrnTabStore(true, "willNotShowLoadingModal");
+            // setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz");
+            // setApiQsFetchingStatusStore(true, "willGetQs");
         } else {
-            setApiQsFetchingStatusStore(true, "willGetQs")
+            setApiQsFetchingStatusStore(true, "willGetQs");
         }
 
         setGameScrnTabStore("finished", "mode");
@@ -62,7 +68,6 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         setGameScrnTabStore(0, "wrong")
         setQuestionsStore([], "questions");
         navigate("Home");
-
     };
 
     async function saveQuizAfterQuizIsDone() {
@@ -88,21 +93,25 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     }
 
     function handleOnComplete() {
+        const answeredQs = questions.filter(question => question.userAnswer);
+        const unansweredQs = questions.filter(question => !question.userAnswer);
+
+
+        console.log("answerQs: ", answeredQs)
+
         setGameScrnTabStore("finished", 'mode');
 
-        setTimeout(() => {
-            setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz");
+        if (unansweredQs[1]) {
+            console.log("unansweredQs.slice(1), hey there: ", unansweredQs.slice(1))
+            setQuestionsStore(unansweredQs.slice(1), "questionsForNextQuiz")
+        } else {
+            setTimeout(() => {
+                setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz");
 
-            setApiQsFetchingStatusStore(true, "willGetQs");
+                setApiQsFetchingStatusStore(true, "willGetQs");
 
-            setApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
-        }, 400);
-
-        const answeredQs = questions.filter(question => question.userAnswer);
-        const unansweredQs = questions.filter(question => !question.userAnswer)
-
-        if (unansweredQs.length) {
-            setQuestionsStore(unansweredQs, "questionsForNextQuiz")
+                setApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
+            }, 400);
         }
 
         // the user didn't answer any questions

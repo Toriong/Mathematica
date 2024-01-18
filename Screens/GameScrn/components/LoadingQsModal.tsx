@@ -10,7 +10,7 @@ import { TStackNavigationProp } from "../../../Navigation";
 import { TStateSetter } from "../../../globalTypes&Interfaces";
 import { TQuestionTypes } from "../../../sharedInterfaces&TypesWithBackend";
 
-const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean, TStateSetter<boolean>] }) => {
+const LoadingQsModal = ({ _wasSkipBtnPressed, isThereAQToDisplay }: { _wasSkipBtnPressed: [boolean, TStateSetter<boolean>], isThereAQToDisplay: boolean }) => {
     const navigation = useNavigation<TStackNavigationProp>();
     // make the route name type safe
     const route = useRoute();
@@ -18,6 +18,7 @@ const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean, 
     const mode = useGameScrnTabStore(state => state.mode);
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const updateGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
+    const willNotShowLoadingModal = useGameScrnTabStore(state => state.willNotShowLoadingModal);
     const [isModalVisible, setIsModalVisible] = useState((gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE"));
     const appColors = useGetAppColors();
     const [wasSkipBtnPressed, setWasSkipBtnPressed] = _wasSkipBtnPressed;
@@ -48,11 +49,9 @@ const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean, 
     }
 
     useEffect(() => {
-        console.log("gettingQsStatus: ", gettingQsStatus);
-
         if (
-            ((mode === "quiz") && (route.name === "GameScreen")) && (gettingQsStatus === "IN_PROGRESS") ||
-            (gettingQsStatus === "FAILURE")
+            (((mode === "quiz") && (route.name === "GameScreen")) && (gettingQsStatus === "IN_PROGRESS") ||
+            (gettingQsStatus === "FAILURE")) || !isThereAQToDisplay
         ) {
             setIsModalVisible(true);
         } else if (
@@ -63,7 +62,7 @@ const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean, 
                 setIsModalVisible(false);
             }, 1000);
         }
-    }, [gettingQsStatus, mode, route.name])
+    }, [gettingQsStatus, mode, route.name, isThereAQToDisplay])
 
     return (
         <Modal
@@ -110,7 +109,7 @@ const LoadingQsModal = ({ _wasSkipBtnPressed }: { _wasSkipBtnPressed: [boolean, 
                             </PTxt>
                         </>
                     )}
-                    {(gettingQsStatus === "IN_PROGRESS") && (
+                    {((gettingQsStatus === "IN_PROGRESS") || !isThereAQToDisplay) && (
                         <Button
                             handleOnPress={handleBackToMainScreenBtnPress}
                         >

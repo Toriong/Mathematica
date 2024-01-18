@@ -17,6 +17,11 @@ export const useQuestionsStore = create<IQuestionsForObj>(set => ({
     questions: [],
     questionsForNextQuiz: [],
     questionIndex: 0,
+    numberToGetForEachQuestionType: {
+        diagrams: 3,
+        predicate: 3,
+        propositional: 3
+    },
     updateState: (newState: IQuestionsForObj[keyof IQuestionsForObj], fieldName: keyof IQuestionsStates) => set(() => ({ [fieldName]: newState })),
 }));
 
@@ -40,8 +45,9 @@ export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
     const gameScrnTabStore: TGameScrnTabStore = {
         right: 0,
         wrong: 0,
-        // timer: 120_000,
-        timer: 10,
+        timer: 120,
+        willNotShowLoadingModal: false,
+        // timer: 10,
         wasSubmitBtnPressed: false,
         isTimerPaused: false,
         isLoadingModalOn: false,

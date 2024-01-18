@@ -1,6 +1,6 @@
 import { TQuestionTypes } from "../../Screens/GameScrn/typesAndInterfaces";
 import { IReturnObjOfAsyncFn, PATHS, SERVER_ORIGIN } from "../globalApiVars"
-import axios from "axios";
+import axios, { CancelToken } from "axios";
 import { IError } from "../types&Interfaces";
 
 type TGetQuestionsParams = {
@@ -26,8 +26,9 @@ export async function getQuestions<TData>(
     questionsToGetNum: number,
     questionTypes: TQuestionTypes[],
     userId: string,
+    cancelToken: CancelToken,
     sentenceTxts?: string[] | null,
-    willClearUserSentenceTxtsCache?: boolean | null
+    willClearUserSentenceTxtsCache?: boolean | null,
 ): TPromiseReturnValGetQuestions<TData> {
     try {
         const getQuestionsApiUrl = new URL(`${SERVER_ORIGIN}/${getQuestionsApiPath}`);
@@ -50,9 +51,7 @@ export async function getQuestions<TData>(
 
         appendParamsToUrl(getQuestionsApiUrl, params);
 
-        console.log("getQuestionsApiUrl: ", getQuestionsApiUrl)
-
-        const response = await axios.get<TData>(getQuestionsApiUrl.toString());
+        const response = await axios.get<TData>(getQuestionsApiUrl.toString(), { cancelToken });
 
         return { data: response.data }
     } catch (error) {
