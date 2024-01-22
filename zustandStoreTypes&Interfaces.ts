@@ -1,7 +1,9 @@
+import { CancelToken } from 'axios';
 import { TQuestionTypes } from './Screens/GameScrn/typesAndInterfaces';
 import { TResponseStatus } from "./api_services/globalApiVars"
 import { IThemeColors } from "./globalTypes&Interfaces"
 import { IQuestion } from "./sharedInterfaces&TypesWithBackend"
+import axios from 'axios';
 
 export interface IIsGetReqStoreState {
     isGettingQs: boolean
@@ -13,6 +15,7 @@ interface IErrorStore {
     didAnErrorOccurInUserAuth: boolean,
 }
 type TMode = "quiz" | "review" | "finished";
+export type TCancelTokenSource = ReturnType<typeof axios.CancelToken.source>;
 interface IGameScrnTabStoreState {
     right: number
     wrong: number
@@ -20,6 +23,8 @@ interface IGameScrnTabStoreState {
     isTimerPaused: boolean
     isLoadingModalOn: boolean
     wasSubmitBtnPressed: boolean
+    getAddtionalQCancelTokenSource: TCancelTokenSource
+    getInitialQsCancelTokenSource: TCancelTokenSource
     mode: TMode
     willNotShowLoadingModal: boolean
     questionTypes: TQuestionTypes[]
@@ -43,7 +48,7 @@ export interface IQuestionsStates {
     questionsForNextQuiz: IQuestionOnClient[]
     questionIndex: number
     numberToGetForEachQuestionType: TNumberToGetForEachQuestionType
-    
+
 }
 
 export type TUpdateStoreState<TNewState, TFieldName> = {

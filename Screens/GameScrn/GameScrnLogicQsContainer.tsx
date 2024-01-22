@@ -8,6 +8,7 @@ import { IQuestion, TQuestionTypes } from '../../sharedInterfaces&TypesWithBacke
 import { IReturnObjOfAsyncFn } from '../../api_services/globalApiVars';
 import { Storage, TStorageInstance } from '../../utils/storage';
 import { IQuestionOnClient, IQuestionsStates } from '../../zustandStoreTypes&Interfaces';
+import { CancelToken } from 'axios';
 
 type TQuestionFromSever = { questions: [IQuestionOnClient] }
 
@@ -17,7 +18,8 @@ export async function getAdditionalQuestion(
   memory: TStorageInstance,
   questions: IQuestionOnClient[],
   questionTypes: TQuestionTypes[],
-  numOfQuestionsToGet = 1
+  numOfQuestionsToGet = 1,
+  cancelToken: CancelToken
 ): Promise<IReturnObjOfAsyncFn<[IQuestionOnClient] | null>> {
   try {
     const userId = (await getUserId()) as string;
@@ -25,7 +27,7 @@ export async function getAdditionalQuestion(
     console.log("isGameOn: ", isGameOn)
     const sentenceTxts = questions.map(question => question.sentence);
     const questionTypesForServer = questionTypes.length === 1 ? questionTypes : [questionTypes[Math.floor(Math.random() * questionTypes.length)]]
-    const getQuestionsResult = await getQuestions<TQuestionFromSever>(numOfQuestionsToGet, questionTypesForServer, userId, sentenceTxts);
+    const getQuestionsResult = await getQuestions<TQuestionFromSever>(numOfQuestionsToGet, questionTypesForServer, userId, cancelToken, sentenceTxts);
     let newQuestionObj: TQuestionFromSever | null = getQuestionsResult.data ?? null;
 
     console.log("getAdditionalQuestion function call, getQuestionsResult: ", getQuestionsResult)
@@ -33,9 +35,9 @@ export async function getAdditionalQuestion(
 
     // HOW TO STOP THE RECURSIVE CALL:
     // if the user reaches the end of the questions, then set 'isGameOn' in the local storage to false
-    if ((tries <=3) && isGameOn && (getQuestionsResult.didErrorOccur || !getQuestionsResult?.data?.questions?.length)) {
+    if ((tries <= 3) && isGameOn && (getQuestionsResult.didErrorOccur || !getQuestionsResult?.data?.questions?.length)) {
       tries++
-      const getQuestionResultAfterError = await getAdditionalQuestion(memory, questions, questionTypes);
+      const getQuestionResultAfterError = await getAdditionalQuestion(memory, questions, questionTypes, numOfQuestionsToGet, cancelToken);
       newQuestionObj = getQuestionResultAfterError.data ? { questions: getQuestionResultAfterError.data } : null;
     };
 
@@ -60,6 +62,7 @@ const GameScrnContainer = () => {
   const [getMoreQsNum, setWillGetMoreQsNum] = useState<number | null>(null)
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
   const questionTypes = useGameScrnTabStore(state => state.questionTypes);
+  const cancelToken = useGameScrnTabStore(state => state.getAddtionalQCancelToken);
   const questions = useQuestionsStore(state => state.questions);
   const questionIndex = useQuestionsStore(state => state.questionIndex);
   const updateQuestionsStore = useQuestionsStore(state => state.updateState);
@@ -72,7 +75,7 @@ const GameScrnContainer = () => {
       (async () => {
         try {
           console.log("Bacon, getting questions...")
-          const getAdditionalQuestionResult = await getAdditionalQuestion(memory, questions, questionTypes, getMoreQsNum ?? 1);
+          const getAdditionalQuestionResult = await getAdditionalQuestion(memory, questions, questionTypes, getMoreQsNum ?? 1, cancelToken);
 
           if (getAdditionalQuestionResult.didErrorOccur || !getAdditionalQuestionResult?.data?.length) {
             throw new Error(`${getAdditionalQuestionResult.msg} ${!getAdditionalQuestionResult?.data?.length && 'Did not receive a question from the server.'}`);

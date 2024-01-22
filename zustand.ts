@@ -10,6 +10,7 @@ import {
     IApiQsFetchingStatus,
     IQuestionsStates
 } from './zustandStoreTypes&Interfaces';
+import axios from 'axios';
 
 
 export const useQuestionsStore = create<IQuestionsForObj>(set => ({
@@ -39,18 +40,21 @@ export const useRequestStatusStore = create<TIsGettingReqStore>(set => ({
     updateState: (newState: boolean, fieldName: keyof TIsGettingReqStore) => set(() => ({ [fieldName]: newState }))
 }));
 
+// NOTES: 
+// create a axios cancel token for the game screen tab store 
+// when the user goes from the Game screen to the Main screen, cancel the request  
 
-
-export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
+export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {    
     const gameScrnTabStore: TGameScrnTabStore = {
         right: 0,
         wrong: 0,
         timer: 120,
         willNotShowLoadingModal: false,
-        // timer: 10,
         wasSubmitBtnPressed: false,
         isTimerPaused: false,
         isLoadingModalOn: false,
+        getAddtionalQCancelTokenSource: axios.CancelToken.source(),
+        getInitialQsCancelTokenSource: axios.CancelToken.source(),
         mode: "finished",
         questionTypes: [],
         updateState: (newState: TGameScrnTabStore[keyof TGameScrnTabStore], fieldName: keyof TGameScrnTabStore) => set(() => ({ [fieldName]: newState }))

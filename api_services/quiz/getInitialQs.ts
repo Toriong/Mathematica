@@ -5,6 +5,7 @@ import { CustomError, ICustomError } from "../../utils/errors";
 import { getIsTValid } from "../../utils/generalFns";
 import { IReturnObjOfAsyncFn, TResponseStatus } from "../globalApiVars";
 import { TPromiseReturnValGetQuestions, getQuestions } from "./getQuestions";
+import { TCancelTokenSource } from "../../zustandStoreTypes&Interfaces";
 
 interface IInitialQsGetReqResult<TData> {
     gettingQsResponseStatus: TResponseStatus
@@ -15,7 +16,7 @@ let apiRequestTriesNum = 0;
 
 export async function getInitialQs<TData>(
     userId: string,
-    cancelToken: CancelToken,
+    cancelTokenSource: TCancelTokenSource,
     tries: number = 1,
     numberToGetOfEachQType = { propositional: 3, predicate: 3 },
     willClearCacheOnServer?: boolean,
@@ -23,8 +24,8 @@ export async function getInitialQs<TData>(
     try {
         const { propositional, predicate } = numberToGetOfEachQType;
         userId = IS_TESTING ? TESTING_USER_ID : userId;
-        const responseGetPropostionalQs = getQuestions<{ questions: IQuestion[] }>(propositional, ["propositional"], userId as string, cancelToken, null, willClearCacheOnServer);
-        const responseGetPredicateQs = getQuestions<{ questions: IQuestion[] }>(predicate, ["predicate"], userId as string, cancelToken, null, willClearCacheOnServer)
+        const responseGetPropostionalQs = getQuestions<{ questions: IQuestion[] }>(propositional, ["propositional"], userId as string, cancelTokenSource, null, willClearCacheOnServer);
+        const responseGetPredicateQs = getQuestions<{ questions: IQuestion[] }>(predicate, ["predicate"], userId as string, cancelTokenSource, null, willClearCacheOnServer)
         const responses: Awaited<TPromiseReturnValGetQuestions<{ questions: IQuestion[] } | null>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
         let responsesFiltered = responses.filter(response => !!response) as IReturnObjOfAsyncFn<{ questions: IQuestion[] }>[];
         responsesFiltered = responsesFiltered?.length
@@ -54,7 +55,7 @@ export async function getInitialQs<TData>(
 
         if (!responsesFiltered.length) {
             ++apiRequestTriesNum
-            return await getInitialQs(userId);
+            return await getInitialQs(userId, cancelTokenSource, tries, numberToGetOfEachQType, willClearCacheOnServer);
         }
 
         const questions = responsesFiltered.flatMap<unknown>(response => response.data?.questions) as TData[];

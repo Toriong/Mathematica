@@ -4,7 +4,7 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useApiQsFetchingStatusStore, useColorStore, useGameScrnTabStore, useQuestionsStore } from "../../../zustand";
 import Button from "../../Button";
 import { PTxt } from "../../text";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { OVERLAY_OPACITY, structuredClone } from "../../../globalVars";
 import { TStackNavigationProp } from "../../../Navigation";
 import { saveQuiz } from "../../../api_services/quiz/saveQuiz";
@@ -14,7 +14,6 @@ import { getUserId } from "../../../utils/generalFns";
 import { Alert } from "react-native";
 import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
 import uuid from 'react-native-uuid';
-import { IQuestionOnClient } from '../../../zustandStoreTypes&Interfaces';
 import { useResetLogicQs } from '../../../custom_hooks/useResetLogicQs';
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
@@ -40,18 +39,18 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const questions = useQuestionsStore(state => state.questions);
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
     const setQuestionsStore = useQuestionsStore(state => state.updateState);
+    const getAddtionalQCancelToken = useGameScrnTabStore(state => state.getAddtionalQCancelTokenSource);
     const setApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const [isPlaying, setIsPlaying] = useState(false);
     const currentThemeObj = colorThemesObj[currentTheme];
     const questionIndex = useQuestionsStore(state => state.questionIndex)
     const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz)
 
-    function handleBtnPress() {
+    function handleBackToMainScrnBtnPress() {
+        getAddtionalQCancelToken.cancel();
         let unansweredQs = (questionIndex === 0) ? questions.slice(1) : questions.filter(question => !question.userAnswer);
         unansweredQs = structuredClone(unansweredQs)
         const questionsForNextQuizUpdated = questionsForNextQuiz?.length ? [...unansweredQs, ...questionsForNextQuiz] : unansweredQs;
-
-        console.log("questionsForNextQuizUpdated.length: ", questionsForNextQuizUpdated.length);
 
         if (questionsForNextQuizUpdated.length) {
             setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");
@@ -168,7 +167,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
             >
                 <View style={{ display: 'flex', flexDirection: 'row', width: "100%", paddingTop: "3%" }}>
                     <View style={{ width: "30%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <Button backgroundColor='none' handleOnPress={handleBtnPress}>
+                        <Button backgroundColor='none' handleOnPress={handleBackToMainScrnBtnPress}>
                             <View style={{ borderWidth: 3, borderColor: currentThemeObj.second, borderRadius: 50, padding: 8 }}>
                                 <FontAwesomeIcon icon={faArrowLeft} size={50} color={currentThemeObj.second} />
                             </View>

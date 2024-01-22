@@ -6,7 +6,8 @@ import { getInitialQs } from "../api_services/quiz/getInitialQs";
 import { IQuestionOnClient, TNumberToGetForEachQuestionType } from "../zustandStoreTypes&Interfaces";
 
 // NOTES: 
-// CASE: when the user goes from the game screen to the main screen, clear all requests that are being made to the server
+// CASE: when the user goes from the game screen to the main screen, clear all requests that are being made to the server (if any) from the 
+// 
 
 function getRandomIndex<TData>(arr: TData[], incorrectVal: any = undefined) {
     let randomIndex = Math.floor(Math.random() * arr.length);
@@ -15,7 +16,7 @@ function getRandomIndex<TData>(arr: TData[], incorrectVal: any = undefined) {
         randomIndex = Math.floor(Math.random() * arr.length)
     };
 
-    return randomIndex
+    return randomIndex;
 }
 
 function sortRandomly<TData>(arr: TData[]) {
@@ -25,7 +26,7 @@ function sortRandomly<TData>(arr: TData[]) {
         const randomIndex = getRandomIndex(arrSortedRandomly);
         arrSortedRandomly[randomIndex] = val
     })
-    
+
     return arrSortedRandomly;
 };
 
@@ -38,6 +39,7 @@ export function useGetInitialQs(): null {
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);
     const updateGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
+    const getInitialQsCancelTokenSource = useGameScrnTabStore(state => state.getInitialQsCancelTokenSource);
 
     useEffect(() => {
         if (willGetQs) {
@@ -47,22 +49,24 @@ export function useGetInitialQs(): null {
                 try {
                     let userId = await memory.getItem("userId");
                     userId = IS_TESTING ? TESTING_USER_ID : userId;
-                    if(Object.values(numberToGetForEachQuestionType).length){
-                        
-                    }
-                    // const _numberToGetForEachQuestionType = (Object.values(numberToGetForEachQuestionType).length ? numberToGetForEachQuestionType : { predicate: 3, propositional: 3, diagrams: 3 }) as Required<TNumberToGetForEachQuestionType>
-                    const response = await getInitialQs<IQuestionOnClient>(userId as string, areQsReceivedForNextQuiz, 1);
 
-                    console.log("response.questions: ", response.questions);
+                    if (Object.values(numberToGetForEachQuestionType).length) {
+
+                    }
+                    const _numberToGetForEachQuestionType = (Object.values(numberToGetForEachQuestionType).length ? numberToGetForEachQuestionType : { predicate: 3, propositional: 3, diagrams: 3 }) as Required<TNumberToGetForEachQuestionType>
+                    const response = await getInitialQs<IQuestionOnClient>(
+                        userId as string,
+                        getInitialQsCancelTokenSource,
+                        1,
+                        _numberToGetForEachQuestionType,
+                        areQsReceivedForNextQuiz
+                    );
 
                     if (response.gettingQsResponseStatus === "FAILURE") {
                         throw new Error("Failed to get the initial questions from the server.")
                     };
 
-                    const questionsRandomlySorted = (response.questions?.length > 1) ? sortRandomly<IQuestionOnClient>(response.questions) : response.questions; 
-                    console.log("areQsReceivedForNextQuiz: ", areQsReceivedForNextQuiz)
-                    console.log("questionsRandomlySorted hey there: ", questionsRandomlySorted);
-
+                    const questionsRandomlySorted = (response.questions?.length > 1) ? sortRandomly<IQuestionOnClient>(response.questions) : response.questions;
 
                     if (areQsReceivedForNextQuiz) {
                         const questionsForNextQUpdated = questionsForNextQuiz?.length ? [...questionsForNextQuiz, ...questionsRandomlySorted] : questionsRandomlySorted
@@ -80,7 +84,7 @@ export function useGetInitialQs(): null {
                     updateApiQsFetchingStatusStore(false, "willGetQs");
                     updateApiQsFetchingStatusStore(false, "areQsReceivedForNextQuiz");
                     updateGameScrnTabStore(false, "willNotShowLoadingModal")
-                    
+
                 }
             })();
         }
