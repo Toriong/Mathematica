@@ -8,7 +8,6 @@ import Button from "../../../global_components/Button";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { TStackNavigationProp } from "../../../Navigation";
 import { TStateSetter } from "../../../globalTypes&Interfaces";
-import { TQuestionTypes } from "../../../sharedInterfaces&TypesWithBackend";
 
 const LoadingQsModal = ({ _wasSkipBtnPressed, isThereAQToDisplay }: { _wasSkipBtnPressed: [boolean, TStateSetter<boolean>], isThereAQToDisplay: boolean }) => {
     const navigation = useNavigation<TStackNavigationProp>();
@@ -46,18 +45,22 @@ const LoadingQsModal = ({ _wasSkipBtnPressed, isThereAQToDisplay }: { _wasSkipBt
             updateGameScrnTabStore("finished", "mode");
             updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
         }, 800)
-    }
+    };
 
     useEffect(() => {
+        console.log("mode: ", mode);
+
         if (
-            (((mode === "quiz") && (route.name === "GameScreen")) && (gettingQsStatus === "IN_PROGRESS") ||
-            (gettingQsStatus === "FAILURE")) || !isThereAQToDisplay
+            ((mode === 'quiz') && (((route.name === "GameScreen") && (gettingQsStatus === "IN_PROGRESS") ||
+                (gettingQsStatus === "FAILURE")) || !isThereAQToDisplay))
         ) {
+            console.log("will open modal...")
             setIsModalVisible(true);
         } else if (
             (["quiz", "finished"].includes(mode) || (route.name !== "GameScreen")) &&
             (["FAILURE", "SUCCESS"].includes(gettingQsStatus) && isModalVisible)
         ) {
+            console.log("will close modal...")
             setTimeout(() => {
                 setIsModalVisible(false);
             }, 1000);
@@ -67,6 +70,7 @@ const LoadingQsModal = ({ _wasSkipBtnPressed, isThereAQToDisplay }: { _wasSkipBt
     return (
         <Modal
             isVisible={isModalVisible}
+            onBackdropPress={(gettingQsStatus === "SUCCESS") ? () => { setIsModalVisible(false); } : () => {}}
         >
             <View
                 style={{
@@ -109,11 +113,23 @@ const LoadingQsModal = ({ _wasSkipBtnPressed, isThereAQToDisplay }: { _wasSkipBt
                             </PTxt>
                         </>
                     )}
-                    {((gettingQsStatus === "IN_PROGRESS") || !isThereAQToDisplay) && (
+                    {(gettingQsStatus === "IN_PROGRESS") && (
                         <Button
-                            handleOnPress={handleBackToMainScreenBtnPress}
+                            backgroundColor={appColors.second}
+                            handleOnPress={handleOnGoBackMainScrnBtnPress}
+                            dynamicStyles={{
+                                padding: 17,
+                                width: 170,
+                                borderRadius: 15,
+                                marginTop: 25
+                            }}
                         >
-                            <PTxt>
+                            <PTxt
+                                fontSize={20}
+                                style={{
+                                    textAlign: "center"
+                                }}
+                            >
                                 Back to main screen.
                             </PTxt>
                         </Button>

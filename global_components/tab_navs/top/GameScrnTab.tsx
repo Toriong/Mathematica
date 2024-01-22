@@ -44,7 +44,13 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const currentThemeObj = colorThemesObj[currentTheme];
     const questionIndex = useQuestionsStore(state => state.questionIndex)
-    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz)
+    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
+
+    // when the user goes back to the main screen, have the following to occur: 
+    // -cancel the request
+    // -insert a new signal for the zustand store for the field of getAddtionalQCancelTokenSource
+    // -need to create factory function that will create new api request function every time the user
+    // goes back to the main screen?  
 
     function handleBackToMainScrnBtnPress() {
         getAddtionalQCancelToken.cancel();
@@ -54,10 +60,6 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
 
         if (questionsForNextQuizUpdated.length) {
             setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");
-            // setQuestionsStore({ predicate: 1, propositional: 1 }, "numberToGetForEachQuestionType")
-            // setGameScrnTabStore(true, "willNotShowLoadingModal");
-            // setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz");
-            // setApiQsFetchingStatusStore(true, "willGetQs");
         } else {
             setApiQsFetchingStatusStore(true, "willGetQs");
         }
