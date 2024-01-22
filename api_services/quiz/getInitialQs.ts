@@ -1,3 +1,4 @@
+import { CancelToken } from "axios";
 import { IS_TESTING, TESTING_USER_ID } from "../../globalVars";
 import { IQuestion } from "../../sharedInterfaces&TypesWithBackend";
 import { CustomError, ICustomError } from "../../utils/errors";
@@ -12,12 +13,18 @@ interface IInitialQsGetReqResult<TData> {
 
 let apiRequestTriesNum = 0;
 
-export async function getInitialQs<TData>(userId: string, willClearCacheOnServer?: boolean, tries: number = 1, numberToGetOfEachQType = { propositional: 3, predicate: 3 }) {
+export async function getInitialQs<TData>(
+    userId: string,
+    cancelToken: CancelToken,
+    tries: number = 1,
+    numberToGetOfEachQType = { propositional: 3, predicate: 3 },
+    willClearCacheOnServer?: boolean,
+) {
     try {
         const { propositional, predicate } = numberToGetOfEachQType;
         userId = IS_TESTING ? TESTING_USER_ID : userId;
-        const responseGetPropostionalQs = getQuestions<{ questions: IQuestion[] }>(propositional, ["propositional"], userId as string, null, willClearCacheOnServer);
-        const responseGetPredicateQs = getQuestions<{ questions: IQuestion[] }>(predicate, ["predicate"], userId as string, null, willClearCacheOnServer)
+        const responseGetPropostionalQs = getQuestions<{ questions: IQuestion[] }>(propositional, ["propositional"], userId as string, cancelToken, null, willClearCacheOnServer);
+        const responseGetPredicateQs = getQuestions<{ questions: IQuestion[] }>(predicate, ["predicate"], userId as string, cancelToken, null, willClearCacheOnServer)
         const responses: Awaited<TPromiseReturnValGetQuestions<{ questions: IQuestion[] } | null>>[] = await Promise.all([responseGetPropostionalQs, responseGetPredicateQs]);
         let responsesFiltered = responses.filter(response => !!response) as IReturnObjOfAsyncFn<{ questions: IQuestion[] }>[];
         responsesFiltered = responsesFiltered?.length

@@ -5,6 +5,9 @@ import { IS_TESTING, TESTING_USER_ID } from "../globalVars";
 import { getInitialQs } from "../api_services/quiz/getInitialQs";
 import { IQuestionOnClient, TNumberToGetForEachQuestionType } from "../zustandStoreTypes&Interfaces";
 
+// NOTES: 
+// CASE: when the user goes from the game screen to the main screen, clear all requests that are being made to the server
+
 function getRandomIndex<TData>(arr: TData[], incorrectVal: any = undefined) {
     let randomIndex = Math.floor(Math.random() * arr.length);
 
