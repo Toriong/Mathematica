@@ -42,6 +42,7 @@ export function useGetInitialQs(): null {
     const getInitialQsCancelTokenSource = useGameScrnTabStore(state => state.getInitialQsCancelTokenSource);
 
     useEffect(() => {
+        // GOAL: insert the token for the getQuestions function in order to cancel the request.
         if (willGetQs) {
             updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
 

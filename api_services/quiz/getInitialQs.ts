@@ -58,7 +58,13 @@ export async function getInitialQs<TData>(
             return await getInitialQs(userId, cancelTokenSource, tries, numberToGetOfEachQType, willClearCacheOnServer);
         }
 
-        const questions = responsesFiltered.flatMap<unknown>(response => response.data?.questions) as TData[];
+        let questions = responsesFiltered
+            .flatMap<unknown>(response => response?.data?.questions)
+            .filter(question => question) as TData[];
+
+        if (!questions.length) {
+            throw new Error("Received no questions from the server.")
+        }
 
         return { gettingQsResponseStatus: 'SUCCESS', questions: questions }
     } catch (error) {

@@ -23,6 +23,8 @@ interface IGameScrnTabStoreState {
     isTimerPaused: boolean
     isLoadingModalOn: boolean
     wasSubmitBtnPressed: boolean
+    willResetGetAdditionalQCancelTokenSource: boolean
+    willResetGetInitialQsTokenSource: boolean
     getAddtionalQCancelTokenSource: TCancelTokenSource
     getInitialQsCancelTokenSource: TCancelTokenSource
     mode: TMode

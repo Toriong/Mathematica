@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import GameScrnPresentation from './GameScrnLogicQsPresentation';
 import { useApiQsFetchingStatusStore, useGameScrnTabStore, useQuestionsStore } from '../../zustand';
 import { getQuestions } from '../../api_services/quiz/getQuestions';
@@ -8,6 +8,7 @@ import { IQuestion, TQuestionTypes } from '../../sharedInterfaces&TypesWithBacke
 import { IReturnObjOfAsyncFn } from '../../api_services/globalApiVars';
 import { Storage, TStorageInstance } from '../../utils/storage';
 import { IQuestionOnClient, IQuestionsStates, TCancelTokenSource } from '../../zustandStoreTypes&Interfaces';
+import { CancelTokenSource } from 'axios';
 
 type TQuestionFromSever = { questions: [IQuestionOnClient] }
 
@@ -21,17 +22,20 @@ let tries = 0;
 
 export async function getAdditionalQuestion(
   memory: TStorageInstance,
+  numOfQuestionsToGet = 1,
+  getAdditionalQCancelTokenSource: TCancelTokenSource,
   questions: IQuestionOnClient[],
   questionTypes: TQuestionTypes[],
-  numOfQuestionsToGet = 1,
-  getAdditionalQCancelTokenSource: TCancelTokenSource
 ): Promise<IReturnObjOfAsyncFn<[IQuestionOnClient] | null>> {
   try {
+    if(!questions.length){
+      throw new Error("No questions were received.");
+    }
+
     const userId = (await getUserId()) as string;
     const isGameOn = await memory.getItem<boolean>("isGameOn") as boolean;
-    console.log("isGameOn: ", isGameOn)
     const sentenceTxts = questions.map(question => question.sentence);
-    const questionTypesForServer = questionTypes.length === 1 ? questionTypes : [questionTypes[Math.floor(Math.random() * questionTypes.length)]]
+    const questionTypesForServer = (questionTypes.length === 1) ? questionTypes : [questionTypes[Math.floor(Math.random() * questionTypes.length)]]
     const getQuestionsResult = await getQuestions<TQuestionFromSever>(numOfQuestionsToGet, questionTypesForServer, userId, getAdditionalQCancelTokenSource, sentenceTxts);
     let newQuestionObj: TQuestionFromSever | null = getQuestionsResult.data ?? null;
 
@@ -42,7 +46,7 @@ export async function getAdditionalQuestion(
     // if the user reaches the end of the questions, then set 'isGameOn' in the local storage to false
     if ((tries <= 3) && isGameOn && (getQuestionsResult.didErrorOccur || !getQuestionsResult?.data?.questions?.length)) {
       tries++
-      const getQuestionResultAfterError = await getAdditionalQuestion(memory, questions, questionTypes, numOfQuestionsToGet, getAdditionalQCancelTokenSource);
+      const getQuestionResultAfterError = await getAdditionalQuestion(memory, numOfQuestionsToGet, getAdditionalQCancelTokenSource, questions, questionTypes);
       newQuestionObj = getQuestionResultAfterError.data ? { questions: getQuestionResultAfterError.data } : null;
     };
 
@@ -60,6 +64,10 @@ export async function getAdditionalQuestion(
   }
 }
 
+function createGetAdditionalQuestionFn(memory: TStorageInstance, getMoreQsNum: number, cancelTokenSource: CancelTokenSource){
+  return (questions: IQuestionOnClient[], questionTypes: TQuestionTypes[]) => getAdditionalQuestion(memory, getMoreQsNum, cancelTokenSource, questions, questionTypes)
+}
+
 const GameScrnContainer = () => {
   const memory = new Storage();
   const [wasSkipBtnPressed, setWasSkipBtnPressed] = useState(false);
@@ -68,16 +76,24 @@ const GameScrnContainer = () => {
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
   const questionTypes = useGameScrnTabStore(state => state.questionTypes);
   const getAdditionalQCancelTokenSource = useGameScrnTabStore(state => state.getAddtionalQCancelTokenSource);
+  const willResetGetAdditionalQCancelTokenSource = useGameScrnTabStore(state => state.willResetGetAdditionalQCancelTokenSource);
   const questions = useQuestionsStore(state => state.questions);
   const questionIndex = useQuestionsStore(state => state.questionIndex);
   const updateQuestionsStore = useQuestionsStore(state => state.updateState);
+  const updateGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
   const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
+  const [getAdditionalQuestion, setGetAdditionalQuestion] = useState<ReturnType<typeof createGetAdditionalQuestionFn> | null >(null);
+  
+  useEffect(() => {
+    if(willResetGetAdditionalQCancelTokenSource){
+      setGetAdditionalQuestion(createGetAdditionalQuestionFn(memory, getMoreQsNum ?? 1, getAdditionalQCancelTokenSource));
+      updateGameScrnTabStore(false, "willResetGetAdditionalQCancelTokenSource");
+    }
 
-  useEffect(() => {    
-    if (getMoreQsNum || wasSubmitBtnPressed || wasSkipBtnPressed) {
+    if (((getAdditionalQuestion !== null) && (getAdditionalQuestion instanceof Function)) && (getMoreQsNum || wasSubmitBtnPressed || wasSkipBtnPressed)) {
       (async () => {
         try {
-          const getAdditionalQuestionResult = await getAdditionalQuestion(memory, questions, questionTypes, getMoreQsNum ?? 1, getAdditionalQCancelTokenSource);
+          const getAdditionalQuestionResult = await getAdditionalQuestion(questions, questionTypes);
 
           if (getAdditionalQuestionResult.didErrorOccur || !getAdditionalQuestionResult?.data?.length) {
             throw new Error(`${getAdditionalQuestionResult.msg} ${!getAdditionalQuestionResult?.data?.length && 'Did not receive a question from the server.'}`);
@@ -106,7 +122,7 @@ const GameScrnContainer = () => {
         }
       })();
     }
-  }, [wasSubmitBtnPressed, wasSkipBtnPressed, getMoreQsNum]);
+  }, [wasSubmitBtnPressed, wasSkipBtnPressed, getMoreQsNum, willResetGetAdditionalQCancelTokenSource]);
 
   return <GameScrnPresentation _getMoreQsNum={[getMoreQsNum, setWillGetMoreQsNum]} _wasSkipBtnPressed={[wasSkipBtnPressed, setWasSkipBtnPressed]} setWillIncrementQIndex={setWillIncrementQIndex} />;
 };

@@ -53,6 +53,8 @@ export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
         wasSubmitBtnPressed: false,
         isTimerPaused: false,
         isLoadingModalOn: false,
+        willResetGetAdditionalQCancelTokenSource: true,
+        willResetGetInitialQsTokenSource: true,    
         getAddtionalQCancelTokenSource: axios.CancelToken.source(),
         getInitialQsCancelTokenSource: axios.CancelToken.source(),
         mode: "finished",

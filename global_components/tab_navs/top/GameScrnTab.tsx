@@ -15,6 +15,7 @@ import { Alert } from "react-native";
 import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
 import uuid from 'react-native-uuid';
 import { useResetLogicQs } from '../../../custom_hooks/useResetLogicQs';
+import axios from 'axios';
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
@@ -29,7 +30,6 @@ function getTimeForUI(millis: number) {
 const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
     const currentTheme = useColorStore(state => state.currentTheme);
-    const resetLogicQs = useResetLogicQs();
     const colorThemesObj = useColorStore(state => state.themesObj);
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
@@ -69,6 +69,8 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         setGameScrnTabStore(0, "wrong")
         setQuestionsStore([], "questions");
         navigate("Home");
+        setGameScrnTabStore(axios.CancelToken.source(), "getAddtionalQCancelTokenSource")
+        setGameScrnTabStore(true, "willResetGetAdditionalQCancelTokenSource")
     };
 
     async function saveQuizAfterQuizIsDone() {
