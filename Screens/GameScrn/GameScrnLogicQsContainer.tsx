@@ -9,6 +9,7 @@ import { IReturnObjOfAsyncFn } from '../../api_services/globalApiVars';
 import { Storage, TStorageInstance } from '../../utils/storage';
 import { IQuestionOnClient, IQuestionsStates, TCancelTokenSource } from '../../zustandStoreTypes&Interfaces';
 import { CancelTokenSource } from 'axios';
+import { structuredClone } from '../../globalVars';
 
 type TQuestionFromSever = { questions: [IQuestionOnClient] }
 
@@ -28,7 +29,7 @@ export async function getAdditionalQuestion(
   questionTypes: TQuestionTypes[],
 ): Promise<IReturnObjOfAsyncFn<[IQuestionOnClient] | null>> {
   try {
-    if(!questions?.length){
+    if (!questions?.length) {
       throw new Error("No questions were received.");
     }
 
@@ -63,7 +64,7 @@ export async function getAdditionalQuestion(
   }
 }
 
-function createGetAdditionalQuestionFn(memory: TStorageInstance, getMoreQsNum: number, cancelTokenSource: CancelTokenSource){
+function createGetAdditionalQuestionFn(memory: TStorageInstance, getMoreQsNum: number, cancelTokenSource: CancelTokenSource) {
   return (questions: IQuestionOnClient[], questionTypes: TQuestionTypes[]) => getAdditionalQuestion(memory, getMoreQsNum, cancelTokenSource, questions, questionTypes)
 }
 
@@ -81,26 +82,25 @@ const GameScrnContainer = () => {
   const updateQuestionsStore = useQuestionsStore(state => state.updateState);
   const updateGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
   const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
-  const [getAdditionalQuestion, setGetAdditionalQuestion] = useState<ReturnType<typeof createGetAdditionalQuestionFn> | null >(null);
-  
+  const getAdditionalQuestionFnRef = useRef<ReturnType<typeof createGetAdditionalQuestionFn> | null>(null);
+
+
   useEffect(() => {
-    if(willResetGetAdditionalQCancelTokenSource){
-      const fn = createGetAdditionalQuestionFn(memory, getMoreQsNum ?? 1, getAdditionalQCancelTokenSource);
-      console.log("the createGetAdditionalQuestionFn function was executed, return value: ", fn);
-      setGetAdditionalQuestion(fn);
+    if (willResetGetAdditionalQCancelTokenSource) {
+      getAdditionalQuestionFnRef.current = createGetAdditionalQuestionFn(memory, getMoreQsNum ?? 1, getAdditionalQCancelTokenSource);
       updateGameScrnTabStore(false, "willResetGetAdditionalQCancelTokenSource");
     }
 
     console.log("will get questions, wasSubmitBtnPressed: ", wasSubmitBtnPressed);
-    console.log("getAdditionalQuestion !== null: ", getAdditionalQuestion !== null);
-    console.log("getAdditionalQuestion: ", getAdditionalQuestion)
+    console.log("getAdditionalQuestion.current: ", getAdditionalQuestionFnRef.current)
+    console.log("getAdditionalQuestion.current !== null: ", getAdditionalQuestionFnRef.current !== null)
 
-    if ((getAdditionalQuestion !== null) && (getMoreQsNum || wasSubmitBtnPressed || wasSkipBtnPressed)) {
+    if ((getAdditionalQuestionFnRef.current !== null) && (getMoreQsNum || wasSubmitBtnPressed || wasSkipBtnPressed)) {
       (async () => {
         try {
-          console.log("what is up there: ", questions);
-          console.log("questionTypes, yo there meng: ", questionTypes)
-          const getAdditionalQuestionResult = await getAdditionalQuestion(questions, questionTypes);
+          const getAdditionalQuestionResult = await (getAdditionalQuestionFnRef.current as ReturnType<typeof createGetAdditionalQuestionFn>)(questions, questionTypes);
+
+          console.log("getAdditionalQuestionResult: ", getAdditionalQuestionResult)
 
           if (getAdditionalQuestionResult.didErrorOccur || !getAdditionalQuestionResult?.data?.length) {
             throw new Error(`${getAdditionalQuestionResult.msg} ${!getAdditionalQuestionResult?.data?.length && 'Did not receive a question from the server.'}`);
