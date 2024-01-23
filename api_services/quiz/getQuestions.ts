@@ -52,7 +52,7 @@ export async function getQuestions<TData>(
 
         appendParamsToUrl(getQuestionsApiUrl, params);
 
-        const response = await axios.get<TData>(getQuestionsApiUrl.toString(), { cancelToken: cancelTokenSource.token });
+        const response = await axios.get<TData>(getQuestionsApiUrl.toString(), { cancelToken: cancelTokenSource.token, timeout: 10_000 });
 
         return { data: response.data }
     } catch (error) {

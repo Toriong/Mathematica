@@ -13,12 +13,10 @@ import LogicSymbol from './components/LogicSymbol';
 import EditSelectedSymbolBtn from './components/EditSelectedSymbolBtn';
 import LoadingQsModal from './components/LoadingQsModal';
 import { useGetAppColors } from '../../custom_hooks/useGetAppColors';
-import { useFocusEffect, useIsFocused, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { TStackNavigation } from '../../Navigation';
 import { IQuestionOnClient } from '../../zustandStoreTypes&Interfaces';
 import { TStateSetter } from '../../globalTypes&Interfaces';
-import { getAdditionalQuestion } from './GameScrnLogicQsContainer';
-import { Storage } from '../../utils/storage';
 
 const SYMBOL_WIDTH_AND_HEIGHT = 45;
 const TXT_FONT_SIZE = 20;
@@ -336,8 +334,6 @@ const GameScrnPresentation = ({
 
     setTimeout(() => {
       setSelectedLogicSymbols([]);
-
-      setGameScrnTabStore(false, 'wasSubmitBtnPressed');
 
       updateQuestionsStore(questionIndex + 1, "questionIndex");
 

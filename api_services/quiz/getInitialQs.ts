@@ -11,6 +11,7 @@ interface IInitialQsGetReqResult<TData> {
     gettingQsResponseStatus: TResponseStatus
     questions: TData[]
 }
+type TNumberToGetOfEachQType = typeof getInitialQs
 
 let apiRequestTriesNum = 0;
 
