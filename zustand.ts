@@ -39,11 +39,6 @@ export const useRequestStatusStore = create<TIsGettingReqStore>(set => ({
     isGettingUserInfo: false,
     updateState: (newState: boolean, fieldName: keyof TIsGettingReqStore) => set(() => ({ [fieldName]: newState }))
 }));
-
-// NOTES: 
-// create a axios cancel token for the game screen tab store 
-// when the user goes from the Game screen to the Main screen, cancel the request  
-
 export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {    
     const gameScrnTabStore: TGameScrnTabStore = {
         right: 0,
@@ -51,7 +46,7 @@ export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
         timer: 120,
         willNotShowLoadingModal: false,
         wasSubmitBtnPressed: false,
-        isTimerPaused: false,
+        isTimerOn: true,
         isLoadingModalOn: false,
         willResetGetAdditionalQCancelTokenSource: true,
         willResetGetInitialQsTokenSource: true,    

@@ -298,7 +298,7 @@ const GameScrnPresentation = ({
 
   function handleSubmitBtnPress() {
     setGameScrnTabStore(true, 'wasSubmitBtnPressed');
-    setGameScrnTabStore(true, 'isTimerPaused');
+    setGameScrnTabStore(false, 'isTimerOn');
     let answerArrClone = structuredClone<string[]>(answer);
     let correctAnswerArr: string[] = [];
     const currentQuestionUpdated = {
@@ -337,7 +337,7 @@ const GameScrnPresentation = ({
 
       updateQuestionsStore(questionIndex + 1, "questionIndex");
 
-      setGameScrnTabStore(false, 'isTimerPaused');
+      setGameScrnTabStore(true, 'isTimerOn');
 
       setGameScrnTabStore(false, 'wasSubmitBtnPressed');      
     }, 2000);

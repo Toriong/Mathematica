@@ -37,11 +37,11 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const timer = useGameScrnTabStore(state => state.timer);
     const gettingQsResponseStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
     const questions = useQuestionsStore(state => state.questions);
+    const isTimerOn = useGameScrnTabStore(state => state.isTimerOn);
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
     const setQuestionsStore = useQuestionsStore(state => state.updateState);
     const getAddtionalQCancelToken = useGameScrnTabStore(state => state.getAddtionalQCancelTokenSource);
     const setApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
-    const [isPlaying, setIsPlaying] = useState(false);
     const currentThemeObj = colorThemesObj[currentTheme];
     const questionIndex = useQuestionsStore(state => state.questionIndex)
     const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
@@ -99,7 +99,6 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         const answeredQs = questions.filter(question => question.userAnswer);
         const unansweredQs = questions.filter(question => !question.userAnswer);
 
-
         console.log("answerQs: ", answeredQs)
 
         setGameScrnTabStore("finished", 'mode');
@@ -129,15 +128,13 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         navigate('ResultsScreen');
     };
 
-
-
     useEffect(() => {
         if (gettingQsResponseStatus === "SUCCESS") {
             setTimeout(() => {
-                setIsPlaying(true);
+                setGameScrnTabStore(true, "isTimerOn");
             }, 400)
         } else if ((gettingQsResponseStatus === "IN_PROGRESS") || (gettingQsResponseStatus === "FAILURE")) {
-            setIsPlaying(false);
+            setGameScrnTabStore(false, "isTimerOn");
         }
     }, [gettingQsResponseStatus]);
 
@@ -189,7 +186,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                         {(mode === "quiz") && (
                             <View style={{ width: '100%', marginTop: 15, paddingRight: "16%", display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', flexDirection: 'row' }}>
                                 <CountdownCircleTimer
-                                    isPlaying={isPlaying}
+                                    isPlaying={isTimerOn}
                                     duration={timer}
                                     colors={['#004777', '#F7B801', '#A30000', '#A30000']}
                                     colorsTime={[7, 5, 2, 0]}

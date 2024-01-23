@@ -20,7 +20,7 @@ interface IGameScrnTabStoreState {
     right: number
     wrong: number
     timer: number
-    isTimerPaused: boolean
+    isTimerOn: boolean
     isLoadingModalOn: boolean
     wasSubmitBtnPressed: boolean
     willResetGetAdditionalQCancelTokenSource: boolean
