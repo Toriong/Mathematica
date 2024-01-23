@@ -338,6 +338,8 @@ const GameScrnPresentation = ({
       updateQuestionsStore(questionIndex + 1, "questionIndex");
 
       setGameScrnTabStore(false, 'isTimerPaused');
+
+      setGameScrnTabStore(false, 'wasSubmitBtnPressed');      
     }, 2000);
 
     if (isAnswerCorrect) {

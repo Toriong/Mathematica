@@ -126,7 +126,6 @@ const GameScrnContainer = () => {
         } finally {
           setWasSkipBtnPressed(false);
           setWillGetMoreQsNum(null);
-          updateGameScrnTabStore(false, 'wasSubmitBtnPressed');
         }
       })();
     }
