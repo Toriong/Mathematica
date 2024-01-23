@@ -1,6 +1,6 @@
 
 // run the server using serveo and get the url
-export const SERVER_ORIGIN = "http://172.20.10.2:8000";
+export const SERVER_ORIGIN = "http://172.21.224.1:8000";
 export const PATHS = [
     "get-quiz-questions",
     "save-quiz-result",

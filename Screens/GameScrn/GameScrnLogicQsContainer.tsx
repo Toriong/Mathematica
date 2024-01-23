@@ -13,6 +13,12 @@ type TQuestionFromSever = { questions: [IQuestionOnClient] }
 
 let tries = 0;
 
+// GOAL: when the user goes to the main screen generate a new function that gets the questions from the server
+// during when the user is taking the quiz
+
+// GOAL: on the first render, execute the funtion that will return the function that will get the questions during
+// game mode
+
 export async function getAdditionalQuestion(
   memory: TStorageInstance,
   questions: IQuestionOnClient[],
