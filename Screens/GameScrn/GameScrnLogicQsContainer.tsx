@@ -15,12 +15,6 @@ type TQuestionFromSever = { questions: [IQuestionOnClient] }
 
 let tries = 0;
 
-// GOAL: when the user goes to the main screen generate a new function that gets the questions from the server
-// during when the user is taking the quiz
-
-// GOAL: on the first render, execute the funtion that will return the function that will get the questions during
-// game mode
-
 export async function getAdditionalQuestion(
   memory: TStorageInstance,
   numOfQuestionsToGet = 1,
@@ -72,7 +66,8 @@ const GameScrnContainer = () => {
   const memory = new Storage();
   const [wasSkipBtnPressed, setWasSkipBtnPressed] = useState(false);
   const [willIncrementQIndex, setWillIncrementQIndex] = useState(false);
-  const [getMoreQsNum, setWillGetMoreQsNum] = useState<number | null>(null)
+  const [getMoreQsNum, setWillGetMoreQsNum] = useState<number | null>(null);
+  const [isUserOnLastQ, setIsUserIsOnLastQ] = useState(false);
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
   const questionTypes = useGameScrnTabStore(state => state.questionTypes);
   const getAdditionalQCancelTokenSource = useGameScrnTabStore(state => state.getAddtionalQCancelTokenSource);
@@ -106,17 +101,31 @@ const GameScrnContainer = () => {
             throw new Error(`${getAdditionalQuestionResult.msg} ${!getAdditionalQuestionResult?.data?.length && 'Did not receive a question from the server.'}`);
           }
 
+          // WHAT IS HAPPENING: 
+          // when the user continuously presses the skip button, the app throws a bug by not displaying the next question to 
+          // display to the user onto the UI 
+          // tells the user that there is an error
+          // the user presses on the try again button on the loading qs modal
+
           const questionsUpdated = [...questions, ...getAdditionalQuestionResult.data];
+          const newQuestionIndex = questionIndex + 1;
 
           updateQuestionsStore(questionsUpdated, "questions")
 
           // if true that means the user skipped the last question of the questions array and thus no more questions to display to the user
-          if (willIncrementQIndex) {
-            const newQuestionIndex = questionIndex + 1;
+          if (willIncrementQIndex && isUserOnLastQ) {
             updateQuestionsStore(newQuestionIndex, "questionIndex")
             updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus")
             setWillIncrementQIndex(false);
+            updateGameScrnTabStore(true, 'isTimerOn');
+            updateGameScrnTabStore(false, 'wasSubmitBtnPressed');
+            setIsUserIsOnLastQ(false);
+            return;
           }
+
+          updateQuestionsStore(newQuestionIndex, "questionIndex")
+          updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus")
+          setWillIncrementQIndex(false);
         } catch (error) {
           console.error("An error has occurred in getting the next question from the server. Error message: ", error);
 
@@ -131,7 +140,14 @@ const GameScrnContainer = () => {
     }
   }, [wasSubmitBtnPressed, wasSkipBtnPressed, getMoreQsNum, willResetGetAdditionalQCancelTokenSource]);
 
-  return <GameScrnPresentation _getMoreQsNum={[getMoreQsNum, setWillGetMoreQsNum]} _wasSkipBtnPressed={[wasSkipBtnPressed, setWasSkipBtnPressed]} setWillIncrementQIndex={setWillIncrementQIndex} />;
+  return (
+    <GameScrnPresentation
+      _getMoreQsNum={[getMoreQsNum, setWillGetMoreQsNum]}
+      _wasSkipBtnPressed={[wasSkipBtnPressed, setWasSkipBtnPressed]}
+      _isUserOnLastQ={[isUserOnLastQ, setIsUserIsOnLastQ]}
+      setWillIncrementQIndex={setWillIncrementQIndex}
+    />
+  )
 };
 
 export default GameScrnContainer;

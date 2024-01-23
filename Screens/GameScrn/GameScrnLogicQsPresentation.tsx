@@ -1,4 +1,3 @@
-console.log("hi")
 import React, { useEffect, useMemo, useState } from 'react';
 import Layout from '../../global_components/Layout';
 import { View, TouchableOpacity, TextStyle } from 'react-native';
@@ -16,16 +15,23 @@ import { useGetAppColors } from '../../custom_hooks/useGetAppColors';
 import { useNavigation } from '@react-navigation/native';
 import { TStackNavigation } from '../../Navigation';
 import { IQuestionOnClient } from '../../zustandStoreTypes&Interfaces';
-import { TStateSetter } from '../../globalTypes&Interfaces';
+import { TStateSetter, TUseStateReturnVal } from '../../globalTypes&Interfaces';
 
-const SYMBOL_WIDTH_AND_HEIGHT = 45;
-const TXT_FONT_SIZE = 20;
 type TSelectedSymbol = typeof SYMBOLS[number] | typeof LETTERS[number]
 interface ISelectedLogicSymbol {
   symbol: TSelectedSymbol
   _id?: ReturnType<typeof uuid.v4>
   wasPressed?: boolean
 }
+interface TGameScrnLogicQsPresentationProps {
+  _wasSkipBtnPressed: [boolean, TStateSetter<boolean>]
+  _getMoreQsNum: [null | number, TStateSetter<null | number>]
+  _isUserOnLastQ: TUseStateReturnVal<boolean>
+  setWillIncrementQIndex: TStateSetter<boolean>
+} 
+
+const TXT_FONT_SIZE = 20;
+const SYMBOL_WIDTH_AND_HEIGHT = 45;
 
 function getCorrectAnswerArrForUI(answerArrSymbols: string[]) {
   let answerArrClone = structuredClone<string[]>(answerArrSymbols);
@@ -99,12 +105,9 @@ function getUpdatedSelectedSymbolsArr(indexToSwitchSelectedSymbolWith: number, s
 const GameScrnPresentation = ({
   _wasSkipBtnPressed,
   _getMoreQsNum,
-  setWillIncrementQIndex
-}: {
-  _wasSkipBtnPressed: [boolean, TStateSetter<boolean>]
-  _getMoreQsNum: [null | number, TStateSetter<null | number>]
-  setWillIncrementQIndex: TStateSetter<boolean>
-}) => {
+  setWillIncrementQIndex,
+  _isUserOnLastQ
+}: TGameScrnLogicQsPresentationProps) => {
   const navigation = useNavigation<TStackNavigation>();
   const questions = useQuestionsStore(state => state.questions);
   const gameScrnMode = useGameScrnTabStore(state => state.mode);
@@ -123,6 +126,7 @@ const GameScrnPresentation = ({
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
   const [wasSkipBtnPressed, setWasSkipBtnPressed] = _wasSkipBtnPressed;
   const [getMoreQsNum, setGetMoreQsNum] = _getMoreQsNum;
+  const [, setIsUserOnLastQ] = _isUserOnLastQ;
 
   const question = questions?.length ? (isOnReviewMode ? questionsToReview : questions)[questionIndex] : null;
   const { choices, answer, symbolOptions: symbolOptionsFromServer, userAnswer } = question ?? {};
@@ -332,15 +336,27 @@ const GameScrnPresentation = ({
 
     setCorrectAnswerArr(correctAnswerArr);
 
-    setTimeout(() => {
-      setSelectedLogicSymbols([]);
+    if(questions[questionIndex + 1]){
+      setTimeout(() => {
+        setSelectedLogicSymbols([]);
+        
+        updateQuestionsStore(questionIndex + 1, "questionIndex");
+        
+        setGameScrnTabStore(true, 'isTimerOn');
+        
+        setGameScrnTabStore(false, 'wasSubmitBtnPressed');      
+      }, 2000);
+    } else {
+      updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
 
-      updateQuestionsStore(questionIndex + 1, "questionIndex");
+      // GOAL: for the logic that gets the question from the backend in the container component, once the question is received
+      // have the following occur (if successful)
+      // -start the timer
+      // -set wasSubmitBtnPressed to false
+      setIsUserOnLastQ(true);
 
-      setGameScrnTabStore(true, 'isTimerOn');
-
-      setGameScrnTabStore(false, 'wasSubmitBtnPressed');      
-    }, 2000);
+      setWillIncrementQIndex(true);
+    }
 
     if (isAnswerCorrect) {
       setGameScrnTabStore(rightNum + 1, "right");
