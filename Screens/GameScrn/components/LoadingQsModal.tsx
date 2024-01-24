@@ -89,7 +89,7 @@ const LoadingQsModal = ({ isThereAQToDisplay, handleGetQuestionsBtnPress }: TLoa
                             paddingHorizontal: 35
                         }}
                     >
-                        {(gettingQsStatus === "IN_PROGRESS") && "Getting questions..."}
+                        {(gettingQsStatus === "IN_PROGRESS") && "Generating questions..."}
                         {(gettingQsStatus === "SUCCESS") && "Questions received!"}
                     </PTxt>
                     {(gettingQsStatus === "FAILURE") && (

@@ -45,25 +45,23 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const setApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const currentThemeObj = colorThemesObj[currentTheme];
     const questionIndex = useQuestionsStore(state => state.questionIndex)
-    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
-
-    // when the user goes back to the main screen, have the following to occur: 
-    // -cancel the request
-    // -insert a new signal for the zustand store for the field of getAddtionalQCancelTokenSource
-    // -need to create factory function that will create new api request function every time the user
-    // goes back to the main screen?  
+    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz); 
 
     function handleBackToMainScrnBtnPress() {
         getAddtionalQCancelToken.cancel();
+        setGameScrnTabStore(false, "willResetGetAdditionalQCancelTokenSource");
         let unansweredQs = structuredClone<IQuestionOnClient[]>((questionIndex === 0) ? questions.slice(1) : questions.filter(question => !question.userAnswer));
         const questionsForNextQuizUpdated = questionsForNextQuiz?.length ? [...unansweredQs, ...questionsForNextQuiz] : unansweredQs;
 
-        console.log("questionsForNextQuiz length, yo there: ", questionsForNextQuiz.length)
+        console.log("questionsForNextQuizUpdated, hey there: ", questionsForNextQuizUpdated);
+        console.log("questionsForNextQuizUpdated, hey there, the length: ", questionsForNextQuizUpdated.length);
+
 
         if (questionsForNextQuizUpdated.length <= 10) {
             setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");
-        } else if (questionsForNextQuiz.length === 0) {
+        } else if (questionsForNextQuiz.length >= 5) {
             setApiQsFetchingStatusStore(true, "willGetQs");
+            setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz")
         }
 
         setGameScrnTabStore("finished", "mode");

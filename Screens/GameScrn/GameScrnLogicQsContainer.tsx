@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import GameScrnPresentation from './GameScrnLogicQsPresentation';
 import { useApiQsFetchingStatusStore, useGameScrnTabStore, useQuestionsStore } from '../../zustand';
 import { getQuestions } from '../../api_services/quiz/getQuestions';
@@ -10,6 +10,7 @@ import { Storage, TStorageInstance } from '../../utils/storage';
 import { IQuestionOnClient, IQuestionsStates, TCancelTokenSource } from '../../zustandStoreTypes&Interfaces';
 import { CancelTokenSource } from 'axios';
 import { structuredClone } from '../../globalVars';
+import { useFocusEffect } from '@react-navigation/native';
 
 type TQuestionFromSever = { questions: [IQuestionOnClient] }
 
@@ -33,7 +34,7 @@ export async function getAdditionalQuestion(
     const questionTypesForServer = (questionTypes?.length === 1) ? questionTypes : [questionTypes[Math.floor(Math.random() * questionTypes?.length)]]
     const getQuestionsResult = await getQuestions<TQuestionFromSever>(numOfQuestionsToGet, questionTypesForServer, userId, getAdditionalQCancelTokenSource, sentenceTxts);
     let newQuestionObj: TQuestionFromSever | null = getQuestionsResult.data ?? null;
-    
+
     // if the user reaches the end of the questions, then set 'isGameOn' in the local storage to false
     if ((tries <= 3) && isGameOn && (getQuestionsResult.didErrorOccur || !getQuestionsResult?.data?.questions?.length)) {
       tries++
@@ -76,65 +77,82 @@ const GameScrnContainer = () => {
   const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
   const getAdditionalQuestionFnRef = useRef<ReturnType<typeof createGetAdditionalQuestionFn> | null>(null);
 
+  async function addNewQuestionToQuestionsArr() {
+    try {
+      const getAdditionalQuestionResult = await (getAdditionalQuestionFnRef.current as ReturnType<typeof createGetAdditionalQuestionFn>)(questions, questionTypes);
 
-  useEffect(() => {
-    if (willResetGetAdditionalQCancelTokenSource) {
-      getAdditionalQuestionFnRef.current = createGetAdditionalQuestionFn(memory, getMoreQsNum ?? 1, getAdditionalQCancelTokenSource);
-      updateGameScrnTabStore(false, "willResetGetAdditionalQCancelTokenSource");
+      console.log("getAdditionalQuestionResult: ", getAdditionalQuestionResult)
+
+      if (getAdditionalQuestionResult.didErrorOccur || !getAdditionalQuestionResult?.data?.length) {
+        throw new Error(`${getAdditionalQuestionResult.msg} ${!getAdditionalQuestionResult?.data?.length && 'Did not receive a question from the server.'}`);
+      }
+
+      const questionsUpdated = [...questions, ...getAdditionalQuestionResult.data];
+
+      updateQuestionsStore(questionsUpdated, "questions")
+      updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
+
+      // if true that means the user skipped the last question of the questions array and thus no more questions to display to the user
+      if (willIncrementQIndex && isUserOnLastQ) {
+        console.log("The user is on the last question of the questions array...");
+        updateQuestionsStore(questionIndex + 1, "questionIndex");
+        updateGameScrnTabStore(true, 'isTimerOn');
+        updateGameScrnTabStore(false, 'wasSubmitBtnPressed');
+        setIsUserIsOnLastQ(false);
+        setWillIncrementQIndex(false);
+        return;
+      }
+    } catch (error) {
+      console.error("An error has occurred in getting the next question from the server. Error message: ", error);
+
+      if (willIncrementQIndex) {
+        updateApiQsFetchingStatusStore("FAILURE", "gettingQsResponseStatus");
+        updateApiQsFetchingStatusStore("submitBtnPress", "pointOfFailure")
+      }
+    } finally {
+      setWasSkipBtnPressed(false);
+      setWillGetMoreQsNum(null);
+      updateGameScrnTabStore(false, 'wasSubmitBtnPressed');
+      setIsUserIsOnLastQ(false);
     }
+  };
 
-    console.log("will get questions, wasSubmitBtnPressed: ", wasSubmitBtnPressed);
-    console.log("getAdditionalQuestion.current: ", getAdditionalQuestionFnRef.current)
-    console.log("getAdditionalQuestion.current !== null: ", getAdditionalQuestionFnRef.current !== null)
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
 
-    if ((getAdditionalQuestionFnRef.current !== null) && (getMoreQsNum || wasSubmitBtnPressed || wasSkipBtnPressed)) {
-      (async () => {
-        try {
-          const getAdditionalQuestionResult = await (getAdditionalQuestionFnRef.current as ReturnType<typeof createGetAdditionalQuestionFn>)(questions, questionTypes);
+      console.log("getAdditionalQuestionFnRef.current: ", getAdditionalQuestionFnRef.current)
+      if (isActive && willResetGetAdditionalQCancelTokenSource) {
+        getAdditionalQuestionFnRef.current = createGetAdditionalQuestionFn(memory, getMoreQsNum ?? 1, getAdditionalQCancelTokenSource);
+        updateGameScrnTabStore(false, "willResetGetAdditionalQCancelTokenSource");
+      }
 
-          console.log("getAdditionalQuestionResult: ", getAdditionalQuestionResult)
+      console.log("getAdditionalQuestionFnRef.current, what is up there: ", getAdditionalQuestionFnRef.current)
 
-          if (getAdditionalQuestionResult.didErrorOccur || !getAdditionalQuestionResult?.data?.length) {
-            throw new Error(`${getAdditionalQuestionResult.msg} ${!getAdditionalQuestionResult?.data?.length && 'Did not receive a question from the server.'}`);
-          }
+      if (isActive && (getAdditionalQuestionFnRef.current !== null) && (getMoreQsNum || wasSubmitBtnPressed || wasSkipBtnPressed)) {
+        addNewQuestionToQuestionsArr();
+      };
 
-          // WHAT IS HAPPENING: 
-          // when the user continuously presses the skip button, the app throws a bug by not displaying the next question to 
-          // display to the user onto the UI 
-          // tells the user that there is an error
-          // the user presses on the try again button on the loading qs modal
+      return () => {
+        isActive = false;
+      };
+    }, [wasSubmitBtnPressed, wasSkipBtnPressed, getMoreQsNum, willResetGetAdditionalQCancelTokenSource])
+  );
 
-          const questionsUpdated = [...questions, ...getAdditionalQuestionResult.data];
+  // useEffect(() => {
+  //   if (willResetGetAdditionalQCancelTokenSource) {
+  //     getAdditionalQuestionFnRef.current = createGetAdditionalQuestionFn(memory, getMoreQsNum ?? 1, getAdditionalQCancelTokenSource);
+  //     updateGameScrnTabStore(false, "willResetGetAdditionalQCancelTokenSource");
+  //   }
 
-          updateQuestionsStore(questionsUpdated, "questions")
-          updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
-          
-          // if true that means the user skipped the last question of the questions array and thus no more questions to display to the user
-          if (willIncrementQIndex && isUserOnLastQ) {
-            console.log("The user is on the last question of the questions array...");
-            updateQuestionsStore(questionIndex + 1, "questionIndex");
-            updateGameScrnTabStore(true, 'isTimerOn');
-            updateGameScrnTabStore(false, 'wasSubmitBtnPressed');
-            setIsUserIsOnLastQ(false);
-            setWillIncrementQIndex(false);
-            return;
-          }
-        } catch (error) {
-          console.error("An error has occurred in getting the next question from the server. Error message: ", error);
+  //   console.log("will get questions, wasSubmitBtnPressed: ", wasSubmitBtnPressed);
+  //   console.log("getAdditionalQuestion.current: ", getAdditionalQuestionFnRef.current)
+  //   console.log("getAdditionalQuestion.current !== null: ", getAdditionalQuestionFnRef.current !== null)
 
-          if (willIncrementQIndex) {
-            updateApiQsFetchingStatusStore("FAILURE", "gettingQsResponseStatus");
-            updateApiQsFetchingStatusStore("submitBtnPress", "pointOfFailure")
-          }
-        } finally {
-          setWasSkipBtnPressed(false);
-          setWillGetMoreQsNum(null);
-          updateGameScrnTabStore(false, 'wasSubmitBtnPressed');
-          setIsUserIsOnLastQ(false);
-        }
-      })();
-    }
-  }, [wasSubmitBtnPressed, wasSkipBtnPressed, getMoreQsNum, willResetGetAdditionalQCancelTokenSource]);
+  //   if ((getAdditionalQuestionFnRef.current !== null) && (getMoreQsNum || wasSubmitBtnPressed || wasSkipBtnPressed)) {
+  //     addNewQuestionToQuestionsArr()
+  //   }
+  // }, [wasSubmitBtnPressed, wasSkipBtnPressed, getMoreQsNum, willResetGetAdditionalQCancelTokenSource]);
 
   return (
     <GameScrnPresentation
