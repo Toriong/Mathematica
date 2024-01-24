@@ -6,35 +6,16 @@ import { getInitialQs } from "../api_services/quiz/getInitialQs";
 import { IQuestionOnClient, TNumberToGetForEachQuestionType } from "../zustandStoreTypes&Interfaces";
 import { CancelTokenSource } from "axios";
 import { TQuestionTypes } from "../sharedInterfaces&TypesWithBackend";
+import { sortRandomly } from "../utils/generalFns";
 
 // NOTES: 
 // CASE: when the user goes from the game screen to the main screen, clear all requests that are being made to the server (if any) from the 
 // 
 
-function getRandomIndex<TData>(arr: TData[], incorrectVal: any = undefined) {
-    let randomIndex = Math.floor(Math.random() * arr.length);
-
-    while (!(arr[randomIndex] === incorrectVal)) {
-        randomIndex = Math.floor(Math.random() * arr.length)
-    };
-
-    return randomIndex;
-}
-
 // function createGetAdditionalQuestionFn(memory: TStorageInstance, getMoreQsNum: number, cancelTokenSource: CancelTokenSource){
 //     return (questions: IQuestionOnClient[], questionTypes: TQuestionTypes[]) => getAdditionalQuestion(memory, getMoreQsNum, cancelTokenSource, questions, questionTypes)
 //   }
 
-function sortRandomly<TData>(arr: TData[]) {
-    let arrSortedRandomly = Array.from({ length: arr.length });
-
-    arr.forEach(val => {
-        const randomIndex = getRandomIndex(arrSortedRandomly);
-        arrSortedRandomly[randomIndex] = val
-    })
-
-    return arrSortedRandomly;
-};
 
 export function useGetInitialQs(): null {
     const memory = new Storage();
@@ -69,10 +50,10 @@ export function useGetInitialQs(): null {
                         throw new Error("Failed to get the initial questions from the server.")
                     };
 
-                    const questionsRandomlySorted = (response.questions?.length > 1) ? sortRandomly<IQuestionOnClient>(response.questions) : response.questions;
+                    const questionsRandomlySorted = (response.questions?.length > 1) ? sortRandomly(response.questions) : response.questions;
 
                     if (areQsReceivedForNextQuiz) {
-                        const questionsForNextQUpdated = questionsForNextQuiz?.length ? [...questionsForNextQuiz, ...questionsRandomlySorted] : questionsRandomlySorted
+                        const questionsForNextQUpdated = questionsForNextQuiz?.length ? sortRandomly([...questionsForNextQuiz, ...questionsRandomlySorted]) : questionsRandomlySorted
                         updateQuestionsStore(questionsForNextQUpdated as IQuestionOnClient[], "questionsForNextQuiz")
                     } else {
                         updateQuestionsStore(questionsRandomlySorted as IQuestionOnClient[], "questions");

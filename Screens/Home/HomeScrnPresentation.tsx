@@ -6,6 +6,8 @@ import { TScreenNames, TStackNavigation } from "../../Navigation";
 import { useColorStore, useGameScrnTabStore, useQuestionsStore } from "../../zustand";
 import Button from "../../global_components/Button";
 import { Storage } from "../../utils/storage";
+import { sortRandomly } from "../../utils/generalFns";
+import { IQuestionOnClient } from "../../zustandStoreTypes&Interfaces";
 
 const HomeScrnPresentation = () => {
     const navigation = useNavigation<TStackNavigation>();
@@ -21,21 +23,17 @@ const HomeScrnPresentation = () => {
         scrnName: TScreenNames,
         types: Exclude<Parameters<typeof updateGameScrnTabStore>[0], number | boolean>
     ) {
-        // when get more questions after the user responds to a question, check if the test is still going when a recursive call is being
-        // implemented
-
-        console.log("questionsForNextQuiz hey there: ", questionsForNextQuiz.length)
-        if((scrnName === "GameScreen") && questionsForNextQuiz.length){
+        if ((scrnName === "GameScreen") && questionsForNextQuiz.length) {
             await memory.setItem("isGameOn", true);
             updateGameScrnTabStore(types, "questionTypes");
             updateGameScrnTabStore("quiz", "mode");
             updateQuestionStore(0, "questionIndex");
-            setQuestionsStore(questionsForNextQuiz, "questions");
+            setQuestionsStore(sortRandomly(questionsForNextQuiz), "questions");
             navigation.navigate(scrnName);
             return;
         }
 
-        if((scrnName === "GameScreen")){
+        if ((scrnName === "GameScreen")) {
             await memory.setItem("isGameOn", true);
             updateGameScrnTabStore(types, "questionTypes");
             updateGameScrnTabStore("quiz", "mode");

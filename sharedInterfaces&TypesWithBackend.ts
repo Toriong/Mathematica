@@ -12,6 +12,7 @@ export interface IQuestion {
     answer: string[]
     choices: IChoice[]
     type: TQuestionTypes
+    wasSkipped?: boolean
     userAnswer: string[] | null
 }
 export interface IQuiz {

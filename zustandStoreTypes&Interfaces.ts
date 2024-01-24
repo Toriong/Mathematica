@@ -1,4 +1,3 @@
-import { CancelToken } from 'axios';
 import { TQuestionTypes } from './Screens/GameScrn/typesAndInterfaces';
 import { TResponseStatus } from "./api_services/globalApiVars"
 import { IThemeColors } from "./globalTypes&Interfaces"

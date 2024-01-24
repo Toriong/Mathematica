@@ -175,6 +175,18 @@ const GameScrnPresentation = ({
   };
 
   async function handleSkipBtnPress() {
+    const questionsUpdated = questions.map((question, index) => {
+      if(index === questionIndex){
+        return {
+          ...question,
+          wasSkipped: true
+        }
+      };
+
+      return question;
+    });
+
+    updateQuestionsStore(questionsUpdated, "questions");
     setSelectedLogicSymbols([]);
 
     if (!questions[questionIndex + 1]) {

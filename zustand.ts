@@ -6,7 +6,6 @@ import {
     TCurrentTheme,
     TGameScrnTabStore,
     TIsGettingReqStore,
-    TUpdateStoreState,
     IApiQsFetchingStatus,
     IQuestionsStates
 } from './zustandStoreTypes&Interfaces';
@@ -40,7 +39,7 @@ export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
     const gameScrnTabStore: TGameScrnTabStore = {
         right: 0,
         wrong: 0,
-        timer: 240,
+        timer: 120,
         willNotShowLoadingModal: false,
         wasSubmitBtnPressed: false,
         isTimerOn: true,

@@ -16,6 +16,7 @@ import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
 import uuid from 'react-native-uuid';
 import { useResetLogicQs } from '../../../custom_hooks/useResetLogicQs';
 import axios from 'axios';
+import { IQuestionOnClient } from '../../../zustandStoreTypes&Interfaces';
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
@@ -54,13 +55,14 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
 
     function handleBackToMainScrnBtnPress() {
         getAddtionalQCancelToken.cancel();
-        let unansweredQs = (questionIndex === 0) ? questions.slice(1) : questions.filter(question => !question.userAnswer);
-        unansweredQs = structuredClone(unansweredQs)
+        let unansweredQs = structuredClone<IQuestionOnClient[]>((questionIndex === 0) ? questions.slice(1) : questions.filter(question => !question.userAnswer));
         const questionsForNextQuizUpdated = questionsForNextQuiz?.length ? [...unansweredQs, ...questionsForNextQuiz] : unansweredQs;
 
-        if (questionsForNextQuizUpdated.length) {
+        console.log("questionsForNextQuiz length, yo there: ", questionsForNextQuiz.length)
+
+        if (questionsForNextQuizUpdated.length <= 10) {
             setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");
-        } else {
+        } else if (questionsForNextQuiz.length === 0) {
             setApiQsFetchingStatusStore(true, "willGetQs");
         }
 
@@ -97,9 +99,12 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
 
     function handleOnComplete() {
         const answeredQs = questions.filter(question => question.userAnswer);
-        const unansweredQs = questions.filter(question => !question.userAnswer);
+        let unansweredQs = questions
+            .filter(question => !question.userAnswer)
+            .filter(question => !question.wasSkipped);
 
-        console.log("answerQs: ", answeredQs)
+        console.log("answerQs: ", answeredQs);
+        console.log("unansweredQs: ", unansweredQs);
 
         setGameScrnTabStore("finished", 'mode');
 

@@ -13,6 +13,27 @@ export function getIsTValid<TData>(
     return (typeof val === expectedType) && isNotNullForObj
 }
 
+export function getRandomIndex<TData>(arr: TData[], incorrectVal: any = undefined) {
+    let randomIndex = Math.floor(Math.random() * arr.length);
+
+    while (!(arr[randomIndex] === incorrectVal)) {
+        randomIndex = Math.floor(Math.random() * arr.length)
+    };
+
+    return randomIndex;
+}
+
+export function sortRandomly<TData>(arr: TData[]) {
+    let arrSortedRandomly:TData[] = Array.from({ length: arr.length });
+
+    arr.forEach(val => {
+        const randomIndex = getRandomIndex(arrSortedRandomly);
+        arrSortedRandomly[randomIndex] = val
+    })
+
+    return arrSortedRandomly;
+};
+
 const memory = new Storage()
 
 export async function getUserId(): Promise<string | null> {
