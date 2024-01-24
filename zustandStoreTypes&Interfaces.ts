@@ -65,10 +65,12 @@ export interface IColorStore {
     currentTheme: TCurrentTheme
     setCurrentTheme: (theme: TCurrentTheme) => () => void
 }
+type TPointOfFailure = "submitBtnPress" | "gettingInitialQs" | null;
 export interface IApiQsFetchingStatus {
     willGetQs: boolean
     areQsReceivedForNextQuiz: boolean
     gettingQsResponseStatus: TResponseStatus
+    pointOfFailure: TPointOfFailure
 }
 
 export type TApiQsFetchingStatusStore = IApiQsFetchingStatus & TUpdateStoreState<IApiQsFetchingStatus[keyof IApiQsFetchingStatus], keyof IApiQsFetchingStatus>

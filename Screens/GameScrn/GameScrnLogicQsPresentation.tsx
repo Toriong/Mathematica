@@ -28,7 +28,7 @@ interface TGameScrnLogicQsPresentationProps {
   _getMoreQsNum: [null | number, TStateSetter<null | number>]
   _isUserOnLastQ: TUseStateReturnVal<boolean>
   setWillIncrementQIndex: TStateSetter<boolean>
-} 
+}
 
 const TXT_FONT_SIZE = 20;
 const SYMBOL_WIDTH_AND_HEIGHT = 45;
@@ -122,6 +122,7 @@ const GameScrnPresentation = ({
   const updateQuestionsStore = useQuestionsStore(state => state.updateState);
   const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
   const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
+  const pointOfFailureInGettingNextQ = useApiQsFetchingStatusStore(state => state.pointOfFailure);
   const [correctAnswerArr, setCorrectAnswerArr] = useState<string[]>([]);
   const [selectedLogicSymbols, setSelectedLogicSymbols] = useState<ISelectedLogicSymbol[]>([]);
   const [wasSkipBtnPressed, setWasSkipBtnPressed] = _wasSkipBtnPressed;
@@ -174,9 +175,12 @@ const GameScrnPresentation = ({
   };
 
   async function handleSkipBtnPress() {
+    setSelectedLogicSymbols([]);
+
     if (!questions[questionIndex + 1]) {
       updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
       setWillIncrementQIndex(true);
+      setIsUserOnLastQ(true);
       setWasSkipBtnPressed(true);
       return;
     };
@@ -336,17 +340,19 @@ const GameScrnPresentation = ({
 
     setCorrectAnswerArr(correctAnswerArr);
 
-    if(questions[questionIndex + 1]){
+    if (questions[questionIndex + 1]) {
       setTimeout(() => {
         setSelectedLogicSymbols([]);
-        
+
         updateQuestionsStore(questionIndex + 1, "questionIndex");
-        
+
         setGameScrnTabStore(true, 'isTimerOn');
-        
-        setGameScrnTabStore(false, 'wasSubmitBtnPressed');      
+
+        setGameScrnTabStore(false, 'wasSubmitBtnPressed');
       }, 2000);
     } else {
+      console.log("The user is on the last question, will get next question for the questions array...");
+
       updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
 
       // GOAL: for the logic that gets the question from the backend in the container component, once the question is received
@@ -354,8 +360,10 @@ const GameScrnPresentation = ({
       // -start the timer
       // -set wasSubmitBtnPressed to false
       setIsUserOnLastQ(true);
-
       setWillIncrementQIndex(true);
+      setTimeout(() => {
+        setSelectedLogicSymbols([]);
+      }, 300)
     }
 
     if (isAnswerCorrect) {
@@ -365,6 +373,22 @@ const GameScrnPresentation = ({
 
     setGameScrnTabStore(wrongNum + 1, "wrong")
   };
+
+  // GOAL: execute the logic within the useEffect of the GameScrnLogicQsContainer when the user presses
+  // the GetQuestionBtn
+
+  function handleGetQuestionsBtnPress() {
+    updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")
+
+    if (pointOfFailureInGettingNextQ === "submitBtnPress") {
+      setWillIncrementQIndex(true);
+      setIsUserOnLastQ(true);
+      setWasSkipBtnPressed(true);
+      return;
+    }
+
+    updateApiQsFetchingStatusStore(true, "willGetQs");
+  }
 
   useEffect(() => {
     if (gameScrnMode === "finished") {
@@ -815,7 +839,10 @@ const GameScrnPresentation = ({
           }
         </View>
       </Layout >
-      <LoadingQsModal _wasSkipBtnPressed={[wasSkipBtnPressed, setWasSkipBtnPressed]} isThereAQToDisplay={!!question} />
+      <LoadingQsModal
+        handleGetQuestionsBtnPress={handleGetQuestionsBtnPress}
+        isThereAQToDisplay={!!question}
+      />
     </>
   );
 };

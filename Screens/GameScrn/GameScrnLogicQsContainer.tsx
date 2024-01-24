@@ -33,10 +33,7 @@ export async function getAdditionalQuestion(
     const questionTypesForServer = (questionTypes?.length === 1) ? questionTypes : [questionTypes[Math.floor(Math.random() * questionTypes?.length)]]
     const getQuestionsResult = await getQuestions<TQuestionFromSever>(numOfQuestionsToGet, questionTypesForServer, userId, getAdditionalQCancelTokenSource, sentenceTxts);
     let newQuestionObj: TQuestionFromSever | null = getQuestionsResult.data ?? null;
-
-    console.log("getAdditionalQuestion function call, getQuestionsResult: ", getQuestionsResult)
-    console.log("getQuestionsResult.didErrorOccur: ", getQuestionsResult.didErrorOccur)
-
+    
     // if the user reaches the end of the questions, then set 'isGameOn' in the local storage to false
     if ((tries <= 3) && isGameOn && (getQuestionsResult.didErrorOccur || !getQuestionsResult?.data?.questions?.length)) {
       tries++
@@ -108,29 +105,26 @@ const GameScrnContainer = () => {
           // the user presses on the try again button on the loading qs modal
 
           const questionsUpdated = [...questions, ...getAdditionalQuestionResult.data];
-          const newQuestionIndex = questionIndex + 1;
 
           updateQuestionsStore(questionsUpdated, "questions")
-
+          updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
+          
           // if true that means the user skipped the last question of the questions array and thus no more questions to display to the user
           if (willIncrementQIndex && isUserOnLastQ) {
-            updateQuestionsStore(newQuestionIndex, "questionIndex")
-            updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus")
-            setWillIncrementQIndex(false);
+            console.log("The user is on the last question of the questions array...");
+            updateQuestionsStore(questionIndex + 1, "questionIndex");
             updateGameScrnTabStore(true, 'isTimerOn');
             updateGameScrnTabStore(false, 'wasSubmitBtnPressed');
             setIsUserIsOnLastQ(false);
+            setWillIncrementQIndex(false);
             return;
           }
-
-          updateQuestionsStore(newQuestionIndex, "questionIndex")
-          updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus")
-          setWillIncrementQIndex(false);
         } catch (error) {
           console.error("An error has occurred in getting the next question from the server. Error message: ", error);
 
           if (willIncrementQIndex) {
-            updateApiQsFetchingStatusStore("FAILURE", "gettingQsResponseStatus")
+            updateApiQsFetchingStatusStore("FAILURE", "gettingQsResponseStatus");
+            updateApiQsFetchingStatusStore("submitBtnPress", "pointOfFailure")
           }
         } finally {
           setWasSkipBtnPressed(false);

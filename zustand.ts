@@ -81,6 +81,7 @@ export const useApiQsFetchingStatusStore = create<TApiQsFetchingStatusStore>(set
         willGetQs: true,
         gettingQsResponseStatus: "NOT_EXECUTING",
         areQsReceivedForNextQuiz: false,
+        pointOfFailure: null,
         updateState: (newState: IApiQsFetchingStatus[keyof IApiQsFetchingStatus], fieldName: keyof IApiQsFetchingStatus) => set(() => ({ [fieldName]: newState }))
     }
     return store;

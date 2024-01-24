@@ -9,7 +9,12 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { TStackNavigationProp } from "../../../Navigation";
 import { TStateSetter } from "../../../globalTypes&Interfaces";
 
-const LoadingQsModal = ({ _wasSkipBtnPressed, isThereAQToDisplay }: { _wasSkipBtnPressed: [boolean, TStateSetter<boolean>], isThereAQToDisplay: boolean }) => {
+type TLoadingQsModalProp = {
+    handleGetQuestionsBtnPress: () => void 
+    isThereAQToDisplay: boolean 
+}
+
+const LoadingQsModal = ({ isThereAQToDisplay, handleGetQuestionsBtnPress }: TLoadingQsModalProp) => {
     const navigation = useNavigation<TStackNavigationProp>();
     // make the route name type safe
     const route = useRoute();
@@ -20,16 +25,6 @@ const LoadingQsModal = ({ _wasSkipBtnPressed, isThereAQToDisplay }: { _wasSkipBt
     const willNotShowLoadingModal = useGameScrnTabStore(state => state.willNotShowLoadingModal);
     const [isModalVisible, setIsModalVisible] = useState((gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE"));
     const appColors = useGetAppColors();
-    const [wasSkipBtnPressed, setWasSkipBtnPressed] = _wasSkipBtnPressed;
-
-    function handleGetMoreQsBtnPress() {
-        if (wasSkipBtnPressed) {
-            setWasSkipBtnPressed(true);
-        }
-
-        updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")
-        updateApiQsFetchingStatusStore(true, "willGetQs");
-    };
 
     function handleBackToMainScreenBtnPress() {
         setIsModalVisible(false);
@@ -166,7 +161,7 @@ const LoadingQsModal = ({ _wasSkipBtnPressed, isThereAQToDisplay }: { _wasSkipBt
                             >
                                 <Button
                                     backgroundColor={appColors.second}
-                                    handleOnPress={handleGetMoreQsBtnPress}
+                                    handleOnPress={handleGetQuestionsBtnPress}
                                     dynamicStyles={{
                                         padding: 17,
                                         borderRadius: 15,

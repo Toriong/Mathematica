@@ -83,6 +83,7 @@ export function useGetInitialQs(): null {
                 } catch (error) {
                     console.error("Failed to get questions from the server. Error message: ", error)
                     updateApiQsFetchingStatusStore("FAILURE", "gettingQsResponseStatus");
+                    updateApiQsFetchingStatusStore("gettingInitialQs", "pointOfFailure");
                 } finally {
                     updateApiQsFetchingStatusStore(false, "willGetQs");
                     updateApiQsFetchingStatusStore(false, "areQsReceivedForNextQuiz");
