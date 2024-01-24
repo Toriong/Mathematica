@@ -45,7 +45,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const setApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const currentThemeObj = colorThemesObj[currentTheme];
     const questionIndex = useQuestionsStore(state => state.questionIndex)
-    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz); 
+    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
 
     function handleBackToMainScrnBtnPress() {
         getAddtionalQCancelToken.cancel();
@@ -59,9 +59,14 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
 
         if (questionsForNextQuizUpdated.length <= 10) {
             setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");
-        } else if (questionsForNextQuiz.length >= 5) {
+        } else if ((questionsForNextQuiz.length >= 5) && (questionsForNextQuizUpdated.length > 0)) {
+            setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");
             setApiQsFetchingStatusStore(true, "willGetQs");
             setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz")
+        } else {
+            setApiQsFetchingStatusStore(true, "willGetQs");
+            setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz")
+            setApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")
         }
 
         setGameScrnTabStore("finished", "mode");

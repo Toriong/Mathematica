@@ -22,6 +22,7 @@ export function useGetInitialQs(): null {
     const willGetQs = useApiQsFetchingStatusStore(state => state.willGetQs);
     const areQsReceivedForNextQuiz = useApiQsFetchingStatusStore(state => state.areQsReceivedForNextQuiz);
     const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
+    const currentQuestions = useQuestionsStore(state => state.questions);
     const numberToGetForEachQuestionType = useQuestionsStore(state => state.numberToGetForEachQuestionType);
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);

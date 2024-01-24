@@ -117,24 +117,28 @@ const GameScrnContainer = () => {
     }
   };
 
+  const didInitialFocusOccur = useRef(false);
+
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
 
-      console.log("getAdditionalQuestionFnRef.current: ", getAdditionalQuestionFnRef.current)
-      if (isActive && willResetGetAdditionalQCancelTokenSource) {
+      if (didInitialFocusOccur && isActive && willResetGetAdditionalQCancelTokenSource) {
         getAdditionalQuestionFnRef.current = createGetAdditionalQuestionFn(memory, getMoreQsNum ?? 1, getAdditionalQCancelTokenSource);
         updateGameScrnTabStore(false, "willResetGetAdditionalQCancelTokenSource");
       }
 
       console.log("getAdditionalQuestionFnRef.current, what is up there: ", getAdditionalQuestionFnRef.current)
 
-      if (isActive && (getAdditionalQuestionFnRef.current !== null) && (getMoreQsNum || wasSubmitBtnPressed || wasSkipBtnPressed)) {
+      if (didInitialFocusOccur && isActive && (getAdditionalQuestionFnRef.current !== null) && (getMoreQsNum || wasSubmitBtnPressed || wasSkipBtnPressed)) {
         addNewQuestionToQuestionsArr();
       };
 
+      didInitialFocusOccur.current = true;
+
       return () => {
         isActive = false;
+        didInitialFocusOccur.current = false; 
       };
     }, [wasSubmitBtnPressed, wasSkipBtnPressed, getMoreQsNum, willResetGetAdditionalQCancelTokenSource])
   );
