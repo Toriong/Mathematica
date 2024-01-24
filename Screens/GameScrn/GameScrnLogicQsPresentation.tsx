@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import { TStackNavigation } from '../../Navigation';
 import { IQuestionOnClient } from '../../zustandStoreTypes&Interfaces';
 import { TStateSetter, TUseStateReturnVal } from '../../globalTypes&Interfaces';
+import { getIsAnswerCorrect } from './functions/getIsAnswerCorrect';
 
 type TSelectedSymbol = typeof SYMBOLS[number] | typeof LETTERS[number]
 interface ISelectedLogicSymbol {
@@ -131,7 +132,7 @@ const GameScrnPresentation = ({
 
   const question = questions?.length ? (isOnReviewMode ? questionsToReview : questions)[questionIndex] : null;
   const { choices, answer, symbolOptions: symbolOptionsFromServer, userAnswer } = question ?? {};
-  let isAnswerCorrect: boolean | null = null;
+  let isAnswerCorrect: boolean = false;
   let isAnswerCorrectOnReviewMode: boolean | null = null;
   const symbolOptions = useMemo(() => [...SYMBOLS, ...(Array.isArray(symbolOptionsFromServer) ? symbolOptionsFromServer : [])].map(symbol => ({
     symbol: symbol,
@@ -147,11 +148,12 @@ const GameScrnPresentation = ({
 
   if (isOnReviewMode) {
     const userAnswerArrAfterEmptyCheck = userAnswer?.length ? userAnswer : [];
-    isAnswerCorrectOnReviewMode = !userAnswer?.length ? false : JSON.stringify(answer) === JSON.stringify(userAnswerArrAfterEmptyCheck);
+    isAnswerCorrectOnReviewMode = !userAnswerArrAfterEmptyCheck?.length ? false : getIsAnswerCorrect(userAnswerArrAfterEmptyCheck, answer as string[]);
   }
 
   if (wasSubmitBtnPressed) {
-    isAnswerCorrect = JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol));
+    // isAnswerCorrect = JSON.stringify(answer) === JSON.stringify(selectedLogicSymbols.map(({ symbol }) => symbol));
+    isAnswerCorrect = getIsAnswerCorrect(selectedLogicSymbols.map(({ symbol }) => symbol), answer as string[])
   };
 
   function handleSymbolOptPress(selectedLogicSymbol: ISelectedLogicSymbol) {

@@ -59,11 +59,10 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
 
         if (questionsForNextQuizUpdated.length <= 10) {
             setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");
-        } else if ((questionsForNextQuiz.length >= 5) && (questionsForNextQuizUpdated.length > 0)) {
-            setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");
+        } else if ((questionsForNextQuiz.length <= 5) && (questionsForNextQuizUpdated.length > 0)) {
             setApiQsFetchingStatusStore(true, "willGetQs");
             setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz")
-        } else {
+        } else if(questionsForNextQuiz.length === 0) {
             setApiQsFetchingStatusStore(true, "willGetQs");
             setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz")
             setApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")
