@@ -104,7 +104,6 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         setGameScrnTabStore("finished", 'mode');
 
         if (unansweredQs[1]) {
-            console.log("unansweredQs.slice(1), hey there: ", unansweredQs.slice(1))
             setQuestionsStore(unansweredQs.slice(1), "questionsForNextQuiz")
         } else {
             setTimeout(() => {

@@ -12,7 +12,6 @@ import {
 } from './zustandStoreTypes&Interfaces';
 import axios from 'axios';
 
-
 export const useQuestionsStore = create<IQuestionsForObj>(set => ({
     task: "",
     questions: [],
@@ -25,7 +24,6 @@ export const useQuestionsStore = create<IQuestionsForObj>(set => ({
     },
     updateState: (newState: IQuestionsForObj[keyof IQuestionsForObj], fieldName: keyof IQuestionsStates) => set(() => ({ [fieldName]: newState })),
 }));
-
 export const useErrorsStore = create(set => ({
     didAnErrorOccurInGettingQs: false,
     didAnErrorOccurInUserAuth: false,
@@ -33,7 +31,6 @@ export const useErrorsStore = create(set => ({
         didAnErrorOccurInGettingQs: didAnErrorOccurInGettingQs
     }))
 }));
-
 export const useRequestStatusStore = create<TIsGettingReqStore>(set => ({
     isGettingQs: true,
     isGettingUserInfo: false,
@@ -43,7 +40,7 @@ export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
     const gameScrnTabStore: TGameScrnTabStore = {
         right: 0,
         wrong: 0,
-        timer: 120,
+        timer: 240,
         willNotShowLoadingModal: false,
         wasSubmitBtnPressed: false,
         isTimerOn: true,
