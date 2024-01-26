@@ -81,8 +81,6 @@ const GameScrnContainer = () => {
     try {
       const getAdditionalQuestionResult = await (getAdditionalQuestionFnRef.current as ReturnType<typeof createGetAdditionalQuestionFn>)(questions, questionTypes);
 
-      console.log("getAdditionalQuestionResult: ", getAdditionalQuestionResult)
-
       if (getAdditionalQuestionResult.didErrorOccur || !getAdditionalQuestionResult?.data?.length) {
         throw new Error(`${getAdditionalQuestionResult.msg} ${!getAdditionalQuestionResult?.data?.length && 'Did not receive a question from the server.'}`);
       }
@@ -128,8 +126,6 @@ const GameScrnContainer = () => {
         updateGameScrnTabStore(false, "willResetGetAdditionalQCancelTokenSource");
       }
 
-      console.log("getAdditionalQuestionFnRef.current, what is up there: ", getAdditionalQuestionFnRef.current)
-
       if (didInitialFocusOccur && isActive && (getAdditionalQuestionFnRef.current !== null) && (getMoreQsNum || wasSubmitBtnPressed || wasSkipBtnPressed)) {
         addNewQuestionToQuestionsArr();
       };
@@ -138,25 +134,10 @@ const GameScrnContainer = () => {
 
       return () => {
         isActive = false;
-        didInitialFocusOccur.current = false; 
+        didInitialFocusOccur.current = false;
       };
     }, [wasSubmitBtnPressed, wasSkipBtnPressed, getMoreQsNum, willResetGetAdditionalQCancelTokenSource])
   );
-
-  // useEffect(() => {
-  //   if (willResetGetAdditionalQCancelTokenSource) {
-  //     getAdditionalQuestionFnRef.current = createGetAdditionalQuestionFn(memory, getMoreQsNum ?? 1, getAdditionalQCancelTokenSource);
-  //     updateGameScrnTabStore(false, "willResetGetAdditionalQCancelTokenSource");
-  //   }
-
-  //   console.log("will get questions, wasSubmitBtnPressed: ", wasSubmitBtnPressed);
-  //   console.log("getAdditionalQuestion.current: ", getAdditionalQuestionFnRef.current)
-  //   console.log("getAdditionalQuestion.current !== null: ", getAdditionalQuestionFnRef.current !== null)
-
-  //   if ((getAdditionalQuestionFnRef.current !== null) && (getMoreQsNum || wasSubmitBtnPressed || wasSkipBtnPressed)) {
-  //     addNewQuestionToQuestionsArr()
-  //   }
-  // }, [wasSubmitBtnPressed, wasSkipBtnPressed, getMoreQsNum, willResetGetAdditionalQCancelTokenSource]);
 
   return (
     <GameScrnPresentation

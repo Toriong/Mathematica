@@ -14,9 +14,9 @@ import { getUserId } from "../../../utils/generalFns";
 import { Alert } from "react-native";
 import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
 import uuid from 'react-native-uuid';
-import { useResetLogicQs } from '../../../custom_hooks/useResetLogicQs';
 import axios from 'axios';
 import { IQuestionOnClient } from '../../../zustandStoreTypes&Interfaces';
+import { Storage } from '../../../utils/storage';
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
@@ -29,6 +29,7 @@ function getTimeForUI(millis: number) {
 };
 
 const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
+    const storage = new Storage();
     const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
     const currentTheme = useColorStore(state => state.currentTheme);
     const colorThemesObj = useColorStore(state => state.themesObj);
@@ -62,7 +63,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         } else if ((questionsForNextQuiz.length <= 5) && (questionsForNextQuizUpdated.length > 0)) {
             setApiQsFetchingStatusStore(true, "willGetQs");
             setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz")
-        } else if(questionsForNextQuiz.length === 0) {
+        } else if (questionsForNextQuiz.length === 0) {
             setApiQsFetchingStatusStore(true, "willGetQs");
             setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz")
             setApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")
@@ -99,14 +100,20 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
             })
     }
 
+    async function incrementQuizzesTakenNum() {
+        try {
+                
+        } catch (error) {
+            console.error("Something went wrong. Couldn't increment quizzesTaken number.")
+        }
+    }
+
     function handleOnComplete() {
         const answeredQs = questions.filter(question => question.userAnswer);
         let unansweredQs = questions
             .filter(question => !question.userAnswer)
             .filter(question => !question.wasSkipped);
 
-        console.log("answerQs: ", answeredQs);
-        console.log("unansweredQs: ", unansweredQs);
 
         setGameScrnTabStore("finished", 'mode');
 

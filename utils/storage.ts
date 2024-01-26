@@ -1,11 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type TStorageKeys = "userId"
+// GOAL: the user can only generate 5 quizzes per day for free
+// the user can generate up to 20 quizzes per day for paid tiers.
+
+// export type TStorageKeys = "userId" | "quizzesTaken"
 export type TStorageInstance = InstanceType<typeof Storage>;
 export interface IStorage {
     userId: string
     isGameOn: boolean
+    quizzesTaken: number
 }
+export type TStorageKeys = keyof IStorage
 
 export class Storage {
     storage = AsyncStorage;
