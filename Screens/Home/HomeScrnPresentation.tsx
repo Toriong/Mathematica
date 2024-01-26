@@ -6,8 +6,10 @@ import { TScreenNames, TStackNavigation } from "../../Navigation";
 import { useColorStore, useGameScrnTabStore, useQuestionsStore } from "../../zustand";
 import Button from "../../global_components/Button";
 import { Storage } from "../../utils/storage";
-import { sortRandomly } from "../../utils/generalFns";
+import { getUserId, sortRandomly } from "../../utils/generalFns";
 import { IQuestionOnClient } from "../../zustandStoreTypes&Interfaces";
+import { getHasUserReachedQuizGenerationLimit } from "../../api_services/users/getHasUserReachedQuizGenerationLimit";
+import { CustomError } from "../../utils/errors";
 
 const HomeScrnPresentation = () => {
     const navigation = useNavigation<TStackNavigation>();
@@ -21,19 +23,31 @@ const HomeScrnPresentation = () => {
 
     async function handleOnBtnPress(
         scrnName: TScreenNames,
-        types: Exclude<Parameters<typeof updateGameScrnTabStore>[0], number | boolean>
+        types: Exclude<Parameters<typeof updateGameScrnTabStore>[0], number | boolean>,
+        gameType?: "logic" | "math"
     ) {
-        if ((scrnName === "GameScreen") && questionsForNextQuiz.length) {
-            await memory.setItem("isGameOn", true);
-            updateGameScrnTabStore(types, "questionTypes");
-            updateGameScrnTabStore("quiz", "mode");
-            updateQuestionStore(0, "questionIndex");
-            setQuestionsStore(sortRandomly(questionsForNextQuiz), "questions");
-            navigation.navigate(scrnName);
+        if ((scrnName === "GameScreen") && questionsForNextQuiz.length && (gameType === "logic")) {
+            try {
+                await memory.setItem("isGameOn", true);
+                const userId = await getUserId() as string;
+                const hasUserReachedTheirQuizGenerationLimit = await getHasUserReachedQuizGenerationLimit(userId);
+                
+                if(hasUserReachedTheirQuizGenerationLimit){
+                    throw new CustomError("The user has reached daily limit of quiz generation.", 429);
+                }
+
+                updateGameScrnTabStore(types, "questionTypes");
+                updateGameScrnTabStore("quiz", "mode");
+                updateQuestionStore(0, "questionIndex");
+                setQuestionsStore(sortRandomly(questionsForNextQuiz), "questions");
+                navigation.navigate(scrnName);
+            } catch (error) {
+                console.error("An error has occurred: ", error);
+            }
             return;
         }
 
-        if ((scrnName === "GameScreen")) {
+        if ((scrnName === "GameScreen") && (gameType === "logic")) {
             await memory.setItem("isGameOn", true);
             updateGameScrnTabStore(types, "questionTypes");
             updateGameScrnTabStore("quiz", "mode");
@@ -51,7 +65,7 @@ const HomeScrnPresentation = () => {
                         isDisabled={false}
                         dynamicStyles={{ padding: 10, borderRadius: 15 }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={async _ => { await handleOnBtnPress("GameScreen", ["propositional", "predicate"]) }}
+                        handleOnPress={async _ => { await handleOnBtnPress("GameScreen", ["propositional", "predicate"], "logic") }}
                     >
 
                         <PTxt>PROPOSITIONAL</PTxt>

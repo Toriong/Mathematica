@@ -5,13 +5,13 @@ import { CustomError } from "../../utils/errors";
 
 const hasUserReachedQuizGeneratinLimitApiPath = getPath("get-did-user-reach-quiz-generation-limit");
 
-export async function getHasUserReachedQuizGenerationLimit(userId: string, cancelToken: TCancelTokenSource) {
+export async function getHasUserReachedQuizGenerationLimit(userId: string) {
     try {
         const url = new URLSearchParams(`${SERVER_ORIGIN}/${hasUserReachedQuizGeneratinLimitApiPath}`);
 
         url.set("userId", userId)
         
-        const response = await axios.get(url.toString(), {  cancelToken: cancelToken.token })
+        const response = await axios.get(url.toString(), {  timeout: 5_000 })
 
         if(response.status !== 200){
             throw new CustomError("Failed to check if the user has reached their daily limit of quizzes generated.", response.status);

@@ -11,6 +11,9 @@ import { faLock } from "@fortawesome/free-solid-svg-icons";
 import Layout from "../../global_components/Layout";
 import Button from "../../global_components/Button";
 import { IQuestionOnClient } from '../../zustandStoreTypes&Interfaces';
+import { getUserId } from '../../utils/generalFns';
+import { getHasUserReachedQuizGenerationLimit } from '../../api_services/users/getHasUserReachedQuizGenerationLimit';
+import { CustomError } from '../../utils/errors';
 
 const BTN_FONT_SIZE = 22;
 const PTXT_FONT_SIZE = 35;
@@ -30,27 +33,38 @@ const ResultsPresentation = () => {
     const updateGameScrnStore = useGameScrnTabStore(state => state.updateState);
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);
 
-    function handlePlayAgainBtnPress() {
-        updateQuestionsStore(0, "questionIndex");
-        const questionsForNextQuizUpdated = structuredClone<IQuestionOnClient[]>((questions.length === 0) ? questionsForNextQuiz.slice(1) : questionsForNextQuiz);
+    async function handlePlayAgainBtnPress() {
+        try {
+            const userId = await getUserId() as string;
+            const hasUserReachedTheirQuizGenerationLimit = await getHasUserReachedQuizGenerationLimit(userId);
 
-        if (questionsForNextQuizUpdated?.length) {
-            updateQuestionsStore(questionsForNextQuizUpdated, "questions");
-            updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
-        } else if (!willGetQs && (gettingQsResponseStatus === "FAILURE")) {
-            updateApiQsFetchingStatusStore(true, "willGetQs");
-            updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
-            updateQuestionsStore([], "questions");
-        };
+            if (hasUserReachedTheirQuizGenerationLimit) {
+                throw new CustomError("The user has reached their daily limit of quizzes generated.", 429);
+            }
 
-        console.log("questionsFromPreviousQuiz: ", questionsFromPreviousQuiz)
+            updateQuestionsStore(0, "questionIndex");
+            const questionsForNextQuizUpdated = structuredClone<IQuestionOnClient[]>((questions.length === 0) ? questionsForNextQuiz.slice(1) : questionsForNextQuiz);
 
-        // if the questions for the next quiz has not been retrieved then change gettingQsStatus global state 
-        // to IN_PROGRESS
-        updateGameScrnStore(0, "right");
-        updateGameScrnStore(0, "wrong");
-        updateGameScrnStore("quiz", "mode");
-        navigate("GameScreen");
+            if (questionsForNextQuizUpdated?.length) {
+                updateQuestionsStore(questionsForNextQuizUpdated, "questions");
+                updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
+            } else if (!willGetQs && (gettingQsResponseStatus === "FAILURE")) {
+                updateApiQsFetchingStatusStore(true, "willGetQs");
+                updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
+                updateQuestionsStore([], "questions");
+            };
+
+            console.log("questionsFromPreviousQuiz: ", questionsFromPreviousQuiz)
+
+            // if the questions for the next quiz has not been retrieved then change gettingQsStatus global state 
+            // to IN_PROGRESS
+            updateGameScrnStore(0, "right");
+            updateGameScrnStore(0, "wrong");
+            updateGameScrnStore("quiz", "mode");
+            navigate("GameScreen");
+        } catch (error) {
+            console.error("An error has occurred when the user pressed the 'Play Again' button on the results screen. Error object: ", error);
+        }
     };
 
     const questionIndex = useQuestionsStore(state => state.questionIndex);
@@ -71,7 +85,7 @@ const ResultsPresentation = () => {
             setApiQsFetchingStatusStore(true, "willGetQs")
         }
 
-        if(questions.length > 0){
+        if (questions.length > 0) {
             setQuestionsStore([], "questions");
         }
 

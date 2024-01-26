@@ -17,6 +17,7 @@ import uuid from 'react-native-uuid';
 import axios from 'axios';
 import { IQuestionOnClient } from '../../../zustandStoreTypes&Interfaces';
 import { Storage } from '../../../utils/storage';
+import { updateUserQuizzesTakenNum } from '../../../api_services/users/updateUserQuizzesTakenNum';
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
@@ -100,15 +101,15 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
             })
     }
 
-    async function incrementQuizzesTakenNum() {
-        try {
-                
-        } catch (error) {
-            console.error("Something went wrong. Couldn't increment quizzesTaken number.")
-        }
-    }
-
     function handleOnComplete() {
+        updateUserQuizzesTakenNum()
+            .then(response => {
+                console.log("From the server: ", response);
+            })
+            .catch((error) => {
+                console.error("An error has occurred in incrementing the total times that the user has taken a quiz within a 24 hour time period.");
+                console.error("Error object: ", error);
+            })
         const answeredQs = questions.filter(question => question.userAnswer);
         let unansweredQs = questions
             .filter(question => !question.userAnswer)

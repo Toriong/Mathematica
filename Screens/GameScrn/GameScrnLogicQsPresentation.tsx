@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Layout from '../../global_components/Layout';
-import { View, TouchableOpacity, TextStyle } from 'react-native';
+import { View, TouchableOpacity, TextStyle, Alert } from 'react-native';
 import { PTxt } from '../../global_components/text';
 import { useApiQsFetchingStatusStore, useGameScrnTabStore, useQuestionsStore } from '../../zustand';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -17,6 +17,9 @@ import { TStackNavigation } from '../../Navigation';
 import { IQuestionOnClient } from '../../zustandStoreTypes&Interfaces';
 import { TStateSetter, TUseStateReturnVal } from '../../globalTypes&Interfaces';
 import { getIsAnswerCorrect } from './functions/getIsAnswerCorrect';
+import { getHasUserReachedQuizGenerationLimit } from '../../api_services/users/getHasUserReachedQuizGenerationLimit';
+import { getUserId } from '../../utils/generalFns';
+import { CustomError } from '../../utils/errors';
 
 type TSelectedSymbol = typeof SYMBOLS[number] | typeof LETTERS[number]
 interface ISelectedLogicSymbol {
@@ -178,7 +181,7 @@ const GameScrnPresentation = ({
 
   async function handleSkipBtnPress() {
     const questionsUpdated = questions.map((question, index) => {
-      if(index === questionIndex){
+      if (index === questionIndex) {
         return {
           ...question,
           wasSkipped: true
@@ -391,17 +394,29 @@ const GameScrnPresentation = ({
   // GOAL: execute the logic within the useEffect of the GameScrnLogicQsContainer when the user presses
   // the GetQuestionBtn
 
-  function handleGetQuestionsBtnPress() {
-    updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")
+  async function handleGetQuestionsBtnPress() {
+    try {
+      const userId = await getUserId() as string;
+      const hasUserReachedTheirQuizGenerationLimit = await getHasUserReachedQuizGenerationLimit(userId);
 
-    if (pointOfFailureInGettingNextQ === "submitBtnPress") {
-      setWillIncrementQIndex(true);
-      setIsUserOnLastQ(true);
-      setWasSkipBtnPressed(true);
-      return;
+      if (hasUserReachedTheirQuizGenerationLimit) {
+        Alert.alert("You have reached your daily limit quiz generation. Please try again later.")
+        throw new CustomError("The user has reached their daily limit of quiz generated within 24 hours.", 429);
+      }
+
+      updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")
+
+      if (pointOfFailureInGettingNextQ === "submitBtnPress") {
+        setWillIncrementQIndex(true);
+        setIsUserOnLastQ(true);
+        setWasSkipBtnPressed(true);
+        return;
+      }
+
+      updateApiQsFetchingStatusStore(true, "willGetQs");
+    } catch (error) {
+      console.error("An error has occurred when user pressed 'Press to get questions' button. Error object: ", error)
     }
-
-    updateApiQsFetchingStatusStore(true, "willGetQs");
   }
 
   useEffect(() => {
