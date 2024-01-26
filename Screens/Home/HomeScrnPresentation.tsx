@@ -1,5 +1,5 @@
 import Layout from "../../global_components/Layout";
-import { View } from 'react-native'
+import { Alert, View } from 'react-native'
 import { PTxt } from "../../global_components/text";
 import { useNavigation } from '@react-navigation/native';
 import { TScreenNames, TStackNavigation } from "../../Navigation";
@@ -9,7 +9,7 @@ import { Storage } from "../../utils/storage";
 import { getUserId, sortRandomly } from "../../utils/generalFns";
 import { IQuestionOnClient } from "../../zustandStoreTypes&Interfaces";
 import { getHasUserReachedQuizGenerationLimit } from "../../api_services/users/getHasUserReachedQuizGenerationLimit";
-import { CustomError } from "../../utils/errors";
+import { CustomError, ICustomError } from "../../utils/errors";
 
 const HomeScrnPresentation = () => {
     const navigation = useNavigation<TStackNavigation>();
@@ -26,13 +26,13 @@ const HomeScrnPresentation = () => {
         types: Exclude<Parameters<typeof updateGameScrnTabStore>[0], number | boolean>,
         gameType?: "logic" | "math"
     ) {
-        if ((scrnName === "GameScreen") && questionsForNextQuiz.length && (gameType === "logic")) {
-            try {
+        try {
+            if ((scrnName === "GameScreen") && questionsForNextQuiz.length && (gameType === "logic")) {
                 await memory.setItem("isGameOn", true);
                 const userId = await getUserId() as string;
-                const hasUserReachedTheirQuizGenerationLimit = await getHasUserReachedQuizGenerationLimit(userId);
-                
-                if(hasUserReachedTheirQuizGenerationLimit){
+                const result = await getHasUserReachedQuizGenerationLimit(userId);
+
+                if (result.hasReachedLimit) {
                     throw new CustomError("The user has reached daily limit of quiz generation.", 429);
                 }
 
@@ -41,19 +41,32 @@ const HomeScrnPresentation = () => {
                 updateQuestionStore(0, "questionIndex");
                 setQuestionsStore(sortRandomly(questionsForNextQuiz), "questions");
                 navigation.navigate(scrnName);
-            } catch (error) {
-                console.error("An error has occurred: ", error);
+                return;
             }
-            return;
-        }
 
-        if ((scrnName === "GameScreen") && (gameType === "logic")) {
-            await memory.setItem("isGameOn", true);
-            updateGameScrnTabStore(types, "questionTypes");
-            updateGameScrnTabStore("quiz", "mode");
-            updateQuestionStore(0, "questionIndex");
-            navigation.navigate(scrnName);
-            return;
+            if ((scrnName === "GameScreen") && (gameType === "logic")) {
+                await memory.setItem("isGameOn", true);
+                const userId = await getUserId() as string;
+                const result = await getHasUserReachedQuizGenerationLimit(userId);
+
+                if (result.hasReachedLimit) {
+                    throw new CustomError("The user has reached daily limit of quiz generation.", 429);
+                };
+
+                updateGameScrnTabStore(types, "questionTypes");
+                updateGameScrnTabStore("quiz", "mode");
+                updateQuestionStore(0, "questionIndex");
+                navigation.navigate(scrnName);
+                return;
+            }
+        } catch (error) {
+            const { status, msg } = error as ICustomError;
+
+            if (status === 429) {
+                Alert.alert("You have reached your limit of quizzes that can be generated within a 24 hour period. Please try again later.");
+            }
+
+            console.error("An error has occurred. Error message: ", msg);
         }
     }
 

@@ -6,7 +6,9 @@ import { getInitialQs } from "../api_services/quiz/getInitialQs";
 import { IQuestionOnClient, TNumberToGetForEachQuestionType } from "../zustandStoreTypes&Interfaces";
 import { CancelTokenSource } from "axios";
 import { TQuestionTypes } from "../sharedInterfaces&TypesWithBackend";
-import { sortRandomly } from "../utils/generalFns";
+import { getUserId, sortRandomly } from "../utils/generalFns";
+import { getHasUserReachedQuizGenerationLimit } from "../api_services/users/getHasUserReachedQuizGenerationLimit";
+import { CustomError } from "../utils/errors";
 
 // NOTES: 
 // CASE: when the user goes from the game screen to the main screen, clear all requests that are being made to the server (if any) from the 
@@ -30,12 +32,18 @@ export function useGetInitialQs(): null {
     const getInitialQsCancelTokenSource = useGameScrnTabStore(state => state.getInitialQsCancelTokenSource);
 
     useEffect(() => {
-        // GOAL: insert the token for the getQuestions function in order to cancel the request.
-        if (willGetQs) {
-            updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
+        (async () => {
+            try {
+                const userId = await getUserId() as string;
+                const result = await getHasUserReachedQuizGenerationLimit(userId);
 
-            (async () => {
-                try {
+                if (result.hasReachedLimit) {
+                    console.log("The user has reached daily limit of quizzes generated.")
+                    throw new CustomError("The user has reached their daily limit of quizzes generated.", 429);
+                }
+
+                if (willGetQs) {
+                    updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
                     let userId = await memory.getItem("userId");
                     userId = IS_TESTING ? TESTING_USER_ID : userId;
                     const _numberToGetForEachQuestionType = (Object.values(numberToGetForEachQuestionType).length ? numberToGetForEachQuestionType : { predicate: 3, propositional: 3, diagrams: 3 }) as Required<TNumberToGetForEachQuestionType>
@@ -62,18 +70,17 @@ export function useGetInitialQs(): null {
                     };
 
                     updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
-                } catch (error) {
-                    console.error("Failed to get questions from the server. Error message: ", error)
-                    updateApiQsFetchingStatusStore("FAILURE", "gettingQsResponseStatus");
-                    updateApiQsFetchingStatusStore("gettingInitialQs", "pointOfFailure");
-                } finally {
-                    updateApiQsFetchingStatusStore(false, "willGetQs");
-                    updateApiQsFetchingStatusStore(false, "areQsReceivedForNextQuiz");
-                    updateGameScrnTabStore(false, "willNotShowLoadingModal")
-
                 }
-            })();
-        }
+            } catch (error) {
+                console.error("Failed to get questions from the server. Error message: ", error)
+                updateApiQsFetchingStatusStore("FAILURE", "gettingQsResponseStatus");
+                updateApiQsFetchingStatusStore("gettingInitialQs", "pointOfFailure");
+            } finally {
+                updateApiQsFetchingStatusStore(false, "willGetQs");
+                updateApiQsFetchingStatusStore(false, "areQsReceivedForNextQuiz");
+                updateGameScrnTabStore(false, "willNotShowLoadingModal")
+            }
+        })();
     }, [willGetQs]);
 
     return null;

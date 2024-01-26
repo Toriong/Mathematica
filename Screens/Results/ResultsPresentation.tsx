@@ -36,9 +36,11 @@ const ResultsPresentation = () => {
     async function handlePlayAgainBtnPress() {
         try {
             const userId = await getUserId() as string;
-            const hasUserReachedTheirQuizGenerationLimit = await getHasUserReachedQuizGenerationLimit(userId);
+            const result = await getHasUserReachedQuizGenerationLimit(userId);
+            console.log("result: ", result)
 
-            if (hasUserReachedTheirQuizGenerationLimit) {
+            if (result.hasReachedLimit) {
+                Alert.alert("You have reached your limit of quizzes that can be generated within a 24 hour period. Please try again later.")
                 throw new CustomError("The user has reached their daily limit of quizzes generated.", 429);
             }
 

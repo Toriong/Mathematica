@@ -391,16 +391,13 @@ const GameScrnPresentation = ({
     setGameScrnTabStore(wrongNum + 1, "wrong")
   };
 
-  // GOAL: execute the logic within the useEffect of the GameScrnLogicQsContainer when the user presses
-  // the GetQuestionBtn
-
   async function handleGetQuestionsBtnPress() {
     try {
       const userId = await getUserId() as string;
-      const hasUserReachedTheirQuizGenerationLimit = await getHasUserReachedQuizGenerationLimit(userId);
+      const result = await getHasUserReachedQuizGenerationLimit(userId);
 
-      if (hasUserReachedTheirQuizGenerationLimit) {
-        Alert.alert("You have reached your daily limit quiz generation. Please try again later.")
+      if (result.hasReachedLimit) {
+        Alert.alert("You have reached your daily limit of quiz generations. Please try again later.")
         throw new CustomError("The user has reached their daily limit of quiz generated within 24 hours.", 429);
       }
 
