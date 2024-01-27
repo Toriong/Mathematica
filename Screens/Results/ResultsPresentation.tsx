@@ -14,6 +14,8 @@ import { IQuestionOnClient } from '../../zustandStoreTypes&Interfaces';
 import { getUserId } from '../../utils/generalFns';
 import { getHasUserReachedQuizGenerationLimit } from '../../api_services/users/getHasUserReachedQuizGenerationLimit';
 import { CustomError } from '../../utils/errors';
+import { useGetCanUserGetAGeneratedQuiz } from '../../custom_hooks/useGetCanUserGenerateAQuiz';
+import { useState } from 'react';
 
 const BTN_FONT_SIZE = 22;
 const PTXT_FONT_SIZE = 35;
@@ -21,7 +23,6 @@ const PTXT_FONT_SIZE = 35;
 const ResultsPresentation = () => {
     // How to provide type checking for the navigation function for the screen names? 
     const { navigate } = useNavigation<TStackNavigation>();
-    const resetLogicQs = useResetLogicQs();
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
     const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
@@ -29,51 +30,59 @@ const ResultsPresentation = () => {
     const appColors = useGetAppColors();
     const willGetQs = useApiQsFetchingStatusStore(state => state.willGetQs);
     const gettingQsResponseStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
+    const questions = useQuestionsStore(state => state.questions);
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const updateGameScrnStore = useGameScrnTabStore(state => state.updateState);
     const updateQuestionsStore = useQuestionsStore(state => state.updateState);
-
-    async function handlePlayAgainBtnPress() {
-        try {
-            const userId = await getUserId() as string;
-            const result = await getHasUserReachedQuizGenerationLimit(userId);
-            console.log("result: ", result)
-
-            if (result.hasReachedLimit) {
-                Alert.alert("You have reached your limit of quizzes that can be generated within a 24 hour period. Please try again later.")
-                throw new CustomError("The user has reached their daily limit of quizzes generated.", 429);
-            }
-
-            updateQuestionsStore(0, "questionIndex");
-            const questionsForNextQuizUpdated = structuredClone<IQuestionOnClient[]>((questions.length === 0) ? questionsForNextQuiz.slice(1) : questionsForNextQuiz);
-
-            if (questionsForNextQuizUpdated?.length) {
-                updateQuestionsStore(questionsForNextQuizUpdated, "questions");
-                updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
-            } else if (!willGetQs && (gettingQsResponseStatus === "FAILURE")) {
-                updateApiQsFetchingStatusStore(true, "willGetQs");
-                updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
-                updateQuestionsStore([], "questions");
-            };
-
-            console.log("questionsFromPreviousQuiz: ", questionsFromPreviousQuiz)
-
-            // if the questions for the next quiz has not been retrieved then change gettingQsStatus global state 
-            // to IN_PROGRESS
-            updateGameScrnStore(0, "right");
-            updateGameScrnStore(0, "wrong");
-            updateGameScrnStore("quiz", "mode");
-            navigate("GameScreen");
-        } catch (error) {
-            console.error("An error has occurred when the user pressed the 'Play Again' button on the results screen. Error object: ", error);
-        }
-    };
-
-    const questionIndex = useQuestionsStore(state => state.questionIndex);
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
     const setQuestionsStore = useQuestionsStore(state => state.updateState);
-    const questions = useQuestionsStore(state => state.questions);
     const setApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
+    const [isPlayAgainBtnDisabled, setIsPlayAgainBtnDisabled] = useState(false);
+
+    // results 
+    // loading qs modal
+
+    async function handlePlayAgainBtnPress() {
+        setIsPlayAgainBtnDisabled(true);
+
+        const userId = await getUserId();
+        
+        getHasUserReachedQuizGenerationLimit(userId as string)
+            .then(result => {
+                console.log("result: ", result)
+                
+                if(!result.wasSuccessful){
+                    throw new CustomError("Something went wrong. Was not successful in checking if the user can generate a quiz.", 400);
+                }
+
+                if(result.hasReachedLimit){
+                    throw new CustomError("The user cannot generate a quiz.", 400);
+                }
+
+                updateQuestionsStore(0, "questionIndex");
+                const questionsForNextQuizUpdated = structuredClone<IQuestionOnClient[]>((questions.length === 0) ? questionsForNextQuiz.slice(1) : questionsForNextQuiz);
+
+                if (questionsForNextQuizUpdated?.length) {
+                    updateQuestionsStore(questionsForNextQuizUpdated, "questions");
+                    updateApiQsFetchingStatusStore("SUCCESS", "gettingQsResponseStatus");
+                } else if (!willGetQs && (gettingQsResponseStatus === "FAILURE")) {
+                    updateApiQsFetchingStatusStore(true, "willGetQs");
+                    updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
+                    updateQuestionsStore([], "questions");
+                };
+
+                updateGameScrnStore(0, "right");
+                updateGameScrnStore(0, "wrong");
+                updateGameScrnStore("quiz", "mode");
+                navigate("GameScreen");
+            })
+            .catch(error => {
+                console.error("An error has occurred when the user pressed the 'Play Again' button. Error message: ", error);
+            })
+            .finally(() => {
+                setIsPlayAgainBtnDisabled(false);    
+            })
+    };
 
     function handleHomeBtnPress() {
         const questionsForNextQuizUpdated = structuredClone<IQuestionOnClient[]>((questions.length === 0) ? questionsForNextQuiz.slice(1) : questionsForNextQuiz);
@@ -169,6 +178,7 @@ const ResultsPresentation = () => {
                         backgroundColor={SUCCESS_COLOR}
                         handleOnPress={handlePlayAgainBtnPress}
                         dynamicStyles={styles.button}
+                        isDisabled={isPlayAgainBtnDisabled}
                     >
                         <PTxt
                             fontSize={BTN_FONT_SIZE}

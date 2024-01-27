@@ -8,8 +8,8 @@ import Button from "../../global_components/Button";
 import { Storage } from "../../utils/storage";
 import { getUserId, sortRandomly } from "../../utils/generalFns";
 import { getHasUserReachedQuizGenerationLimit } from "../../api_services/users/getHasUserReachedQuizGenerationLimit";
-import { CustomError, ICustomError } from "../../utils/errors";
-import { useRef, useState } from "react";
+import { CustomError } from "../../utils/errors";
+import { useState } from "react";
 
 const HomeScrnPresentation = () => {
     const navigation = useNavigation<TStackNavigation>();
@@ -27,58 +27,48 @@ const HomeScrnPresentation = () => {
         types: Exclude<Parameters<typeof updateGameScrnTabStore>[0], number | boolean>,
         gameType?: "logic" | "math"
     ) {
-        try {
-            const userId = await getUserId() as string;
-            const result = await getHasUserReachedQuizGenerationLimit(userId);
-            console.log("result: ", result)
-
-            if (result.hasReachedLimit) {
-                Alert.alert("You have reached your limit of quizzes that can be generated within a 24 hour period. Please try again later.")
-                throw new CustomError("The user has reached their daily limit of quizzes generated.", 429);
-            }
-
-            if ((scrnName === "GameScreen") && questionsForNextQuiz.length && (gameType === "logic")) {
-                await memory.setItem("isGameOn", true);
-                updateGameScrnTabStore(types, "questionTypes");
-                updateGameScrnTabStore("quiz", "mode");
-                updateQuestionStore(0, "questionIndex");
-                setQuestionsStore(sortRandomly(questionsForNextQuiz), "questions");
-                navigation.navigate(scrnName);
-                return;
-            }
-
-            if ((scrnName === "GameScreen") && (gameType === "logic")) {
-                await memory.setItem("isGameOn", true);
-                const userId = await getUserId() as string;
-                const result = await getHasUserReachedQuizGenerationLimit(userId);
-
-                console.log("result, yo there meng: ", result)
-
-                if (result.hasReachedLimit) {
-                    throw new CustomError("The user has reached daily limit of quiz generation.", 429);
-                };
+        setIsPlayLogicGameBtnDisabled(true);
+        const userId = await getUserId();
+        await memory.setItem("isGameOn", true);
+        getHasUserReachedQuizGenerationLimit(userId as string)
+            .then(result => {
+                console.log("result, yo there meng: ", result);
 
                 if (!result.wasSuccessful) {
-                    Alert.alert("Something went wrong in generating your quiz. Please try again later.")
-                    throw new CustomError("Something went wrong on the server. Unable to check if the user can take a quiz.", 400);
+                    Alert.alert("Something went wrong. Couldn't generate a quiz. Please try again later.");
+                    throw new CustomError("The response from the server was unsuccessful.", 400);
                 }
 
-                updateGameScrnTabStore(types, "questionTypes");
-                updateGameScrnTabStore("quiz", "mode");
-                updateQuestionStore(0, "questionIndex");
-                navigation.navigate(scrnName);
-                return;
-            }
-        } catch (error) {
-            const { status, msg } = error as ICustomError;
+                if (result.hasReachedLimit) {
+                    Alert.alert("You have reached your limit of quizzes that can be generated within a 24 hour period. Please try again later.")
+                    throw new CustomError("The user has reached their daily limit of quizzes generated.", 429);
+                }
 
-            if (status === 429) {
-                Alert.alert("You have reached your limit of quizzes that can be generated within a 24 hour period. Please try again later.");
-            }
+                if ((scrnName === "GameScreen") && questionsForNextQuiz.length && (gameType === "logic")) {
+                    updateGameScrnTabStore(types, "questionTypes");
+                    updateGameScrnTabStore("quiz", "mode");
+                    updateQuestionStore(0, "questionIndex");
+                    setQuestionsStore(sortRandomly(questionsForNextQuiz), "questions");
+                    navigation.navigate(scrnName);
+                    return;
+                }
 
-            memory.setItem("isGameOn", false);
-            console.error("An error has occurred. Error message: ", msg);
-        }
+                if ((scrnName === "GameScreen") && (gameType === "logic")) {
+                    updateGameScrnTabStore(types, "questionTypes");
+                    updateGameScrnTabStore("quiz", "mode");
+                    updateQuestionStore(0, "questionIndex");
+                    navigation.navigate(scrnName);
+                    return;
+                }
+            })
+            .catch(error => {
+                console.error("An error has occurred in starting the quiz. Error message: ", error);
+                memory.setItem("isGameOn", false);
+                setIsPlayLogicGameBtnDisabled(false);
+            })
+            .finally(() => {
+                setIsPlayLogicGameBtnDisabled(false);
+            })
     }
 
     return (
@@ -86,11 +76,10 @@ const HomeScrnPresentation = () => {
             <View style={{ display: "flex", flexDirection: 'column', flex: 1 }}>
                 <View style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <Button
-                        isDisabled={false}
-                        dynamicStyles={{ padding: 10, borderRadius: 15 }}
+                        isDisabled={isPlayLogicGameBtnDisabled}
+                        dynamicStyles={{ padding: 10, borderRadius: 15, opacity: isPlayLogicGameBtnDisabled ? .4 : 1 }}
                         backgroundColor={currentAppColors.second}
                         handleOnPress={async _ => {
-
                             await handleOnBtnPress("GameScreen", ["propositional", "predicate"], "logic")
                         }}
                     >
@@ -102,11 +91,10 @@ const HomeScrnPresentation = () => {
                     style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                 >
                     <Button
-                        isDisabled={false}
+                        isDisabled={isPlayLogicGameBtnDisabled}
                         dynamicStyles={{ padding: 10, borderRadius: 15 }}
                         backgroundColor={currentAppColors.second}
                         handleOnPress={async _ => {
-
                             await handleOnBtnPress("GameScreen", ["predicate"])
                         }}
                     >
@@ -117,10 +105,10 @@ const HomeScrnPresentation = () => {
                     style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                 >
                     <Button
-                        isDisabled={false}
+                        isDisabled={isPlayLogicGameBtnDisabled}
                         dynamicStyles={{ padding: 10, borderRadius: 15 }}
-                        backgroundColor={currentAppColors.second} handleOnPress={async _ => {
-
+                        backgroundColor={currentAppColors.second}
+                        handleOnPress={async _ => {
                             await handleOnBtnPress("GameScreen", ["diagrams"])
                         }}
                     >
@@ -131,9 +119,10 @@ const HomeScrnPresentation = () => {
                     style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                 >
                     <Button
-                        isDisabled={false}
+                        isDisabled={isPlayLogicGameBtnDisabled}
                         dynamicStyles={{ padding: 10, borderRadius: 15 }}
-                        backgroundColor={currentAppColors.second} handleOnPress={async _ => {
+                        backgroundColor={currentAppColors.second}
+                        handleOnPress={async _ => {
                             await handleOnBtnPress("GameScreen", ["diagrams", "predicate", "propositional"])
                         }}
                     >

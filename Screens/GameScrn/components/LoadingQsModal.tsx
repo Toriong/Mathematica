@@ -10,26 +10,20 @@ import { TStackNavigationProp } from "../../../Navigation";
 import { TStateSetter } from "../../../globalTypes&Interfaces";
 
 type TLoadingQsModalProp = {
-    handleGetQuestionsBtnPress: () => void 
+    handleGetQuestionsBtnPress: (toggleDisableGetQuestionsBtn: () => void) => void 
     isThereAQToDisplay: boolean 
 }
 
 const LoadingQsModal = ({ isThereAQToDisplay, handleGetQuestionsBtnPress }: TLoadingQsModalProp) => {
     const navigation = useNavigation<TStackNavigationProp>();
-    // make the route name type safe
     const route = useRoute();
     const gettingQsStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
     const mode = useGameScrnTabStore(state => state.mode);
     const updateApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
     const updateGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
-    const willNotShowLoadingModal = useGameScrnTabStore(state => state.willNotShowLoadingModal);
     const [isModalVisible, setIsModalVisible] = useState((gettingQsStatus === "IN_PROGRESS") || (gettingQsStatus === "FAILURE"));
+    const [isGetQuestionsBtnDisabled, setIsGetQuestionsBtnDisabled] = useState(false);
     const appColors = useGetAppColors();
-
-    function handleBackToMainScreenBtnPress() {
-        setIsModalVisible(false);
-        navigation.navigate("Home")
-    }
 
     function handleOnGoBackMainScrnBtnPress() {
         setIsModalVisible(false);
@@ -43,8 +37,6 @@ const LoadingQsModal = ({ isThereAQToDisplay, handleGetQuestionsBtnPress }: TLoa
     };
 
     useEffect(() => {
-        console.log("mode: ", mode);
-
         if (
             ((mode === 'quiz') && (((route.name === "GameScreen") && (gettingQsStatus === "IN_PROGRESS") ||
                 (gettingQsStatus === "FAILURE")) || !isThereAQToDisplay))
@@ -160,8 +152,9 @@ const LoadingQsModal = ({ isThereAQToDisplay, handleGetQuestionsBtnPress }: TLoa
                                 style={{ flexDirection: "column", justifyContent: 'center', alignItems: "center", width: "100%" }}
                             >
                                 <Button
+                                    isDisabled={isGetQuestionsBtnDisabled}
                                     backgroundColor={appColors.second}
-                                    handleOnPress={handleGetQuestionsBtnPress}
+                                    handleOnPress={() => handleGetQuestionsBtnPress(() => { setIsGetQuestionsBtnDisabled(state => !state) })}
                                     dynamicStyles={{
                                         padding: 17,
                                         borderRadius: 15,

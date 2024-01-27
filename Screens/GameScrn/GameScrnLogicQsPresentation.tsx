@@ -20,6 +20,7 @@ import { getIsAnswerCorrect } from './functions/getIsAnswerCorrect';
 import { getHasUserReachedQuizGenerationLimit } from '../../api_services/users/getHasUserReachedQuizGenerationLimit';
 import { getUserId } from '../../utils/generalFns';
 import { CustomError } from '../../utils/errors';
+import { useGetCanUserGetAGeneratedQuiz } from '../../custom_hooks/useGetCanUserGenerateAQuiz';
 
 type TSelectedSymbol = typeof SYMBOLS[number] | typeof LETTERS[number]
 interface ISelectedLogicSymbol {
@@ -391,29 +392,46 @@ const GameScrnPresentation = ({
     setGameScrnTabStore(wrongNum + 1, "wrong")
   };
 
-  async function handleGetQuestionsBtnPress() {
-    try {
-      const userId = await getUserId() as string;
-      const result = await getHasUserReachedQuizGenerationLimit(userId);
+  // results
+  // LoadingQsModal
 
-      if (result.hasReachedLimit) {
-        Alert.alert("You have reached your daily limit of quiz generations. Please try again later.")
-        throw new CustomError("The user has reached their daily limit of quiz generated within 24 hours.", 429);
-      }
+  // const getCanUserGetGeneratedQuiz = useGetCanUserGetAGeneratedQuiz();
 
-      updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")
+  async function handleGetQuestionsBtnPress(toggleDisableGetQuestionsBtn: () => void) {
+    const userId = await getUserId();
 
-      if (pointOfFailureInGettingNextQ === "submitBtnPress") {
-        setWillIncrementQIndex(true);
-        setIsUserOnLastQ(true);
-        setWasSkipBtnPressed(true);
-        return;
-      }
+    toggleDisableGetQuestionsBtn();
 
-      updateApiQsFetchingStatusStore(true, "willGetQs");
-    } catch (error) {
-      console.error("An error has occurred when user pressed 'Press to get questions' button. Error object: ", error)
-    }
+    getHasUserReachedQuizGenerationLimit(userId as string)
+      .then(result => {
+
+        console.log("result: ", result)
+                
+        if(!result.wasSuccessful){
+            throw new CustomError("Something went wrong. Was not successful in checking if the user can generate a quiz.", 400);
+        }
+
+        if(result.hasReachedLimit){
+            throw new CustomError("The user cannot generate a quiz.", 400);
+        }
+
+        updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")
+
+        if (pointOfFailureInGettingNextQ === "submitBtnPress") {
+          setWillIncrementQIndex(true);
+          setIsUserOnLastQ(true);
+          setWasSkipBtnPressed(true);
+          return;
+        }
+
+        updateApiQsFetchingStatusStore(true, "willGetQs");
+      })
+      .catch(error => {
+        console.error("An error has occurred in checking if the user has reached their limit of quiz generated within a 24 hour span. Error object: ", error);
+      })
+      .finally(() => {
+        toggleDisableGetQuestionsBtn();
+      })
   }
 
   useEffect(() => {
@@ -452,7 +470,6 @@ const GameScrnPresentation = ({
           flexDirection: 'column',
           position: 'relative',
         }}
-        backgroundColor="#343541"
         layoutStyle={{
           position: 'relative',
           width: '100%',
