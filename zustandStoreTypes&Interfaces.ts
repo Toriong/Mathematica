@@ -15,20 +15,22 @@ interface IErrorStore {
 }
 type TMode = "quiz" | "review" | "finished";
 export type TCancelTokenSource = ReturnType<typeof axios.CancelToken.source>;
-interface IGameScrnTabStoreState {
+interface IGameScrnInfo<TData>{
     right: number
     wrong: number
     timer: number
     isTimerOn: boolean
-    isLoadingModalOn: boolean
+    mode: TMode
     wasSubmitBtnPressed: boolean
+    questionTypes: TData[]
+}
+interface IGameScrnTabStoreState extends IGameScrnInfo<TQuestionTypes> {
+    isLoadingModalOn: boolean
     willResetGetAdditionalQCancelTokenSource: boolean
     willResetGetInitialQsTokenSource: boolean
     getAddtionalQCancelTokenSource: TCancelTokenSource
     getInitialQsCancelTokenSource: TCancelTokenSource
-    mode: TMode
     willNotShowLoadingModal: boolean
-    questionTypes: TQuestionTypes[]
 }
 export interface IChoice {
     value: string
@@ -51,6 +53,7 @@ export interface IQuestionsStates {
     numberToGetForEachQuestionType: TNumberToGetForEachQuestionType
 
 }
+
 
 export type TUpdateStoreState<TNewState, TFieldName> = {
     updateState: (newState: TNewState, fieldName: TFieldName) => void

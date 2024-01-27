@@ -16,12 +16,13 @@ export async function getHasUserReachedQuizGenerationLimit(userId: string) {
         )
 
         console.log("response.data, hey there: ", response.data)
+        console.log("response.data, hey there: ", response.data.didUserReachQuizGenerationLimit)
 
         if (response.status !== 200) {
             throw new CustomError("Failed to check if the user has reached their daily limit of quizzes generated.", response.status);
         };
 
-        return { wasSuccessful: true, hasReachedLimit: response.data.didUserReacheQuizGenerationLimit }
+        return { wasSuccessful: true, hasReachedLimit: response.data.didUserReachQuizGenerationLimit }
     } catch (error) {
         console.error("An error has occurred in getting the quiz generation limit number for the user. Error object: ", error);
 

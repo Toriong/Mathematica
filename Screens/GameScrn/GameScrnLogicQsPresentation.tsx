@@ -392,11 +392,6 @@ const GameScrnPresentation = ({
     setGameScrnTabStore(wrongNum + 1, "wrong")
   };
 
-  // results
-  // LoadingQsModal
-
-  // const getCanUserGetGeneratedQuiz = useGetCanUserGetAGeneratedQuiz();
-
   async function handleGetQuestionsBtnPress(toggleDisableGetQuestionsBtn: () => void) {
     const userId = await getUserId();
 
@@ -404,15 +399,14 @@ const GameScrnPresentation = ({
 
     getHasUserReachedQuizGenerationLimit(userId as string)
       .then(result => {
-
-        console.log("result: ", result)
-                
-        if(!result.wasSuccessful){
-            throw new CustomError("Something went wrong. Was not successful in checking if the user can generate a quiz.", 400);
+        if (!result.wasSuccessful) {
+          Alert.alert("Something went wrong. Couldn't generate a quiz. Please try again later.");
+          throw new CustomError("The response from the server was unsuccessful.", 400);
         }
 
-        if(result.hasReachedLimit){
-            throw new CustomError("The user cannot generate a quiz.", 400);
+        if (result.hasReachedLimit) {
+          Alert.alert("You have reached your limit of gnerated quizzes within a 24 hour period. Please try again later.")
+          throw new CustomError("The user has reached their daily limit of quizzes generated.", 429);
         }
 
         updateApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")

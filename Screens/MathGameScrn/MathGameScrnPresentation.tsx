@@ -3,6 +3,8 @@ import Layout from "../../global_components/Layout";
 
 
 function MathGameScrnPresentation() {
+    
+
     return (
         <Layout
             style={{

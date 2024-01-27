@@ -46,17 +46,19 @@ const ResultsPresentation = () => {
         setIsPlayAgainBtnDisabled(true);
 
         const userId = await getUserId();
-        
+
         getHasUserReachedQuizGenerationLimit(userId as string)
             .then(result => {
                 console.log("result: ", result)
-                
-                if(!result.wasSuccessful){
-                    throw new CustomError("Something went wrong. Was not successful in checking if the user can generate a quiz.", 400);
+
+                if (!result.wasSuccessful) {
+                    Alert.alert("Something went wrong. Couldn't generate a quiz. Please try again later.");
+                    throw new CustomError("The response from the server was unsuccessful.", 400);
                 }
 
-                if(result.hasReachedLimit){
-                    throw new CustomError("The user cannot generate a quiz.", 400);
+                if (result.hasReachedLimit) {
+                    Alert.alert("You have reached your limit of quizzes that can be generated within a 24 hour period. Please try again later.")
+                    throw new CustomError("The user has reached their daily limit of quizzes generated.", 429);
                 }
 
                 updateQuestionsStore(0, "questionIndex");
@@ -80,7 +82,7 @@ const ResultsPresentation = () => {
                 console.error("An error has occurred when the user pressed the 'Play Again' button. Error message: ", error);
             })
             .finally(() => {
-                setIsPlayAgainBtnDisabled(false);    
+                setIsPlayAgainBtnDisabled(false);
             })
     };
 
@@ -177,7 +179,7 @@ const ResultsPresentation = () => {
                     <Button
                         backgroundColor={SUCCESS_COLOR}
                         handleOnPress={handlePlayAgainBtnPress}
-                        dynamicStyles={styles.button}
+                        dynamicStyles={{ ...styles.button, opacity: isPlayAgainBtnDisabled ? .4 : 1 }}
                         isDisabled={isPlayAgainBtnDisabled}
                     >
                         <PTxt
