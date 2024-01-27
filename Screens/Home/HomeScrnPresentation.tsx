@@ -7,9 +7,9 @@ import { useColorStore, useGameScrnTabStore, useQuestionsStore } from "../../zus
 import Button from "../../global_components/Button";
 import { Storage } from "../../utils/storage";
 import { getUserId, sortRandomly } from "../../utils/generalFns";
-import { IQuestionOnClient } from "../../zustandStoreTypes&Interfaces";
 import { getHasUserReachedQuizGenerationLimit } from "../../api_services/users/getHasUserReachedQuizGenerationLimit";
 import { CustomError, ICustomError } from "../../utils/errors";
+import { useRef, useState } from "react";
 
 const HomeScrnPresentation = () => {
     const navigation = useNavigation<TStackNavigation>();
@@ -20,6 +20,7 @@ const HomeScrnPresentation = () => {
     const appColors = useColorStore();
     const memory = new Storage();
     const currentAppColors = appColors.themesObj[appColors.currentTheme];
+    const [isPlayLogicGameBtnDisabled, setIsPlayLogicGameBtnDisabled] = useState(false);
 
     async function handleOnBtnPress(
         scrnName: TScreenNames,
@@ -27,15 +28,17 @@ const HomeScrnPresentation = () => {
         gameType?: "logic" | "math"
     ) {
         try {
+            const userId = await getUserId() as string;
+            const result = await getHasUserReachedQuizGenerationLimit(userId);
+            console.log("result: ", result)
+
+            if (result.hasReachedLimit) {
+                Alert.alert("You have reached your limit of quizzes that can be generated within a 24 hour period. Please try again later.")
+                throw new CustomError("The user has reached their daily limit of quizzes generated.", 429);
+            }
+
             if ((scrnName === "GameScreen") && questionsForNextQuiz.length && (gameType === "logic")) {
                 await memory.setItem("isGameOn", true);
-                const userId = await getUserId() as string;
-                const result = await getHasUserReachedQuizGenerationLimit(userId);
-
-                if (result.hasReachedLimit) {
-                    throw new CustomError("The user has reached daily limit of quiz generation.", 429);
-                }
-
                 updateGameScrnTabStore(types, "questionTypes");
                 updateGameScrnTabStore("quiz", "mode");
                 updateQuestionStore(0, "questionIndex");
@@ -49,9 +52,16 @@ const HomeScrnPresentation = () => {
                 const userId = await getUserId() as string;
                 const result = await getHasUserReachedQuizGenerationLimit(userId);
 
+                console.log("result, yo there meng: ", result)
+
                 if (result.hasReachedLimit) {
                     throw new CustomError("The user has reached daily limit of quiz generation.", 429);
                 };
+
+                if (!result.wasSuccessful) {
+                    Alert.alert("Something went wrong in generating your quiz. Please try again later.")
+                    throw new CustomError("Something went wrong on the server. Unable to check if the user can take a quiz.", 400);
+                }
 
                 updateGameScrnTabStore(types, "questionTypes");
                 updateGameScrnTabStore("quiz", "mode");
@@ -66,6 +76,7 @@ const HomeScrnPresentation = () => {
                 Alert.alert("You have reached your limit of quizzes that can be generated within a 24 hour period. Please try again later.");
             }
 
+            memory.setItem("isGameOn", false);
             console.error("An error has occurred. Error message: ", msg);
         }
     }
@@ -78,7 +89,10 @@ const HomeScrnPresentation = () => {
                         isDisabled={false}
                         dynamicStyles={{ padding: 10, borderRadius: 15 }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={async _ => { await handleOnBtnPress("GameScreen", ["propositional", "predicate"], "logic") }}
+                        handleOnPress={async _ => {
+
+                            await handleOnBtnPress("GameScreen", ["propositional", "predicate"], "logic")
+                        }}
                     >
 
                         <PTxt>PROPOSITIONAL</PTxt>
@@ -91,7 +105,10 @@ const HomeScrnPresentation = () => {
                         isDisabled={false}
                         dynamicStyles={{ padding: 10, borderRadius: 15 }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={async _ => { await handleOnBtnPress("GameScreen", ["predicate"]) }}
+                        handleOnPress={async _ => {
+
+                            await handleOnBtnPress("GameScreen", ["predicate"])
+                        }}
                     >
                         <PTxt>PREDICATE</PTxt>
                     </Button>
@@ -102,7 +119,10 @@ const HomeScrnPresentation = () => {
                     <Button
                         isDisabled={false}
                         dynamicStyles={{ padding: 10, borderRadius: 15 }}
-                        backgroundColor={currentAppColors.second} handleOnPress={async _ => { await handleOnBtnPress("GameScreen", ["diagrams"]) }}
+                        backgroundColor={currentAppColors.second} handleOnPress={async _ => {
+
+                            await handleOnBtnPress("GameScreen", ["diagrams"])
+                        }}
                     >
                         <PTxt>DIAGRAMS</PTxt>
                     </Button>
@@ -113,7 +133,9 @@ const HomeScrnPresentation = () => {
                     <Button
                         isDisabled={false}
                         dynamicStyles={{ padding: 10, borderRadius: 15 }}
-                        backgroundColor={currentAppColors.second} handleOnPress={async _ => { await handleOnBtnPress("GameScreen", ["diagrams", "predicate", "propositional"]) }}
+                        backgroundColor={currentAppColors.second} handleOnPress={async _ => {
+                            await handleOnBtnPress("GameScreen", ["diagrams", "predicate", "propositional"])
+                        }}
                     >
                         <PTxt>ALL</PTxt>
                     </Button>
