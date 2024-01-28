@@ -84,7 +84,7 @@ const HomeScrnPresentation = () => {
                         }}
                     >
 
-                        <PTxt>PROPOSITIONAL</PTxt>
+                        <PTxt>LOGIC</PTxt>
                     </Button>
                 </View>
                 <View
@@ -98,7 +98,7 @@ const HomeScrnPresentation = () => {
                             await handleOnBtnPress("GameScreen", ["predicate"])
                         }}
                     >
-                        <PTxt>PREDICATE</PTxt>
+                        <PTxt>LEARN LOGIC</PTxt>
                     </Button>
                 </View>
                 <View
@@ -112,7 +112,7 @@ const HomeScrnPresentation = () => {
                             await handleOnBtnPress("GameScreen", ["diagrams"])
                         }}
                     >
-                        <PTxt>DIAGRAMS</PTxt>
+                        <PTxt>MATH/BINARY</PTxt>
                     </Button>
                 </View>
                 <View

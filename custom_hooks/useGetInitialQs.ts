@@ -1,22 +1,12 @@
 import { useEffect } from "react";
 import { useApiQsFetchingStatusStore, useGameScrnTabStore, useQuestionsStore } from "../zustand";
-import { Storage, TStorageInstance } from "../utils/storage";
+import { Storage } from "../utils/storage";
 import { IS_TESTING, TESTING_USER_ID } from "../globalVars";
 import { getInitialQs } from "../api_services/quiz/getInitialQs";
 import { IQuestionOnClient, TNumberToGetForEachQuestionType } from "../zustandStoreTypes&Interfaces";
-import { CancelTokenSource } from "axios";
-import { TQuestionTypes } from "../sharedInterfaces&TypesWithBackend";
 import { getUserId, sortRandomly } from "../utils/generalFns";
 import { getHasUserReachedQuizGenerationLimit } from "../api_services/users/getHasUserReachedQuizGenerationLimit";
 import { CustomError } from "../utils/errors";
-
-// NOTES: 
-// CASE: when the user goes from the game screen to the main screen, clear all requests that are being made to the server (if any) from the 
-// 
-
-// function createGetAdditionalQuestionFn(memory: TStorageInstance, getMoreQsNum: number, cancelTokenSource: CancelTokenSource){
-//     return (questions: IQuestionOnClient[], questionTypes: TQuestionTypes[]) => getAdditionalQuestion(memory, getMoreQsNum, cancelTokenSource, questions, questionTypes)
-//   }
 
 
 export function useGetInitialQs(): null {
