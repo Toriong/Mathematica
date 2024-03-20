@@ -9,6 +9,7 @@ import HomeScrnContainer from './Screens/Home/HomeScrnContainer';
 import HomeScrnTab from './global_components/tab_navs/top/HomeScrnTab';
 import { StackNavigationProp } from '@react-navigation/stack/lib/typescript/src/types';
 import MathOptionsScrnContainer from './Screens/MathOptionsScrn/MathOptionsScrnContainer';
+import MathScrnOptionsTab from './global_components/tab_navs/top/MathScrnOptionsTab';
 
 const Stack = createStackNavigator();
 const navTabs = [
@@ -26,7 +27,7 @@ const navTabs = [
     },
     {
         name: "MathScrn",
-        comp: MathOptionsScrnContainer
+        comp: MathScrnOptionsTab
     }
 ] as const;
 

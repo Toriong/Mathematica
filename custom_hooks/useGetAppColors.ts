@@ -1,9 +1,10 @@
 import { useColorStore } from "../zustand";
 
-export function useGetAppColors(){
-    const currentColorTheme = useColorStore(state => state.currentTheme);
-    const themesObj = useColorStore(state => state.themesObj);
+export function useGetAppColors() {
+    const colorThemesObj = useColorStore(state => state.themesObj);
+    const currentTheme = useColorStore(state => state.currentTheme);
+    const currentThemeObj = colorThemesObj[currentTheme];
 
-    return themesObj[currentColorTheme];
+    return { currentThemeObj, currentTheme };
 };
 

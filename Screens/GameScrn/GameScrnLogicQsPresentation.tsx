@@ -119,7 +119,7 @@ const GameScrnPresentation = ({
   const isOnReviewMode = gameScrnMode === "review";
   const questionsToReview = gameScrnMode === "review" ? questions.filter(question => question.userAnswer) : [];
   const questionsLength = (gameScrnMode === "review") ? questionsToReview.length : 0
-  const currentColorsThemeObj = useGetAppColors();
+  const { currentThemeObj } = useGetAppColors();
   const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
   const rightNum = useGameScrnTabStore(state => state.right);
   const wrongNum = useGameScrnTabStore(state => state.wrong);
@@ -579,7 +579,7 @@ const GameScrnPresentation = ({
               alignItems: 'center',
               gap: 5,
               borderBottomWidth: 1,
-              borderBottomColor: currentColorsThemeObj.second,
+              borderBottomColor: currentThemeObj.second,
               position: 'relative',
             }}
           >
@@ -677,7 +677,7 @@ const GameScrnPresentation = ({
               display: "flex",
               flexDirection: "row",
               borderBottomWidth: 1,
-              borderBottomColor: currentColorsThemeObj.second,
+              borderBottomColor: currentThemeObj.second,
               width: "93%",
               gap: 8,
               justifyContent: 'center',
@@ -690,7 +690,7 @@ const GameScrnPresentation = ({
                   style={{
                     width: SYMBOL_WIDTH_AND_HEIGHT,
                     height: SYMBOL_WIDTH_AND_HEIGHT,
-                    backgroundColor: currentColorsThemeObj.second,
+                    backgroundColor: currentThemeObj.second,
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
@@ -760,7 +760,7 @@ const GameScrnPresentation = ({
                   <LogicSymbol
                     width={SYMBOL_WIDTH_AND_HEIGHT}
                     height={SYMBOL_WIDTH_AND_HEIGHT}
-                    backgroundColor={currentColorsThemeObj.second}
+                    backgroundColor={currentThemeObj.second}
                     txtFontSize={24}
                   >
                     {symbolOpt.symbol}
@@ -799,7 +799,7 @@ const GameScrnPresentation = ({
                 <Button
                   isDisabled={questionIndex === 0}
                   handleOnPress={handleReviewQNavBtn(-1)}
-                  backgroundColor={currentColorsThemeObj.second}
+                  backgroundColor={currentThemeObj.second}
                   dynamicStyles={{
                     padding: 14,
                     borderRadius: 15,
@@ -811,7 +811,7 @@ const GameScrnPresentation = ({
                 <Button
                   isDisabled={questionIndex === (questionsToReview.length - 1)}
                   handleOnPress={handleReviewQNavBtn(1)}
-                  backgroundColor={currentColorsThemeObj.second}
+                  backgroundColor={currentThemeObj.second}
                   dynamicStyles={{
                     padding: 14,
                     borderRadius: 15,
@@ -839,7 +839,7 @@ const GameScrnPresentation = ({
               >
                 <Button
                   handleOnPress={handleToResultScrnBtnPress}
-                  backgroundColor={currentColorsThemeObj.second}
+                  backgroundColor={currentThemeObj.second}
                   dynamicStyles={{ padding: 15, borderRadius: 15 }}
                 >
                   <PTxt>To Results Screen</PTxt>
