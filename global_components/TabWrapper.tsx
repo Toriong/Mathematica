@@ -6,7 +6,7 @@ interface TStyle extends ViewStyle {
     width: "100%",
     position: 'relative',
     display: 'flex',
-    borderWidth: 1
+    borderWidth?: number
 }
 
 const TabWrapper = ({
