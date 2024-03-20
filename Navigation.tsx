@@ -1,4 +1,4 @@
-import { NavigationContainer, NavigationProp, ParamListBase, Route, useNavigation } from '@react-navigation/native';
+import { NavigationContainer, NavigationProp, ParamListBase } from '@react-navigation/native';
 import { View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import GameScrnContainer from './Screens/GameScrn/GameScrnLogicQsContainer';
@@ -8,6 +8,7 @@ import ResultsScrnTab from './global_components/tab_navs/top/ResultsScrnTab';
 import HomeScrnContainer from './Screens/Home/HomeScrnContainer';
 import HomeScrnTab from './global_components/tab_navs/top/HomeScrnTab';
 import { StackNavigationProp } from '@react-navigation/stack/lib/typescript/src/types';
+import MathOptionsScrnContainer from './Screens/MathOptionsScrn/MathOptionsScrnContainer';
 
 const Stack = createStackNavigator();
 const navTabs = [
@@ -22,6 +23,10 @@ const navTabs = [
     {
         name: "Home",
         comp: HomeScrnTab
+    },
+    {
+        name: "MathScrn",
+        comp: MathOptionsScrnContainer
     }
 ] as const;
 
@@ -62,6 +67,10 @@ const LogicGameAppNavigation = () => (
             <Stack.Screen
                 name="ResultsScreen"
                 component={ResultContainer}
+            />
+            <Stack.Screen
+                name="MathScrn"
+                component={MathOptionsScrnContainer}
             />
         </Stack.Navigator>
     </NavigationContainer>

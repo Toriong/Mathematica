@@ -24,9 +24,15 @@ const HomeScrnPresentation = () => {
 
     async function handleOnBtnPress(
         scrnName: TScreenNames,
-        types: Exclude<Parameters<typeof updateGameScrnTabStore>[0], number | boolean>,
+        types?: Exclude<Parameters<typeof updateGameScrnTabStore>[0], number | boolean>,
         gameType?: "logic" | "math"
     ) {
+        // if the user pressed the Math/Binary button, then take the user to the Math/Binary game screen
+        if (scrnName === "MathScrn") {
+            navigation.navigate(scrnName);
+            return;
+        }
+
         setIsPlayLogicGameBtnDisabled(true);
         const userId = await getUserId();
         await memory.setItem("isGameOn", true);
@@ -44,7 +50,7 @@ const HomeScrnPresentation = () => {
                     throw new CustomError("The user has reached their daily limit of quizzes generated.", 429);
                 }
 
-                if ((scrnName === "GameScreen") && questionsForNextQuiz.length && (gameType === "logic")) {
+                if (types && (scrnName === "GameScreen") && questionsForNextQuiz.length && (gameType === "logic")) {
                     updateGameScrnTabStore(types, "questionTypes");
                     updateGameScrnTabStore("quiz", "mode");
                     updateQuestionStore(0, "questionIndex");
@@ -53,7 +59,7 @@ const HomeScrnPresentation = () => {
                     return;
                 }
 
-                if ((scrnName === "GameScreen") && (gameType === "logic")) {
+                if (types && (scrnName === "GameScreen") && (gameType === "logic")) {
                     updateGameScrnTabStore(types, "questionTypes");
                     updateGameScrnTabStore("quiz", "mode");
                     updateQuestionStore(0, "questionIndex");
@@ -77,14 +83,19 @@ const HomeScrnPresentation = () => {
                 <View style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <Button
                         isDisabled={isPlayLogicGameBtnDisabled}
-                        dynamicStyles={{ padding: 10, borderRadius: 15, opacity: isPlayLogicGameBtnDisabled ? .4 : 1 }}
+                        dynamicStyles={{
+                            width: 150,
+                            padding: 10,
+                            borderRadius: 15,
+                            opacity: isPlayLogicGameBtnDisabled ? .4 : 1
+                        }}
                         backgroundColor={currentAppColors.second}
                         handleOnPress={async _ => {
                             await handleOnBtnPress("GameScreen", ["propositional", "predicate"], "logic")
                         }}
                     >
 
-                        <PTxt>LOGIC</PTxt>
+                        <PTxt style={{ textAlign: "center" }}>LOGIC</PTxt>
                     </Button>
                 </View>
                 <View
@@ -92,13 +103,13 @@ const HomeScrnPresentation = () => {
                 >
                     <Button
                         isDisabled={isPlayLogicGameBtnDisabled}
-                        dynamicStyles={{ padding: 10, borderRadius: 15 }}
+                        dynamicStyles={{ width: 150, padding: 10, borderRadius: 15 }}
                         backgroundColor={currentAppColors.second}
                         handleOnPress={async _ => {
                             await handleOnBtnPress("GameScreen", ["predicate"])
                         }}
                     >
-                        <PTxt>LEARN LOGIC</PTxt>
+                        <PTxt style={{ textAlign: 'center' }}>LEARN LOGIC</PTxt>
                     </Button>
                 </View>
                 <View
@@ -106,27 +117,13 @@ const HomeScrnPresentation = () => {
                 >
                     <Button
                         isDisabled={isPlayLogicGameBtnDisabled}
-                        dynamicStyles={{ padding: 10, borderRadius: 15 }}
+                        dynamicStyles={{ width: 150, padding: 10, borderRadius: 15 }}
                         backgroundColor={currentAppColors.second}
                         handleOnPress={async _ => {
-                            await handleOnBtnPress("GameScreen", ["diagrams"])
+                            await handleOnBtnPress("MathScrn")
                         }}
                     >
-                        <PTxt>MATH/BINARY</PTxt>
-                    </Button>
-                </View>
-                <View
-                    style={{ flex: 1, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-                >
-                    <Button
-                        isDisabled={isPlayLogicGameBtnDisabled}
-                        dynamicStyles={{ padding: 10, borderRadius: 15 }}
-                        backgroundColor={currentAppColors.second}
-                        handleOnPress={async _ => {
-                            await handleOnBtnPress("GameScreen", ["diagrams", "predicate", "propositional"])
-                        }}
-                    >
-                        <PTxt>ALL</PTxt>
+                        <PTxt style={{ textAlign: 'center' }}>MATH/BINARY</PTxt>
                     </Button>
                 </View>
             </View>

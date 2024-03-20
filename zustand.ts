@@ -7,7 +7,9 @@ import {
     TGameScrnTabStore,
     TIsGettingReqStore,
     IApiQsFetchingStatus,
-    IQuestionsStates
+    IQuestionsStates,
+    TMathGameInfoStore,
+    IMathGameInfoStates
 } from './zustandStoreTypes&Interfaces';
 import axios from 'axios';
 
@@ -35,6 +37,22 @@ export const useRequestStatusStore = create<TIsGettingReqStore>(set => ({
     isGettingUserInfo: false,
     updateState: (newState: boolean, fieldName: keyof TIsGettingReqStore) => set(() => ({ [fieldName]: newState }))
 }));
+export const useMathGameInfoStore = create<TMathGameInfoStore>(set => {
+    const mathGameInfo = {
+        decimalStatus: 'none',
+        difficulty: 'easy',
+        gameType: 'addition',
+        isTimerOn: false,
+        mode: 'quiz',
+        right: 0,
+        wrong: 0,
+        timer: 120,
+        wasSubmitBtnPressed: false,
+        updateState: (newState: IMathGameInfoStates[keyof IMathGameInfoStates], fieldName: keyof IMathGameInfoStates) => set(() => ({ [fieldName]: newState }))
+    } satisfies TMathGameInfoStore;
+
+    return mathGameInfo;
+})
 export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {    
     const gameScrnTabStore: TGameScrnTabStore = {
         right: 0,

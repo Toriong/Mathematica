@@ -1,9 +1,6 @@
 import { TStackNavigationProp } from "../../../Navigation";
 import TabWrapper from "../../TabWrapper";
 import { PTxt } from "../../text";
-import { NativeStackHeaderProps } from "@react-navigation/native-stack";
-
-// { navigation }: NativeStackHeaderProps
 
 const HomeScrnTab = ({ navigate }: TStackNavigationProp) => {
 

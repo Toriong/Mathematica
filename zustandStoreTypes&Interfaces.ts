@@ -15,22 +15,22 @@ interface IErrorStore {
 }
 type TMode = "quiz" | "review" | "finished";
 export type TCancelTokenSource = ReturnType<typeof axios.CancelToken.source>;
-interface IGameScrnInfo<TData>{
+interface IGameScrnInfo {
     right: number
     wrong: number
     timer: number
     isTimerOn: boolean
     mode: TMode
     wasSubmitBtnPressed: boolean
-    questionTypes: TData[]
 }
-interface IGameScrnTabStoreState extends IGameScrnInfo<TQuestionTypes> {
+interface IGameScrnTabStoreState extends IGameScrnInfo {
     isLoadingModalOn: boolean
     willResetGetAdditionalQCancelTokenSource: boolean
     willResetGetInitialQsTokenSource: boolean
     getAddtionalQCancelTokenSource: TCancelTokenSource
     getInitialQsCancelTokenSource: TCancelTokenSource
     willNotShowLoadingModal: boolean
+    questionTypes: TQuestionTypes[]
 }
 export interface IChoice {
     value: string
@@ -53,8 +53,14 @@ export interface IQuestionsStates {
     numberToGetForEachQuestionType: TNumberToGetForEachQuestionType
 
 }
-
-
+export type TDifficulty = "easy" | "med" | "hard";
+export type TMathGameType = "addition" | "subtraction" | "multiplication" | "division" | "binary"
+export type TDecimalStatus = "all" | "atleastOne" | "none" 
+export interface IMathGameInfoStates extends IGameScrnInfo {
+    difficulty: TDifficulty
+    gameType: TMathGameType
+    decimalStatus: TDecimalStatus
+}
 export type TUpdateStoreState<TNewState, TFieldName> = {
     updateState: (newState: TNewState, fieldName: TFieldName) => void
 }
@@ -80,3 +86,4 @@ export type TErrorStore = IErrorStore & TUpdateStoreState<boolean, keyof IErrorS
 export type TGameScrnTabStore = IGameScrnTabStoreState & TUpdateStoreState<IGameScrnTabStoreState[keyof IGameScrnTabStoreState], keyof IGameScrnTabStoreState>
 export type TIsGettingReqStore = IIsGetReqStoreState & TUpdateStoreState<boolean, keyof IIsGetReqStoreState>
 export type IQuestionsForObj = IQuestionsStates & TUpdateStoreStateDynamicType
+export type TMathGameInfoStore = IMathGameInfoStates & TUpdateStoreState<IMathGameInfoStates[keyof IMathGameInfoStates], keyof IMathGameInfoStates>
