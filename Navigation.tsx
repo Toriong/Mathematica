@@ -28,6 +28,10 @@ const navTabs = [
     {
         name: "MathScrn",
         comp: MathScrnOptionsTab
+    },
+    {
+        name: "BinaryScrn",
+        comp: MathScrnOptionsTab
     }
 ] as const;
 
@@ -71,6 +75,10 @@ const LogicGameAppNavigation = () => (
             />
             <Stack.Screen
                 name="MathScrn"
+                component={MathOptionsScrnContainer}
+            />
+            <Stack.Screen
+                name="BinaryScrn"
                 component={MathOptionsScrnContainer}
             />
         </Stack.Navigator>

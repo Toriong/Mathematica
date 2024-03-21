@@ -9,7 +9,7 @@ import {
     IApiQsFetchingStatus,
     IQuestionsStates,
     TMathGameInfoStore,
-    IMathGameInfoStates
+    IMathGameInfoStates,
 } from './zustandStoreTypes&Interfaces';
 import axios from 'axios';
 
@@ -37,23 +37,26 @@ export const useRequestStatusStore = create<TIsGettingReqStore>(set => ({
     isGettingUserInfo: false,
     updateState: (newState: boolean, fieldName: keyof TIsGettingReqStore) => set(() => ({ [fieldName]: newState }))
 }));
-export const useMathGameInfoStore = create<TMathGameInfoStore>(set => {
+export const useMathGameStore = create<TMathGameInfoStore>(set => {
     const mathGameInfo = {
-        decimalStatus: 'none',
         difficulty: 'easy',
         gameType: 'addition',
+        isQuizTimed: true,
         isTimerOn: false,
         mode: 'quiz',
         right: 0,
         wrong: 0,
         timer: 120,
+        // min questions is 20
+        // max qs is 200
+        totalQs: 40,
         wasSubmitBtnPressed: false,
         updateState: (newState: IMathGameInfoStates[keyof IMathGameInfoStates], fieldName: keyof IMathGameInfoStates) => set(() => ({ [fieldName]: newState }))
     } satisfies TMathGameInfoStore;
 
     return mathGameInfo;
 })
-export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {    
+export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
     const gameScrnTabStore: TGameScrnTabStore = {
         right: 0,
         wrong: 0,
@@ -63,7 +66,7 @@ export const useGameScrnTabStore = create<TGameScrnTabStore>(set => {
         isTimerOn: true,
         isLoadingModalOn: false,
         willResetGetAdditionalQCancelTokenSource: true,
-        willResetGetInitialQsTokenSource: true,    
+        willResetGetInitialQsTokenSource: true,
         getAddtionalQCancelTokenSource: axios.CancelToken.source(),
         getInitialQsCancelTokenSource: axios.CancelToken.source(),
         mode: "finished",

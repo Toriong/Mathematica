@@ -27,59 +27,12 @@ const HomeScrnPresentation = () => {
     const currentAppColors = appColors.themesObj[appColors.currentTheme];
     const [isPlayLogicGameBtnDisabled, setIsPlayLogicGameBtnDisabled] = useState(false);
 
-    async function handleOnBtnPress(
+    function handleOnBtnPress(
         scrnName: TScreenNames,
-        types?: Exclude<Parameters<typeof updateGameScrnTabStore>[0], number | boolean>,
-        gameType?: "logic" | "math"
     ) {
-        // if the user pressed the Math/Binary button, then take the user to the Math/Binary game screen
-        if (scrnName === "MathScrn") {
-            navigation.navigate(scrnName);
-            return;
+        return () => {
+            navigation.navigate(scrnName)
         }
-
-        setIsPlayLogicGameBtnDisabled(true);
-        const userId = await getUserId();
-        await memory.setItem("isGameOn", true);
-        getHasUserReachedQuizGenerationLimit(userId as string)
-            .then(result => {
-                console.log("result, yo there meng: ", result);
-
-                if (!result.wasSuccessful) {
-                    Alert.alert("Something went wrong. Couldn't generate a quiz. Please try again later.");
-                    throw new CustomError("The response from the server was unsuccessful.", 400);
-                }
-
-                if (result.hasReachedLimit) {
-                    Alert.alert("You have reached your limit of quizzes that can be generated within a 24 hour period. Please try again later.")
-                    throw new CustomError("The user has reached their daily limit of quizzes generated.", 429);
-                }
-
-                if (types && (scrnName === "GameScreen") && questionsForNextQuiz.length && (gameType === "logic")) {
-                    updateGameScrnTabStore(types, "questionTypes");
-                    updateGameScrnTabStore("quiz", "mode");
-                    updateQuestionStore(0, "questionIndex");
-                    setQuestionsStore(sortRandomly(questionsForNextQuiz), "questions");
-                    navigation.navigate(scrnName);
-                    return;
-                }
-
-                if (types && (scrnName === "GameScreen") && (gameType === "logic")) {
-                    updateGameScrnTabStore(types, "questionTypes");
-                    updateGameScrnTabStore("quiz", "mode");
-                    updateQuestionStore(0, "questionIndex");
-                    navigation.navigate(scrnName);
-                    return;
-                }
-            })
-            .catch(error => {
-                console.error("An error has occurred in starting the quiz. Error message: ", error);
-                memory.setItem("isGameOn", false);
-                setIsPlayLogicGameBtnDisabled(false);
-            })
-            .finally(() => {
-                setIsPlayLogicGameBtnDisabled(false);
-            })
     }
 
     return (
@@ -99,9 +52,7 @@ const HomeScrnPresentation = () => {
                             opacity: isPlayLogicGameBtnDisabled ? .4 : 1
                         }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={async _ => {
-                            await handleOnBtnPress("GameScreen", ["propositional", "predicate"], "logic")
-                        }}
+                        handleOnPress={handleOnBtnPress("MathScrn")}
                     >
 
                         <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: "center" }}>Addition</PTxt>
@@ -128,9 +79,7 @@ const HomeScrnPresentation = () => {
                             flexDirection: 'row',
                         }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={async _ => {
-                            await handleOnBtnPress("GameScreen", ["predicate"])
-                        }}
+                        handleOnPress={handleOnBtnPress('MathScrn')}
                     >
                         <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: "center" }}>Division</PTxt>
                         <Icon size={BTN_TXT_FONT_SZ} icon={faDivide} style={{ marginStart: 5 }} />
@@ -151,9 +100,7 @@ const HomeScrnPresentation = () => {
                             alignItems: 'center',
                         }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={async _ => {
-                            await handleOnBtnPress("MathScrn")
-                        }}
+                        handleOnPress={handleOnBtnPress("MathScrn")}
                     >
                         <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: "center" }}>Multiplication</PTxt>
                         <Icon size={BTN_TXT_FONT_SZ} icon={faMultiply} style={{ marginStart: 5 }} />
@@ -174,9 +121,7 @@ const HomeScrnPresentation = () => {
                             alignItems: 'center',
                         }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={async _ => {
-                            await handleOnBtnPress("MathScrn")
-                        }}
+                        handleOnPress={handleOnBtnPress("MathScrn")}
                     >
                         <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: "center" }}>Subtraction</PTxt>
                         <Icon size={BTN_TXT_FONT_SZ} icon={faSubtract} style={{ marginStart: 5 }} />
@@ -197,12 +142,10 @@ const HomeScrnPresentation = () => {
                             alignItems: 'center',
                         }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={async _ => {
-                            await handleOnBtnPress("MathScrn")
-                        }}
+                        handleOnPress={handleOnBtnPress("BinaryScrn")}
                     >
-                        <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: 'center' }}>Binary Options</PTxt>
-                        <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ marginStart: 5 }}>010</PTxt>
+                        <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: 'center' }}>Binary/SigFigs</PTxt>
+                        {/* <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ marginStart: 5 }}>010</PTxt> */}
                     </Button>
                 </View>
             </View>

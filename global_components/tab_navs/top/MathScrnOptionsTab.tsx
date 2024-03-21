@@ -1,58 +1,112 @@
 import { SafeAreaView, View } from 'react-native'
 import Button from '../../Button'
 import { useGetAppColors } from '../../../custom_hooks/useGetAppColors';
-import { useColorStore, useMathGameInfoStore } from '../../../zustand';
+import { useColorStore, useMathGameStore } from '../../../zustand';
 import { TStackNavigation } from '../../../Navigation';
 import { useNavigation } from '@react-navigation/native';
 import { TDifficulty } from '../../../zustandStoreTypes&Interfaces';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { PTxt } from '../../text';
-import { faStar } from '@fortawesome/free-solid-svg-icons';
+import { HeadingTxt, PTxt } from '../../text';
+import { faArrowCircleLeft, faArrowLeft, faArrowLeftRotate, faStar } from '@fortawesome/free-solid-svg-icons';
 import SafeAreaViewWrapper from '../../SafeAreaViewWrapper';
+import TabWrapper from '../../TabWrapper';
+import { Icon } from '../../Icon';
 
 
 const MathScrnOptionsTab = () => {
     const { navigate } = useNavigation<TStackNavigation>();
-    const setMathGameInfoStore = useMathGameInfoStore(state => state.updateState);
-    const difficulty = useMathGameInfoStore(state => state.difficulty);
+    const setMathGameStore = useMathGameStore(state => state.updateState);
+    const difficulty = useMathGameStore(state => state.difficulty);
     const { currentThemeObj } = useGetAppColors();
 
     function handleDifficulytBtnPress(difficulty: TDifficulty) {
         return () => {
-            setMathGameInfoStore(difficulty, "difficulty")
+            setMathGameStore(difficulty, "difficulty")
         }
     }
 
-    function handleMoreSettingBtnPress() {
-        navigate("GameScrnSettings")
+    function handleBackBtnPress() {
+        navigate('Home')
     }
 
     return (
-        <SafeAreaViewWrapper>
-            <SafeAreaView
+        <TabWrapper
+            style={{
+                flexDirection: 'row',
+                width: '100%',
+                position: 'relative',
+                display: 'flex',
+                height: 200
+            }}
+        >
+            <View
                 style={{
-                    width: "100%",
-                    position: 'relative',
                     display: 'flex',
-                    backgroundColor: currentThemeObj.first,
-                    borderBottomColor: currentThemeObj.second,
-                    borderWidth: 1
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    flex: 1
                 }}
             >
                 <View
                     style={{
                         width: "100%",
-                        flex: .5
+                        height: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        flexDirection: 'column',
                     }}
                 >
                     <View
                         style={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
+                            width: '100%',
+                            flex: .1,
+                            paddingStart: 15
+                        }}
+                    >
+                        <Button
+                            handleOnPress={handleBackBtnPress}
+                            style={{ marginStart: 15 }}
+                        >
+                            <Icon
+                                icon={faArrowCircleLeft}
+                                color='#767577'
+                                size={26}
+                            />
+                        </Button>
+                    </View>
+                    <View
+                        style={{
+                            width: '100%',
+                            flex: .3,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <HeadingTxt
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                width: '100%',
+                                textAlign: 'center'
+                            }}
+                            fontSize={31}
+                        >
+                            Set Up Game & Play!
+                        </HeadingTxt>
+                    </View>
+                    <View
+                        style={{
+                            width: '100%',
+                            flex: .5,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
                             flexDirection: 'row',
-                            gap: 10
+                            gap: 10,
+                            marginTop: 10
                         }}
                     >
                         <Button
@@ -114,22 +168,9 @@ const MathScrnOptionsTab = () => {
                             </PTxt>
                         </Button>
                     </View>
-                    <View
-                        style={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "flex-start",
-                        }}
-                    >
-                        <Button
-                            handleOnPress={handleMoreSettingBtnPress}
-                        >
-                            <PTxt>More Settings</PTxt>
-                        </Button>
-                    </View>
                 </View>
-            </SafeAreaView>
-        </SafeAreaViewWrapper>
+            </View>
+        </TabWrapper>
     )
 }
 

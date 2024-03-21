@@ -18,6 +18,7 @@ import axios from 'axios';
 import { IQuestionOnClient } from '../../../zustandStoreTypes&Interfaces';
 import { Storage } from '../../../utils/storage';
 import { updateUserQuizzesTakenNum } from '../../../api_services/users/updateUserQuizzesTakenNum';
+import TabWrapper from '../../TabWrapper';
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
@@ -30,8 +31,6 @@ function getTimeForUI(millis: number) {
 };
 
 const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
-    const storage = new Storage();
-    const wasSubmitBtnPressed = useGameScrnTabStore(state => state.wasSubmitBtnPressed);
     const currentTheme = useColorStore(state => state.currentTheme);
     const colorThemesObj = useColorStore(state => state.themesObj);
     const rightNum = useGameScrnTabStore(state => state.right);
@@ -54,10 +53,6 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
         setGameScrnTabStore(false, "willResetGetAdditionalQCancelTokenSource");
         let unansweredQs = structuredClone<IQuestionOnClient[]>((questionIndex === 0) ? questions.slice(1) : questions.filter(question => !question.userAnswer));
         const questionsForNextQuizUpdated = questionsForNextQuiz?.length ? [...unansweredQs, ...questionsForNextQuiz] : unansweredQs;
-
-        console.log("questionsForNextQuizUpdated, hey there: ", questionsForNextQuizUpdated);
-        console.log("questionsForNextQuizUpdated, hey there, the length: ", questionsForNextQuizUpdated.length);
-
 
         if (questionsForNextQuizUpdated.length <= 10) {
             setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");
@@ -153,31 +148,21 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     }, [gettingQsResponseStatus]);
 
     return (
-        <SafeAreaViewWrapper
-            layoutStyle={{ position: 'relative' }}
-            OverlayComp={
-                wasSubmitBtnPressed && (
-                    <View
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            backgroundColor: 'black',
-                            position: 'absolute',
-                            zIndex: 1,
-                            opacity: OVERLAY_OPACITY
-                        }}
-                    />
-                )
-            }
+        <TabWrapper
+            style={{
+                flexDirection: 'row',
+                width: '100%',
+                position: 'relative',
+                display: 'flex',
+                height: 150
+            }}
         >
-            <SafeAreaView
+            <View
                 style={{
-                    width: "100%",
-                    position: 'relative',
                     display: 'flex',
-                    backgroundColor: currentThemeObj.first,
-                    borderBottomColor: currentThemeObj.second,
-                    borderWidth: 1
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    flex: 1
                 }}
             >
                 <View style={{ display: 'flex', flexDirection: 'row', width: "100%", paddingTop: "3%" }}>
@@ -222,8 +207,8 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                         <PTxt fontSize={FONT_SIZE_SCORE_TXT}>{rightNum}</PTxt>
                     </View>
                 </View>
-            </SafeAreaView>
-        </SafeAreaViewWrapper>
+            </View>
+        </TabWrapper>
     );
 };
 

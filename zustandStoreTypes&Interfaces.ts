@@ -54,12 +54,13 @@ export interface IQuestionsStates {
 
 }
 export type TDifficulty = "easy" | "med" | "hard";
-export type TMathGameType = "addition" | "subtraction" | "multiplication" | "division" | "binary"
-export type TDecimalStatus = "all" | "atleastOne" | "none" 
+export type TMathGameType = "addition" | "subtraction" | "multiplication" | "division"
+export type TDecimalStatus = "10s" | "100s" | "1000s" | "none"
 export interface IMathGameInfoStates extends IGameScrnInfo {
     difficulty: TDifficulty
     gameType: TMathGameType
-    decimalStatus: TDecimalStatus
+    isQuizTimed: boolean
+    totalQs: number
 }
 export type TUpdateStoreState<TNewState, TFieldName> = {
     updateState: (newState: TNewState, fieldName: TFieldName) => void
@@ -80,6 +81,7 @@ export interface IApiQsFetchingStatus {
     gettingQsResponseStatus: TResponseStatus
     pointOfFailure: TPointOfFailure
 }
+export type TGameType = "addition" | "subtraction" | "division" | "multiplication"
 
 export type TApiQsFetchingStatusStore = IApiQsFetchingStatus & TUpdateStoreState<IApiQsFetchingStatus[keyof IApiQsFetchingStatus], keyof IApiQsFetchingStatus>
 export type TErrorStore = IErrorStore & TUpdateStoreState<boolean, keyof IErrorStore>

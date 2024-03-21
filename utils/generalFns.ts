@@ -24,7 +24,7 @@ export function getRandomIndex<TData>(arr: TData[], incorrectVal: any = undefine
 }
 
 export function sortRandomly<TData>(arr: TData[]) {
-    let arrSortedRandomly:TData[] = Array.from({ length: arr.length });
+    let arrSortedRandomly: TData[] = Array.from({ length: arr.length });
 
     arr.forEach(val => {
         const randomIndex = getRandomIndex(arrSortedRandomly);
@@ -38,4 +38,8 @@ const memory = new Storage()
 
 export async function getUserId(): Promise<string | null> {
     return IS_TESTING ? TESTING_USER_ID : await memory.getItem("userId");
+}
+
+export function convertToSecsToMins(secs: number) {
+    return Math.floor(secs / 60)
 }
