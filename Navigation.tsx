@@ -26,7 +26,7 @@ const navTabs = [
         comp: HomeScrnTab
     },
     {
-        name: "MathScrn",
+        name: "MathGameSetup",
         comp: MathScrnOptionsTab
     },
     {
@@ -74,7 +74,7 @@ const LogicGameAppNavigation = () => (
                 component={ResultContainer}
             />
             <Stack.Screen
-                name="MathScrn"
+                name="MathGameSetupScrn"
                 component={MathOptionsScrnContainer}
             />
             <Stack.Screen

@@ -9,6 +9,8 @@ import { convertToSecsToMins } from "../../utils/generalFns";
 import { useMemo } from "react";
 import { useGetAppColors } from "../../custom_hooks/useGetAppColors";
 import { IMathGameInfoStates } from "../../zustandStoreTypes&Interfaces";
+import PulseWrapper from "../../global_components/PulseWrapper";
+import { btnStyles } from '../../global_styles/globalStyles';
 
 type TMaxQuizTime = typeof MAX_QUIZ_TIME
 type TMaxUntimedQuestions = typeof MAX_TOTAL_QUESTIONS
@@ -28,12 +30,16 @@ const MathOptionsScrnPresentation = () => {
     const mathQuizTime = useMathGameStore(state => state.timer);
     const isQuizTimed = useMathGameStore(state => state.isQuizTimed);
     const totalQs = useMathGameStore(state => state.totalQs);
-    const { currentTheme, currentThemeObj } = useGetAppColors();
+    const { currentThemeObj } = useGetAppColors();
 
     function handleCheckBoxBtnPress(isQuizTimed: boolean) {
         return () => {
             setMathGameStore(isQuizTimed, 'isQuizTimed');
         }
+    }
+
+    function handlePlayBtnPress() {
+
     }
 
     function handleArrowBtnPress(
@@ -84,8 +90,8 @@ const MathOptionsScrnPresentation = () => {
                             paddingStart: 10
                         }}
                     >
-                        <HeadingTxt fontSize={HEADER_FONT_SIZE}>
-                            Timed or Numbered?
+                        <HeadingTxt fontSize={HEADER_FONT_SIZE} style={{ fontStyle: 'italic' }}>
+                            Timed or Untimed?
                         </HeadingTxt>
                     </View>
                     <View
@@ -299,10 +305,36 @@ const MathOptionsScrnPresentation = () => {
                 <View
                     style={{
                         width: '100%',
-                        flex: .5
+                        flex: .5,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
                     }}
                 >
-                    {/* PUT THE PLAY BUTTON HERE */}
+                    <PulseWrapper
+                        duration={1000}
+                    >
+                        <Button
+                            handleOnPress={handlePlayBtnPress}
+                            backgroundColor="#007BFF"
+                            dynamicStyles={{
+                                ...btnStyles.shadow,
+                                padding: 30,
+                                borderRadius: 30,
+                                width: 150
+                            }}
+                        >
+                            <PTxt
+                                style={{
+                                    textAlign: 'center',
+                                    width: '100%'
+                                }}
+                                fontSize={22}
+                            >
+                                PLAY!
+                            </PTxt>
+                        </Button>
+                    </PulseWrapper>
                 </View>
             </View>
         </Layout>

@@ -94,7 +94,7 @@ const MathScrnOptionsTab = () => {
                             }}
                             fontSize={31}
                         >
-                            Set Up Game & Play!
+                            Set Up Quiz & Play!
                         </HeadingTxt>
                     </View>
                     <View

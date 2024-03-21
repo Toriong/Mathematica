@@ -3,7 +3,7 @@ import { Alert, View } from 'react-native'
 import { PTxt } from "../../global_components/text";
 import { useNavigation } from '@react-navigation/native';
 import { TScreenNames, TStackNavigation } from "../../Navigation";
-import { useColorStore, useGameScrnTabStore, useQuestionsStore } from "../../zustand";
+import { useColorStore, useGameScrnTabStore, useMathGameStore, useQuestionsStore } from "../../zustand";
 import Button from "../../global_components/Button";
 import { Storage } from "../../utils/storage";
 import { getUserId, sortRandomly } from "../../utils/generalFns";
@@ -12,26 +12,28 @@ import { CustomError } from "../../utils/errors";
 import { useState } from "react";
 import { faAdd, faDivide, faMultiply, faSubtract } from "@fortawesome/free-solid-svg-icons";
 import { Icon } from "../../global_components/Icon";
+import { TMathGameType } from "../../zustandStoreTypes&Interfaces";
 
 const BTN_TXT_FONT_SZ = 23
 const BTN_WIDTH = 225
 
 const HomeScrnPresentation = () => {
     const navigation = useNavigation<TStackNavigation>();
-    const updateGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
-    const updateQuestionStore = useQuestionsStore(state => state.updateState);
-    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
-    const setQuestionsStore = useQuestionsStore(state => state.updateState);
     const appColors = useColorStore();
-    const memory = new Storage();
     const currentAppColors = appColors.themesObj[appColors.currentTheme];
+    const setMathGameStore = useMathGameStore(state => state.updateState)
     const [isPlayLogicGameBtnDisabled, setIsPlayLogicGameBtnDisabled] = useState(false);
 
     function handleOnBtnPress(
         scrnName: TScreenNames,
+        gameType: TMathGameType | null = null
     ) {
         return () => {
-            navigation.navigate(scrnName)
+            if ((scrnName === "MathGameSetup") && gameType) {
+                setMathGameStore(gameType, "gameType")
+                navigation.navigate(scrnName)
+            }
+
         }
     }
 
@@ -52,7 +54,7 @@ const HomeScrnPresentation = () => {
                             opacity: isPlayLogicGameBtnDisabled ? .4 : 1
                         }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={handleOnBtnPress("MathScrn")}
+                        handleOnPress={handleOnBtnPress("MathGameSetup", "addition")}
                     >
 
                         <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: "center" }}>Addition</PTxt>
@@ -79,7 +81,7 @@ const HomeScrnPresentation = () => {
                             flexDirection: 'row',
                         }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={handleOnBtnPress('MathScrn')}
+                        handleOnPress={handleOnBtnPress('MathGameSetup', 'division')}
                     >
                         <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: "center" }}>Division</PTxt>
                         <Icon size={BTN_TXT_FONT_SZ} icon={faDivide} style={{ marginStart: 5 }} />
@@ -100,7 +102,7 @@ const HomeScrnPresentation = () => {
                             alignItems: 'center',
                         }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={handleOnBtnPress("MathScrn")}
+                        handleOnPress={handleOnBtnPress("MathGameSetup", 'multiplication')}
                     >
                         <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: "center" }}>Multiplication</PTxt>
                         <Icon size={BTN_TXT_FONT_SZ} icon={faMultiply} style={{ marginStart: 5 }} />
@@ -121,7 +123,7 @@ const HomeScrnPresentation = () => {
                             alignItems: 'center',
                         }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={handleOnBtnPress("MathScrn")}
+                        handleOnPress={handleOnBtnPress("MathGameSetup", 'subtraction')}
                     >
                         <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: "center" }}>Subtraction</PTxt>
                         <Icon size={BTN_TXT_FONT_SZ} icon={faSubtract} style={{ marginStart: 5 }} />
@@ -144,8 +146,7 @@ const HomeScrnPresentation = () => {
                         backgroundColor={currentAppColors.second}
                         handleOnPress={handleOnBtnPress("BinaryScrn")}
                     >
-                        <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: 'center' }}>Binary/SigFigs</PTxt>
-                        {/* <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ marginStart: 5 }}>010</PTxt> */}
+                        <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: 'center' }}>Binary 010</PTxt>
                     </Button>
                 </View>
             </View>
