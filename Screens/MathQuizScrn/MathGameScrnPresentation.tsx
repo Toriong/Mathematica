@@ -6,12 +6,8 @@ import { Icon } from "../../global_components/Icon";
 import { faDivide, faMultiply, faPlus, faSubtract } from "@fortawesome/free-solid-svg-icons";
 import { useColorStore, useMathGameStore } from '../../zustand';
 import { useGetAppColors } from "../../custom_hooks/useGetAppColors";
-import { TDifficulty, TOperator } from '../../zustandStoreTypes&Interfaces';
+import { TDifficulty, TEquation, TOperator, TStrNum } from '../../zustandStoreTypes&Interfaces';
 import { getIsNum } from "../../utils/generalFns";
-
-type TStrNum = `${number}`
-type TOperatorForMathScn = Omit<TOperator, "none">
-type TEquation = (TStrNum | TOperatorForMathScn)[]
 
 function getTotalParseableInts(equation: TEquation) {
     return equation.filter(val => Number.isInteger(+val)).length

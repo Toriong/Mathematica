@@ -12,7 +12,7 @@ import { CustomError } from "../../utils/errors";
 import { useState } from "react";
 import { faAdd, faDivide, faMultiply, faSubtract } from "@fortawesome/free-solid-svg-icons";
 import { Icon } from "../../global_components/Icon";
-import { TMathGameType } from "../../zustandStoreTypes&Interfaces";
+import { TOperator } from "../../zustandStoreTypes&Interfaces";
 
 const BTN_TXT_FONT_SZ = 23
 const BTN_WIDTH = 225
@@ -26,10 +26,10 @@ const HomeScrnPresentation = () => {
 
     function handleOnBtnPress(
         scrnName: TScreenNames,
-        gameType: TMathGameType | null = null
+        gameType: Exclude<TOperator, 'none'> | null = null
     ) {
         return () => {
-            if ((scrnName === "MathGameSetup") && gameType) {
+            if ((scrnName === "MathGameSetupScrn") && gameType) {
                 setMathGameStore(gameType, "gameType")
                 navigation.navigate(scrnName)
             }
@@ -54,7 +54,7 @@ const HomeScrnPresentation = () => {
                             opacity: isPlayLogicGameBtnDisabled ? .4 : 1
                         }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={handleOnBtnPress("MathGameSetup", "addition")}
+                        handleOnPress={handleOnBtnPress("MathGameSetupScrn", "+")}
                     >
 
                         <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: "center" }}>Addition</PTxt>
@@ -81,7 +81,7 @@ const HomeScrnPresentation = () => {
                             flexDirection: 'row',
                         }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={handleOnBtnPress('MathGameSetup', 'division')}
+                        handleOnPress={handleOnBtnPress('MathGameSetupScrn', '/')}
                     >
                         <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: "center" }}>Division</PTxt>
                         <Icon size={BTN_TXT_FONT_SZ} icon={faDivide} style={{ marginStart: 5 }} />
@@ -102,7 +102,7 @@ const HomeScrnPresentation = () => {
                             alignItems: 'center',
                         }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={handleOnBtnPress("MathGameSetup", 'multiplication')}
+                        handleOnPress={handleOnBtnPress("MathGameSetupScrn", '*')}
                     >
                         <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: "center" }}>Multiplication</PTxt>
                         <Icon size={BTN_TXT_FONT_SZ} icon={faMultiply} style={{ marginStart: 5 }} />
@@ -123,7 +123,7 @@ const HomeScrnPresentation = () => {
                             alignItems: 'center',
                         }}
                         backgroundColor={currentAppColors.second}
-                        handleOnPress={handleOnBtnPress("MathGameSetup", 'subtraction')}
+                        handleOnPress={handleOnBtnPress("MathGameSetupScrn", '-')}
                     >
                         <PTxt fontSize={BTN_TXT_FONT_SZ} style={{ textAlign: "center" }}>Subtraction</PTxt>
                         <Icon size={BTN_TXT_FONT_SZ} icon={faSubtract} style={{ marginStart: 5 }} />

@@ -10,6 +10,7 @@ import HomeScrnTab from './global_components/tab_navs/top/HomeScrnTab';
 import { StackNavigationProp } from '@react-navigation/stack/lib/typescript/src/types';
 import MathOptionsScrnContainer from './Screens/MathOptionsScrn/MathOptionsScrnContainer';
 import MathScrnOptionsTab from './global_components/tab_navs/top/MathScrnOptionsTab';
+import MathGameScrnContainer from './Screens/MathQuizScrn/MathGameScrnContainer';
 
 const Stack = createStackNavigator();
 const navTabs = [
@@ -30,12 +31,16 @@ const navTabs = [
         comp: HomeScrnTab
     },
     {
-        name: "MathGameSetup",
+        name: "MathGameSetupScrn",
         comp: MathScrnOptionsTab
     },
     {
         name: "BinaryScrn",
         comp: MathScrnOptionsTab
+    },
+    {
+        name: 'MathQuizScrn',
+        comp: GameScrnTab
     }
 ] as const;
 
@@ -87,7 +92,7 @@ const LogicGameAppNavigation = () => (
             />
             <Stack.Screen
                 name="MathQuizScrn"
-                component={MathQuizScrnContainer}
+                component={MathGameScrnContainer}
             />
         </Stack.Navigator>
     </NavigationContainer>

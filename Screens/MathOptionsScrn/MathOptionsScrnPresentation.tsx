@@ -11,6 +11,8 @@ import { useGetAppColors } from "../../custom_hooks/useGetAppColors";
 import { IMathGameInfoStates } from "../../zustandStoreTypes&Interfaces";
 import PulseWrapper from "../../global_components/PulseWrapper";
 import { btnStyles } from '../../global_styles/globalStyles';
+import { TStackNavigationProp } from "../../Navigation";
+import { useNavigation } from "@react-navigation/native";
 
 type TMaxQuizTime = typeof MAX_QUIZ_TIME
 type TMaxUntimedQuestions = typeof MAX_TOTAL_QUESTIONS
@@ -26,11 +28,12 @@ const UNSELECTED_GAME_TYPE_OPACITY = .3
 const MAX_TOTAL_QUESTIONS = 200
 
 const MathOptionsScrnPresentation = () => {
-    const setMathGameStore = useMathGameStore(state => state.updateState);
     const mathQuizTime = useMathGameStore(state => state.timer);
     const isQuizTimed = useMathGameStore(state => state.isQuizTimed);
     const totalQs = useMathGameStore(state => state.totalQs);
     const { currentThemeObj } = useGetAppColors();
+    const { navigate } = useNavigation<TStackNavigationProp>();
+    const setMathGameStore = useMathGameStore(state => state.updateState);
 
     function handleCheckBoxBtnPress(isQuizTimed: boolean) {
         return () => {
@@ -39,7 +42,8 @@ const MathOptionsScrnPresentation = () => {
     }
 
     function handlePlayBtnPress() {
-
+        navigate('MathQuizScrn')
+        setMathGameStore('quiz', 'mode')
     }
 
     function handleArrowBtnPress(

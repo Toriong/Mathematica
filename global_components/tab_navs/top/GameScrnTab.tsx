@@ -15,10 +15,11 @@ import { Alert } from "react-native";
 import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
 import uuid from 'react-native-uuid';
 import axios from 'axios';
-import { IQuestionOnClient } from '../../../zustandStoreTypes&Interfaces';
+import { IMathQuizToSave, IQuestionOnClient } from '../../../zustandStoreTypes&Interfaces';
 import { Storage } from '../../../utils/storage';
 import { updateUserQuizzesTakenNum } from '../../../api_services/users/updateUserQuizzesTakenNum';
 import TabWrapper from '../../TabWrapper';
+import { useGetAppColors } from '../../../custom_hooks/useGetAppColors';
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
@@ -31,8 +32,7 @@ function getTimeForUI(millis: number) {
 };
 
 const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
-    const currentTheme = useColorStore(state => state.currentTheme);
-    const colorThemesObj = useColorStore(state => state.themesObj);
+
     const rightNum = useGameScrnTabStore(state => state.right);
     const wrongNum = useGameScrnTabStore(state => state.wrong);
     const mode = useGameScrnTabStore(state => state.mode);
@@ -41,111 +41,19 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const questions = useQuestionsStore(state => state.questions);
     const isTimerOn = useGameScrnTabStore(state => state.isTimerOn);
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
-    const setQuestionsStore = useQuestionsStore(state => state.updateState);
-    const getAddtionalQCancelToken = useGameScrnTabStore(state => state.getAddtionalQCancelTokenSource);
-    const setApiQsFetchingStatusStore = useApiQsFetchingStatusStore(state => state.updateState);
-    const currentThemeObj = colorThemesObj[currentTheme];
-    const questionIndex = useQuestionsStore(state => state.questionIndex)
-    const questionsForNextQuiz = useQuestionsStore(state => state.questionsForNextQuiz);
+    const { currentThemeObj } = useGetAppColors();
 
     function handleBackToMainScrnBtnPress() {
-        getAddtionalQCancelToken.cancel();
-        setGameScrnTabStore(false, "willResetGetAdditionalQCancelTokenSource");
-        let unansweredQs = structuredClone<IQuestionOnClient[]>((questionIndex === 0) ? questions.slice(1) : questions.filter(question => !question.userAnswer));
-        const questionsForNextQuizUpdated = questionsForNextQuiz?.length ? [...unansweredQs, ...questionsForNextQuiz] : unansweredQs;
-
-        if (questionsForNextQuizUpdated.length <= 10) {
-            setQuestionsStore(questionsForNextQuizUpdated, "questionsForNextQuiz");
-        } else if ((questionsForNextQuiz.length <= 5) && (questionsForNextQuizUpdated.length > 0)) {
-            setApiQsFetchingStatusStore(true, "willGetQs");
-            setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz")
-        } else if (questionsForNextQuiz.length === 0) {
-            setApiQsFetchingStatusStore(true, "willGetQs");
-            setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz")
-            setApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus")
-        }
-
-        setGameScrnTabStore("finished", "mode");
-        setGameScrnTabStore(0, "right")
-        setGameScrnTabStore(0, "wrong")
-        setQuestionsStore([], "questions");
-        navigate("Home");
-        setGameScrnTabStore(axios.CancelToken.source(), "getAddtionalQCancelTokenSource")
-        setGameScrnTabStore(true, "willResetGetAdditionalQCancelTokenSource")
+        navigate('Home')
     };
 
-    async function saveQuizAfterQuizIsDone() {
-        const quizObj: Parameters<typeof saveQuiz>[0] = {
-            _id: uuid.v4().toString(),
-            finishedQuizAtMs: Date.now(),
-            userId: (await getUserId()) as string,
-            questions: questions
-        };
-
-        saveQuiz(quizObj)
-            .then(response => {
-                console.log("Response for saving quiz into the database.")
-                if (!response.wasOperationSuccessful) {
-                    throw new CustomError(response.msg ?? "Failed to save quiz. No message was provided from the server.", response.status ?? 500)
-                }
-
-                console.log("Quiz was saved into the database.")
-            })
-            .catch((error) => {
-                console.error('Failed to save quiz into the database: ', error)
-            })
+    async function saveQuizAfterQuizIsDone(quiz: IMathQuizToSave) {
     }
 
     function handleOnComplete() {
-        updateUserQuizzesTakenNum()
-            .then(response => {
-                console.log("From the server: ", response);
-            })
-            .catch((error) => {
-                console.error("An error has occurred in incrementing the total times that the user has taken a quiz within a 24 hour time period.");
-                console.error("Error object: ", error);
-            })
-        const answeredQs = questions.filter(question => question.userAnswer);
-        let unansweredQs = questions
-            .filter(question => !question.userAnswer)
-            .filter(question => !question.wasSkipped);
-
-
-        setGameScrnTabStore("finished", 'mode');
-
-        if (unansweredQs[1]) {
-            setQuestionsStore(unansweredQs.slice(1), "questionsForNextQuiz")
-        } else {
-            setTimeout(() => {
-                setApiQsFetchingStatusStore(true, "areQsReceivedForNextQuiz");
-
-                setApiQsFetchingStatusStore(true, "willGetQs");
-
-                setApiQsFetchingStatusStore("IN_PROGRESS", "gettingQsResponseStatus");
-            }, 400);
-        }
-
-        // the user didn't answer any questions
-        if (!answeredQs.length) {
-            setQuestionsStore([], "questions");
-            Alert.alert("Looks like you didn't answer a question. This quiz will not be saved.")
-        } else {
-            saveQuizAfterQuizIsDone();
-            setQuestionsStore(answeredQs, "questions");
-        }
-
+        // save the quiz into the database for the target user
         navigate('ResultsScreen');
     };
-
-    useEffect(() => {
-        if (gettingQsResponseStatus === "SUCCESS") {
-            setTimeout(() => {
-                setGameScrnTabStore(true, "isTimerOn");
-            }, 400)
-        } else if ((gettingQsResponseStatus === "IN_PROGRESS") || (gettingQsResponseStatus === "FAILURE")) {
-            setGameScrnTabStore(false, "isTimerOn");
-        }
-    }, [gettingQsResponseStatus]);
 
     return (
         <TabWrapper

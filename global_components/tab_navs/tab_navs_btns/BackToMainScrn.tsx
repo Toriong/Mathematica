@@ -8,7 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { TStackNavigationProp } from "../../../Navigation";
 
 const BackToMainScrn = ({ stopTimer }: { stopTimer?: () => void }) => {
-    const currentThemeObj = useGetAppColors();
+    const { currentThemeObj } = useGetAppColors();
     const navigation = useNavigation<TStackNavigationProp>();
     const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
     const setQuestionsStore = useQuestionsStore(state => state.updateState);

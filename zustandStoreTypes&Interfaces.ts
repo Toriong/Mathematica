@@ -54,7 +54,6 @@ export interface IQuestionsStates {
 
 }
 export type TDifficulty = "easy" | "med" | "hard" | "advance";
-export type TOperator = "*" | "+" | "/" | "-" | 'none'
 export type TDecimalStatus = "10s" | "100s" | "1000s" | "none"
 export interface IMathGameInfoStates extends IGameScrnInfo {
     difficulty: TDifficulty
@@ -83,6 +82,22 @@ export interface IApiQsFetchingStatus {
     pointOfFailure: TPointOfFailure
 }
 export type TGameType = "addition" | "subtraction" | "division" | "multiplication"
+export type TOperator = "*" | "+" | "/" | "-" | 'none'
+export type TStrNum = `${number}`
+export type TOperatorForMathScn = Omit<TOperator, "none">
+export type TEquation = (TStrNum | TOperatorForMathScn)[]
+export type TFieldsFromMathGameInfoStates = Omit<IMathGameInfoStates, "isTimerOn" | "mode" | "wasSubmitBtnPressed" | "right" | "wrong">
+export interface IAnsweredMathQuestion {
+    _id: string,
+    equation: TEquation
+    userAnswer: number
+}
+export interface IMathQuizToSave extends TFieldsFromMathGameInfoStates {
+    quizId: string
+    quizFinishedAtDateMs: number
+    userId: string
+    questions: IAnsweredMathQuestion[]
+}
 
 export type TApiQsFetchingStatusStore = IApiQsFetchingStatus & TUpdateStoreState<IApiQsFetchingStatus[keyof IApiQsFetchingStatus], keyof IApiQsFetchingStatus>
 export type TErrorStore = IErrorStore & TUpdateStoreState<boolean, keyof IErrorStore>
