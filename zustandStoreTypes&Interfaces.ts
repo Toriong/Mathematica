@@ -53,8 +53,7 @@ export interface IQuestionsStates {
     numberToGetForEachQuestionType: TNumberToGetForEachQuestionType
 
 }
-export type TDifficulty = "easy" | "med" | "hard";
-export type TMathGameType = "addition" | "subtraction" | "multiplication" | "division"
+export type TDifficulty = "easy" | "med" | "hard" | "advance";
 export type TOperator = "*" | "+" | "/" | "-" | 'none'
 export type TDecimalStatus = "10s" | "100s" | "1000s" | "none"
 export interface IMathGameInfoStates extends IGameScrnInfo {

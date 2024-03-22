@@ -19,11 +19,9 @@ function getTotalParseableInts(equation: TEquation) {
 
 function getRandomNum(min: number, max: number) {
     const totalNumbersToChooseFrom = (max - min) + 1;
-    // add the min, handle the case which the number is below the 
-    // min
-    const randomNum = Math.floor(Math.random() * totalNumbersToChooseFrom) + min;
+    const randomNum = Math.floor(Math.random() * totalNumbersToChooseFrom);
 
-    return randomNum + min;
+    return randomNum;
 }
 
 function computeEquation(equation: TEquation) {
@@ -42,7 +40,7 @@ function computeEquation(equation: TEquation) {
 function generateMathEquation(
     operator: TOperator,
     totalNumsInEquation: number,
-    minAndMax: { min: number, max: number }
+    minAndMax: [number, number]
 ) {
     let equation: (TOperator | TStrNum)[] = [];
 
@@ -50,7 +48,7 @@ function generateMathEquation(
         const lastVal = equation.at(-1)
 
         if (!getIsNum(lastVal)) {
-            equation.push(`${getRandomNum(minAndMax.min, minAndMax.max)}`)
+            equation.push(`${getRandomNum(minAndMax[0], minAndMax[1])}`)
             continue
         }
 
@@ -60,27 +58,43 @@ function generateMathEquation(
     return equation;
 }
 
-function getAnswer(equation: TEquation): number {
+function getAns(equation: TEquation): number {
     const equationStr = equation.join('')
-    const computeAns = Function(`return ${equationStr}`) as (() => number)
+    const computeEquation = Function(`return ${equationStr}`) as (() => number)
 
-    return computeAns()
+    return computeEquation()
 }
 
-// easy: 1 - 2 digit numbers
+// easy: 1 - 2 digit numbers, the second number must always be a single digit number
 // medium: 2 digits numbers
-// hard: 3 - 4 digits
+// hard: 3 digits
+// extra hard: 4 digits
 // custom: the user gets to choose
 
-function getNumRange() {
+function getMinAndMax(difficulty: TDifficulty): [number, number] {
+    if (difficulty === "easy") {
+        return [1, 99]
+    }
 
+    if (difficulty === 'med') {
+        return [10, 99]
+    }
+
+    if (difficulty === 'hard') {
+        return [100, 999]
+    }
+
+    return [1_000, 9_999]
 }
 
 const MathGameScrnPresentation = () => {
     const gameDiffulty = useMathGameStore(state => state.difficulty);
     const gameType = useMathGameStore(state => state.gameType)
     const numbersPerEquation = useMathGameStore(state => state.numsPerEquation)
-    const mathEquation = generateMathEquation(gameType, numbersPerEquation,)
+    const minAndMax = getMinAndMax(gameDiffulty);
+    const mathEquation = generateMathEquation(gameType, numbersPerEquation, minAndMax)
+    const numsInMathEquation = mathEquation.filter(mathEqVal => !Number.isNaN(+mathEqVal))
+    console.log('numsInMathEquation: ', numsInMathEquation)
     // if the hardest difficulty, then generate four digit numbers
     // if the medium difficulty, then generate three digit numbers
     // if easy difficulty, then generate one one to two digit numbers
@@ -104,7 +118,14 @@ const MathGameScrnPresentation = () => {
                 height: '100%'
             }}
         >
-            <View>
+            <View
+                style={{
+                    display: 'flex',
+                    flexDirection: "column",
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}
+            >
 
             </View>
         </Layout>
