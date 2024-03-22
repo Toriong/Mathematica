@@ -55,12 +55,14 @@ export interface IQuestionsStates {
 }
 export type TDifficulty = "easy" | "med" | "hard";
 export type TMathGameType = "addition" | "subtraction" | "multiplication" | "division"
+export type TOperator = "*" | "+" | "/" | "-" | 'none'
 export type TDecimalStatus = "10s" | "100s" | "1000s" | "none"
 export interface IMathGameInfoStates extends IGameScrnInfo {
     difficulty: TDifficulty
-    gameType: TMathGameType
+    gameType: TOperator
     isQuizTimed: boolean
     totalQs: number
+    numsPerEquation: number
 }
 export type TUpdateStoreState<TNewState, TFieldName> = {
     updateState: (newState: TNewState, fieldName: TFieldName) => void

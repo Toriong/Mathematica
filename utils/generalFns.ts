@@ -43,3 +43,7 @@ export async function getUserId(): Promise<string | null> {
 export function convertToSecsToMins(secs: number) {
     return Math.floor(secs / 60)
 }
+
+export function getIsNum(val: any) {
+    return !Number.isNaN(+val)
+}

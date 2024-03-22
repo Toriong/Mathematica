@@ -40,13 +40,14 @@ export const useRequestStatusStore = create<TIsGettingReqStore>(set => ({
 export const useMathGameStore = create<TMathGameInfoStore>(set => {
     const mathGameInfo = {
         difficulty: 'easy',
-        gameType: 'addition',
+        gameType: 'none',
         isQuizTimed: true,
         isTimerOn: false,
         mode: 'quiz',
         right: 0,
         wrong: 0,
         timer: 120,
+        numsPerEquation: 2,
         // min questions is 20
         // max qs is 200
         totalQs: 40,
