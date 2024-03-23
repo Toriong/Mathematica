@@ -89,6 +89,7 @@ export interface IMathGameInfoStates extends IGameScrnInfo {
     totalProblems: number
     numsPerEquation: number
     problems: TEquation[] | null
+    generateEquationAccumalor: number
 }
 export interface IAnsweredMathQuestion {
     _id: string,

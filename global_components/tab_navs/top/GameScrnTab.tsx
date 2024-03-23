@@ -10,14 +10,6 @@ import { TStackNavigationProp } from "../../../Navigation";
 import { saveQuiz } from "../../../api_services/quiz/saveQuiz";
 import { CustomError } from "../../../utils/errors";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer"
-import { getUserId } from "../../../utils/generalFns";
-import { Alert } from "react-native";
-import SafeAreaViewWrapper from "../../SafeAreaViewWrapper";
-import uuid from 'react-native-uuid';
-import axios from 'axios';
-import { IMathQuizToSave, IQuestionOnClient } from '../../../zustandStoreTypes&Interfaces';
-import { Storage } from '../../../utils/storage';
-import { updateUserQuizzesTakenNum } from '../../../api_services/users/updateUserQuizzesTakenNum';
 import TabWrapper from '../../TabWrapper';
 import { useGetAppColors } from '../../../custom_hooks/useGetAppColors';
 
@@ -45,9 +37,6 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     function handleBackToMainScrnBtnPress() {
         navigate('Home')
     };
-
-    async function saveQuizAfterQuizIsDone(quiz: IMathQuizToSave) {
-    }
 
     function handleOnComplete() {
         // save the quiz into the database for the target user

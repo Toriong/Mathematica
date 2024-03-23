@@ -32,11 +32,9 @@ export const PTxt = ({
     testID,
     txtColor = DEFAULT_THIRD_COLOR,
     fontSize = 18,
-    fontStyle = 'normal'
+    fontStyle = 'normal',
 }: TTxtProps & TTxt) => {
     const _idsObj = getIdsObj(id, testID);
-
-
 
     return (
         <Text

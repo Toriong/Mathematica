@@ -1,51 +1,52 @@
 import { Dimensions, FlatList, View } from "react-native";
 import Layout from "../../global_components/Layout";
 import { PTxt } from "../../global_components/text";
-import { Icon } from "../../global_components/Icon";
-import { faAdd, faDivide, faMinus, faMultiply, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { Icon } from '../../global_components/Icon';
+import { faAdd, faDivide, faMinus, faMultiply, faCheck, faCancel } from "@fortawesome/free-solid-svg-icons";
 import { useMathGameStore } from '../../zustand';
 import { TDifficulty, TEquation, TOperator, TStrNum } from '../../zustandStoreTypes&Interfaces';
 import { getIsNum } from "../../utils/generalFns";
-import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useMemo, useRef, useState } from "react";
-import { FlashList } from '@shopify/flash-list'
-import { IAppColor, IComponentProps } from "../../globalTypes&Interfaces";
+import { useRef, useState, isValidElement, JSX, useMemo } from "react";
+import { IAppColor, IComponentProps, TIndices, TUseStateReturnVal } from "../../globalTypes&Interfaces";
 import Button from "../../global_components/Button";
 import { useGetAppColors } from "../../custom_hooks/useGetAppColors";
 
 type TMinAndMax = [number, number]
 type TBtnTxt = typeof BTN_TXTS[number]
+type TBtnTxtsIndices = TIndices<typeof BTN_TXTS>
+type TClearBtnColor = '#FFA500'
+type TSubmitBtnColor = '#198754'
 type TUserSelectionBtn = {
     btnTxt: TBtnTxt
     handleBtnPress: (...args: any[]) => void,
-    btnBackgroundColor: Pick<IAppColor, 'second'>['second'] | '#FFC107' | 'green'
+    btnBackgroundColor: Pick<IAppColor, 'second'>['second'] | TClearBtnColor | TSubmitBtnColor
+    index: TBtnTxtsIndices
 }
-type IUserSelectBtn = Pick<IComponentProps, 'children'> & TUserSelectionBtn
+type TTxtForSelectionBtns = Exclude<TBtnTxt, JSX.Element> | 'clr' | 'submit'
+type TClearAndSubmits = Extract<TTxtForSelectionBtns, 'submit' | 'clr'>
+type IUserSelectBtn = Pick<IComponentProps, 'children'> & Omit<TUserSelectionBtn, "btnTxt">
+// GOAL: get all of the string types from the type of BTN_TXTS
 
 const NUM_AND_OPERATOR_FONT_SIZE = 85
 const OPERATOR_FONT_SIZE = 60
 const CALCULATOR_AND_ANS_FONT_SIZE = 35
-const clearAndSubmitBtnTxts = ['CLR', 'SUB'] as const
-const BTN_TXTS = ['9', '8', '7', '6', '5', '4', '3', '2', '1', 'CLR', '0', 'SUB'] as const;
+const ICON_SIZE = 24;
+const BTN_TXTS = ['9', '8', '7', '6', '5', '4', '3', '2', '1', <Icon icon={faCancel} size={ICON_SIZE} />, '0', <Icon icon={faCheck} size={ICON_SIZE} />] as const;
 
-{/* <PTxt
-    fontSize={CALCULATOR_AND_ANS_FONT_SIZE}
-    txtColor='white'
-    style={{ textAlign: 'center' }}
->
-    {btnTxt}
-</PTxt> */}
-
-const UserSelectBtn = ({ children, btnBackgroundColor, handleBtnPress }: IUserSelectBtn) => {
+const UserSelectBtn = ({ children, btnBackgroundColor, handleBtnPress, index }: IUserSelectBtn) => {
     return (
         <Button
+            key={index.toString()}
             handleOnPress={handleBtnPress}
             dynamicStyles={{
                 padding: 7,
                 borderRadius: 10,
                 width: 90,
                 marginVertical: 5,
-                marginHorizontal: 5
+                marginHorizontal: 5,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
             }}
             backgroundColor={btnBackgroundColor}
         >
@@ -54,24 +55,22 @@ const UserSelectBtn = ({ children, btnBackgroundColor, handleBtnPress }: IUserSe
     )
 }
 
-const RenderUserSelectionBtn = ({ btnTxt, btnBackgroundColor, handleBtnPress }: TUserSelectionBtn) => {
-    if (['CLR', 'SUB'].includes(btnTxt)) {
+const RenderUserSelectionBtn = ({ btnTxt, btnBackgroundColor, handleBtnPress, index }: TUserSelectionBtn) => {
+    if (isValidElement(btnTxt)) {
         return (
             <UserSelectBtn
+                index={index}
                 handleBtnPress={handleBtnPress}
-                btnTxt={"9"}
-                btnBackgroundColor={('CLR' === btnTxt) ? '#FFC107' : 'green'}
+                btnBackgroundColor={btnBackgroundColor}
             >
-                <PTxt>
-                    {btnTxt}
-                </PTxt>
+                {btnTxt}
             </UserSelectBtn>
         )
     }
 
     return (
         <Button
-            handleOnPress={() => { }}
+            handleOnPress={handleBtnPress}
             dynamicStyles={{
                 padding: 7,
                 borderRadius: 10,
@@ -195,17 +194,52 @@ function getMinAndMax(difficulty: TDifficulty): TMinAndMax {
 const MathGameScrnPresentation = () => {
     const gameDiffulty = useMathGameStore(state => state.difficulty);
     const gameType = useMathGameStore(state => state.gameType) as Exclude<TOperator, 'none'>
-    const numbersPerEquation = useMathGameStore(state => state.numsPerEquation)
+    const numbersPerEquation = useMathGameStore(state => state.numsPerEquation);
+    const generateEquationAccumulator = useMathGameStore(state => state.generateEquationAccumalor);
     const { currentThemeObj } = useGetAppColors();
-    const minAndMax = getMinAndMax(gameDiffulty);
-    const mathEquation = generateMathEquation(gameType, numbersPerEquation, minAndMax, gameDiffulty)
+    const minAndMax = useMemo(() => {
+        return getMinAndMax(gameDiffulty)
+    }, [generateEquationAccumulator]);
+    const mathEquation = useMemo(() => {
+        return generateMathEquation(gameType, numbersPerEquation, minAndMax, gameDiffulty)
+    }, [generateEquationAccumulator])
     const numsInMathEquation = mathEquation.filter(mathEqVal => !Number.isNaN(+mathEqVal)).sort((numA, numB) => parseInt(numB) - parseInt(numA))
-    const [userAnswer, setUserAnswer] = useState(0);
+    const [userAnswer, setUserAnswer] = useState('');
     const [btnsSecHeight, setBtnsSecHeight] = useState(0)
-    const { width, height } = Dimensions.get('screen');
     const wasHeightSetRef = useRef(false);
 
+    function handleSelectionBtnPress(btnTxt: TTxtForSelectionBtns) {
+        return () => {
+            console.log('btnTxt: ', btnTxt);
+            console.log('userAnswer, hey there! ', userAnswer)
+            if (btnTxt === 'submit') {
 
+                // GOAL: make the submit button to work by having the following to occur:
+                // present the following:
+                // "Answer: "
+                // "{the answer goes here}"
+                // have the backdrop appear onto the ui
+
+                // the correct answser is displayed onto the ui
+                // the backdrop is displayed onto the ui
+                // if the answer is incorrect, then the color of the correct answer text will be red
+                // if the answer is correct, then the color of the correct answer tet will be green
+                // 
+                return;
+            }
+
+            if (btnTxt === 'clr') {
+                setUserAnswer("")
+                return;
+            }
+
+            if ((userAnswer === '') && (btnTxt === '0')) {
+                return;
+            }
+
+            setUserAnswer(state => `${state}${btnTxt}`)
+        }
+    }
 
     // if the hardest difficulty, then generate four digit numbers
     // if the medium difficulty, then generate three digit numbers
@@ -312,7 +346,8 @@ const MathGameScrnPresentation = () => {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        width: '100%'
+                        width: '100%',
+                        borderWidth: 1
                     }}
                 >
                     <View
@@ -323,18 +358,19 @@ const MathGameScrnPresentation = () => {
                             alignItems: 'center',
                         }}
                     >
-                        <View
+                        {/* <View
                             style={{
                                 transform: [{ translateX: -35 }]
                             }}
                         >
                             <ArithmeticSign operator={gameType} style={{ opacity: 0 }} />
-                        </View>
+                        </View> */}
                         <View
                             style={{
                                 display: 'flex',
                                 justifyContent: 'flex-end',
                                 alignItems: 'flex-end',
+                                borderWidth: 1
                             }}
                         >
                             <PTxt fontSize={NUM_AND_OPERATOR_FONT_SIZE}>
@@ -379,27 +415,31 @@ const MathGameScrnPresentation = () => {
                             display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'
                         }}
                         renderItem={
-                            ({ item: btnTxt, index }) => (
-                                <Button
-                                    handleOnPress={() => { }}
-                                    dynamicStyles={{
-                                        padding: 7,
-                                        borderRadius: 10,
-                                        width: 90,
-                                        marginVertical: 5,
-                                        marginHorizontal: 5
-                                    }}
-                                    backgroundColor={currentThemeObj.second}
-                                >
-                                    <PTxt
-                                        fontSize={CALCULATOR_AND_ANS_FONT_SIZE}
-                                        txtColor='white'
-                                        style={{ textAlign: 'center' }}
-                                    >
-                                        {btnTxt}
-                                    </PTxt>
-                                </Button>
-                            )
+                            ({ item: btnTxt, index }) => {
+                                if (typeof btnTxt === 'string') {
+                                    return (
+                                        <RenderUserSelectionBtn
+                                            btnBackgroundColor={currentThemeObj.second}
+                                            btnTxt={btnTxt}
+                                            key={index}
+                                            index={index.toString() as unknown as TIndices<typeof BTN_TXTS>}
+                                            handleBtnPress={handleSelectionBtnPress(btnTxt)}
+                                        />
+                                    )
+                                }
+
+                                let btnType: TClearAndSubmits = ((index === (BTN_TXTS.length - 1)) ? 'submit' : 'clr')
+
+                                return (
+                                    <RenderUserSelectionBtn
+                                        btnBackgroundColor={(index === (BTN_TXTS.length - 1)) ? '#198754' : '#FFA500'}
+                                        btnTxt={btnTxt}
+                                        key={index}
+                                        index={index.toString() as unknown as TIndices<typeof BTN_TXTS>}
+                                        handleBtnPress={handleSelectionBtnPress(btnType)}
+                                    />
+                                )
+                            }
                         }
                     />
                 </View>

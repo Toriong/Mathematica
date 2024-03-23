@@ -53,6 +53,7 @@ export const useMathGameStore = create<TMathGameInfoStore>(set => {
         problems: null,
         totalProblems: 40,
         wasSubmitBtnPressed: false,
+        generateEquationAccumalor: 0,
         updateState: (newState: IMathGameInfoStates[keyof IMathGameInfoStates], fieldName: keyof IMathGameInfoStates) => set(() => ({ [fieldName]: newState }))
     } satisfies TMathGameInfoStore;
 
