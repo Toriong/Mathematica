@@ -82,13 +82,17 @@ export type TOperatorForMathScn = TOperator
 export type TEquation = (TStrNum | TOperatorForMathScn)[]
 export type TFieldsFromMathGameInfoStates = Omit<IMathGameInfoStates, "isTimerOn" | "mode" | "wasSubmitBtnPressed" | "right" | "wrong">
 
+export interface TUserAnswer {
+    problem: TEquation
+    userAnswer: string
+}
 export interface IMathGameInfoStates extends IGameScrnInfo {
     difficulty: TDifficulty
     gameType: TOperator
     isQuizTimed: boolean
     totalProblems: number
     numsPerEquation: number
-    problems: TEquation[] | null
+    problems: TUserAnswer[] | null
     generateEquationAccumalor: number
 }
 export interface IAnsweredMathQuestion {

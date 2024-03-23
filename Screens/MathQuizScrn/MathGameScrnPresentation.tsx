@@ -10,6 +10,8 @@ import { useRef, useState, isValidElement, JSX, useMemo } from "react";
 import { IAppColor, IComponentProps, TIndices, TUseStateReturnVal } from "../../globalTypes&Interfaces";
 import Button from "../../global_components/Button";
 import { useGetAppColors } from "../../custom_hooks/useGetAppColors";
+import ScreenOverlay from "../../global_components/overlays/ScreenOverlay";
+import Answer from "./components/Answer";
 
 type TMinAndMax = [number, number]
 type TBtnTxt = typeof BTN_TXTS[number]
@@ -31,7 +33,7 @@ const NUM_AND_OPERATOR_FONT_SIZE = 85
 const OPERATOR_FONT_SIZE = 60
 const CALCULATOR_AND_ANS_FONT_SIZE = 35
 const ICON_SIZE = 24;
-const BTN_TXTS = ['9', '8', '7', '6', '5', '4', '3', '2', '1', <Icon icon={faCancel} size={ICON_SIZE} />, '0', <Icon icon={faCheck} size={ICON_SIZE} />] as const;
+const BTN_TXTS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", <Icon icon={faCancel} size={ICON_SIZE} />, '0', <Icon icon={faCheck} size={ICON_SIZE} />] as const;
 
 const UserSelectBtn = ({ children, btnBackgroundColor, handleBtnPress, index }: IUserSelectBtn) => {
     return (
@@ -120,19 +122,6 @@ function getRandomNum(min: number, max: number) {
     return randomNum;
 }
 
-function computeEquation(equation: TEquation) {
-    try {
-        const equationStr = equation.join('')
-        const computeAns = Function(`return ${equationStr}`) as (() => number)
-
-        return computeAns()
-    } catch (error) {
-        console.error('Failed to compute answer. Reason: ', error)
-
-        return null
-    }
-}
-
 function generateMathEquation(
     operator: TOperator,
     totalNumsInEquation: number,
@@ -165,7 +154,7 @@ function generateMathEquation(
     return equation;
 }
 
-function getAns(equation: TEquation): number {
+function computeEquation(equation: TEquation): number {
     const equationStr = equation.join('')
     const computeEquation = Function(`return ${equationStr}`) as (() => number)
 
@@ -196,6 +185,9 @@ const MathGameScrnPresentation = () => {
     const gameType = useMathGameStore(state => state.gameType) as Exclude<TOperator, 'none'>
     const numbersPerEquation = useMathGameStore(state => state.numsPerEquation);
     const generateEquationAccumulator = useMathGameStore(state => state.generateEquationAccumalor);
+    const wasSubmitBtnPressed = useMathGameStore(state => state.wasSubmitBtnPressed);
+    const previousProblems = useMathGameStore(state => state.problems);
+    const setMathGameStore = useMathGameStore(state => state.updateState);
     const { currentThemeObj } = useGetAppColors();
     const minAndMax = useMemo(() => {
         return getMinAndMax(gameDiffulty)
@@ -206,25 +198,23 @@ const MathGameScrnPresentation = () => {
     const numsInMathEquation = mathEquation.filter(mathEqVal => !Number.isNaN(+mathEqVal)).sort((numA, numB) => parseInt(numB) - parseInt(numA))
     const [userAnswer, setUserAnswer] = useState('');
     const [btnsSecHeight, setBtnsSecHeight] = useState(0)
-    const wasHeightSetRef = useRef(false);
+    const [answerSecWidth, setAnswerSecWidth] = useState(0);
+    const wasHeightSetForBtnSecRef = useRef(false);
+    const wasWidthSetForAnswerSecRef = useRef(false);
+    const correctAnswer = wasSubmitBtnPressed ? computeEquation(mathEquation) : null;
+    const isAnswerCorrect = wasSubmitBtnPressed ? parseInt(userAnswer || '0') === correctAnswer : false;
 
     function handleSelectionBtnPress(btnTxt: TTxtForSelectionBtns) {
         return () => {
-            console.log('btnTxt: ', btnTxt);
-            console.log('userAnswer, hey there! ', userAnswer)
             if (btnTxt === 'submit') {
-
-                // GOAL: make the submit button to work by having the following to occur:
-                // present the following:
-                // "Answer: "
-                // "{the answer goes here}"
-                // have the backdrop appear onto the ui
-
-                // the correct answser is displayed onto the ui
-                // the backdrop is displayed onto the ui
-                // if the answer is incorrect, then the color of the correct answer text will be red
-                // if the answer is correct, then the color of the correct answer tet will be green
-                // 
+                setTimeout(() => {
+                    setMathGameStore(false, 'wasSubmitBtnPressed');
+                    setUserAnswer('');
+                    setMathGameStore(generateEquationAccumulator + 1, 'generateEquationAccumalor');
+                }, 1500);
+                setMathGameStore(true, 'wasSubmitBtnPressed');
+                const problemsUpdated = [...(previousProblems?.length ? previousProblems : []), { problem: mathEquation, userAnswer: userAnswer }]
+                setMathGameStore(problemsUpdated, 'problems')
                 return;
             }
 
@@ -249,6 +239,15 @@ const MathGameScrnPresentation = () => {
 
     return (
         <Layout
+            OverlayComp={wasSubmitBtnPressed && (
+                <ScreenOverlay>
+                    <Answer
+                        isAnswerCorrect={isAnswerCorrect}
+                        correctAnswer={`${correctAnswer}`}
+                        userAnswer={`${userAnswer}`}
+                    />
+                </ScreenOverlay>
+            )}
             style={{
                 flex: 1,
                 width: "100%",
@@ -333,9 +332,16 @@ const MathGameScrnPresentation = () => {
                     }}
                 >
                     <View
+                        onLayout={event => {
+                            if (!wasWidthSetForAnswerSecRef.current) {
+                                const width = event.nativeEvent.layout.width - (event.nativeEvent.layout.width * .4);
+                                setAnswerSecWidth(width);
+                                wasWidthSetForAnswerSecRef.current = true
+                            }
+                        }}
                         style={{
                             borderWidth: 10,
-                            width: '80%',
+                            width: '60%',
                             borderColor: 'white',
                             borderRadius: 10
                         }}
@@ -344,39 +350,20 @@ const MathGameScrnPresentation = () => {
                 <View
                     style={{
                         display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
                         width: '100%',
-                        borderWidth: 1
                     }}
                 >
                     <View
                         style={{
                             display: 'flex',
-                            flexDirection: "row",
-                            justifyContent: 'center',
-                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            alignItems: 'flex-end',
+                            width: "71%"
                         }}
                     >
-                        {/* <View
-                            style={{
-                                transform: [{ translateX: -35 }]
-                            }}
-                        >
-                            <ArithmeticSign operator={gameType} style={{ opacity: 0 }} />
-                        </View> */}
-                        <View
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'flex-end',
-                                alignItems: 'flex-end',
-                                borderWidth: 1
-                            }}
-                        >
-                            <PTxt fontSize={NUM_AND_OPERATOR_FONT_SIZE}>
-                                {userAnswer}
-                            </PTxt>
-                        </View>
+                        <PTxt fontSize={NUM_AND_OPERATOR_FONT_SIZE}>
+                            {userAnswer}
+                        </PTxt>
                     </View>
                 </View>
             </View>
@@ -393,9 +380,9 @@ const MathGameScrnPresentation = () => {
             >
                 <View
                     onLayout={event => {
-                        if (!wasHeightSetRef.current) {
+                        if (!wasHeightSetForBtnSecRef.current) {
                             const btnsSecHeight = event.nativeEvent.layout.height * .65
-                            wasHeightSetRef.current = true
+                            wasHeightSetForBtnSecRef.current = true
                             setBtnsSecHeight(btnsSecHeight)
                         }
                     }}

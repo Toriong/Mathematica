@@ -12,6 +12,7 @@ import { CustomError } from "../../../utils/errors";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer"
 import TabWrapper from '../../TabWrapper';
 import { useGetAppColors } from '../../../custom_hooks/useGetAppColors';
+import TabOverlay from '../../overlays/TabOverlay';
 
 const FONT_SIZE_NON_SCORE_TXT = 21;
 const FONT_SIZE_SCORE_TXT = 28;
@@ -28,10 +29,11 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     const wrongNum = useMathGameStore(state => state.wrong);
     const mode = useMathGameStore(state => state.mode);
     const timer = useMathGameStore(state => state.timer);
+    const wasSubmitBtnPressed = useMathGameStore(state => state.wasSubmitBtnPressed);
     const gettingQsResponseStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
     const questions = useQuestionsStore(state => state.questions);
-    const isTimerOn = useMathGameStore(state => state.isTimerOn);
     const setMathGameStore = useMathGameStore(state => state.updateState);
+    const isTimerOn = useMathGameStore(state => state.isTimerOn);
     const { currentThemeObj } = useGetAppColors();
 
     function handleBackToMainScrnBtnPress() {
@@ -50,8 +52,9 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                 width: '100%',
                 position: 'relative',
                 display: 'flex',
-                height: 200
+                height: 200,
             }}
+            Overlay={<TabOverlay />}
         >
             <View
                 style={{
@@ -61,7 +64,8 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                     flex: 1,
                     borderBottomWidth: .8,
                     borderBottomColor: currentThemeObj.second,
-                    paddingBottom: 13
+                    paddingBottom: 13,
+                    position: 'relative'
                 }}
             >
                 <View style={{ display: 'flex', flexDirection: 'row', width: "100%", paddingTop: "3%" }}>
@@ -104,8 +108,8 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                     style={{
                         paddingBottom: 10,
                         paddingLeft: 13,
-                        position: 'relative',
-                        width: '100%'
+                        width: '100%',
+                        position: 'relative'
                     }}
                 >
                     <View
