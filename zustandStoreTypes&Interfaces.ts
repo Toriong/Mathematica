@@ -55,13 +55,6 @@ export interface IQuestionsStates {
 }
 export type TDifficulty = "easy" | "med" | "hard" | "advance";
 export type TDecimalStatus = "10s" | "100s" | "1000s" | "none"
-export interface IMathGameInfoStates extends IGameScrnInfo {
-    difficulty: TDifficulty
-    gameType: TOperator
-    isQuizTimed: boolean
-    totalQs: number
-    numsPerEquation: number
-}
 export type TUpdateStoreState<TNewState, TFieldName> = {
     updateState: (newState: TNewState, fieldName: TFieldName) => void
 }
@@ -84,9 +77,19 @@ export interface IApiQsFetchingStatus {
 export type TGameType = "addition" | "subtraction" | "division" | "multiplication"
 export type TOperator = "*" | "+" | "/" | "-" | 'none'
 export type TStrNum = `${number}`
-export type TOperatorForMathScn = Omit<TOperator, "none">
+// export type TOperatorForMathScn = Omit<TOperator, "none">
+export type TOperatorForMathScn = TOperator
 export type TEquation = (TStrNum | TOperatorForMathScn)[]
 export type TFieldsFromMathGameInfoStates = Omit<IMathGameInfoStates, "isTimerOn" | "mode" | "wasSubmitBtnPressed" | "right" | "wrong">
+
+export interface IMathGameInfoStates extends IGameScrnInfo {
+    difficulty: TDifficulty
+    gameType: TOperator
+    isQuizTimed: boolean
+    totalProblems: number
+    numsPerEquation: number
+    problems: TEquation[] | null
+}
 export interface IAnsweredMathQuestion {
     _id: string,
     equation: TEquation

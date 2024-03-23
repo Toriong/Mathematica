@@ -53,7 +53,7 @@ export type TStackNavigationProp = StackNavigationProp<ParamListBase, string, un
 const LogicGameAppNavigation = () => (
     <NavigationContainer>
         <Stack.Navigator
-            initialRouteName='Home'
+            initialRouteName='MathQuizScrn'
             screenOptions={{
                 header: props => {
                     const { comp: TopTab } = navTabs.find(({ name }) => name === props.route.name) ?? {};

@@ -1,7 +1,7 @@
 import { View, SafeAreaView, GestureResponderEvent, Text } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import { useApiQsFetchingStatusStore, useColorStore, useGameScrnTabStore, useQuestionsStore } from "../../../zustand";
+import { useApiQsFetchingStatusStore, useColorStore, useGameScrnTabStore, useMathGameStore, useQuestionsStore } from "../../../zustand";
 import Button from "../../Button";
 import { PTxt } from "../../text";
 import { useEffect, useState } from "react";
@@ -32,15 +32,14 @@ function getTimeForUI(millis: number) {
 };
 
 const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
-
-    const rightNum = useGameScrnTabStore(state => state.right);
-    const wrongNum = useGameScrnTabStore(state => state.wrong);
-    const mode = useGameScrnTabStore(state => state.mode);
-    const timer = useGameScrnTabStore(state => state.timer);
+    const rightNum = useMathGameStore(state => state.right);
+    const wrongNum = useMathGameStore(state => state.wrong);
+    const mode = useMathGameStore(state => state.mode);
+    const timer = useMathGameStore(state => state.timer);
     const gettingQsResponseStatus = useApiQsFetchingStatusStore(state => state.gettingQsResponseStatus);
     const questions = useQuestionsStore(state => state.questions);
-    const isTimerOn = useGameScrnTabStore(state => state.isTimerOn);
-    const setGameScrnTabStore = useGameScrnTabStore(state => state.updateState);
+    const isTimerOn = useMathGameStore(state => state.isTimerOn);
+    const setMathGameStore = useMathGameStore(state => state.updateState);
     const { currentThemeObj } = useGetAppColors();
 
     function handleBackToMainScrnBtnPress() {
@@ -62,7 +61,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                 width: '100%',
                 position: 'relative',
                 display: 'flex',
-                height: 150
+                height: 200
             }}
         >
             <View
@@ -70,7 +69,10 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    flex: 1
+                    flex: 1,
+                    borderBottomWidth: .8,
+                    borderBottomColor: currentThemeObj.second,
+                    paddingBottom: 13
                 }}
             >
                 <View style={{ display: 'flex', flexDirection: 'row', width: "100%", paddingTop: "3%" }}>
@@ -109,8 +111,21 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                         }
                     </View>
                 </View>
-                <View style={{ marginTop: "3%", paddingBottom: 10, position: 'relative' }}>
-                    <View style={{ width: mode === "review" ? "100%" : "37%", display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                <View
+                    style={{
+                        paddingBottom: 10,
+                        paddingLeft: 13,
+                        position: 'relative',
+                        width: '100%'
+                    }}
+                >
+                    <View
+                        style={{
+                            width: (mode === "review") ? "100%" : "37%",
+                            display: 'flex',
+                            flexDirection: 'row',
+                        }}
+                    >
                         <PTxt fontSize={FONT_SIZE_SCORE_TXT} fontStyle="italic">Score: </PTxt>
                         <PTxt fontSize={FONT_SIZE_SCORE_TXT}>{rightNum}</PTxt>
                     </View>

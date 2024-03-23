@@ -23,14 +23,13 @@ const MAX_QUIZ_TIME = 300
 const TXT_FONT_SIZE = 22
 const PADDING_START = 30
 const HEADER_FONT_SIZE = 29
-const MAIN_HEADER_FONT_SIZE = 32
 const UNSELECTED_GAME_TYPE_OPACITY = .3
 const MAX_TOTAL_QUESTIONS = 200
 
 const MathOptionsScrnPresentation = () => {
     const mathQuizTime = useMathGameStore(state => state.timer);
     const isQuizTimed = useMathGameStore(state => state.isQuizTimed);
-    const totalQs = useMathGameStore(state => state.totalQs);
+    const totalProblems = useMathGameStore(state => state.totalProblems);
     const { currentThemeObj } = useGetAppColors();
     const { navigate } = useNavigation<TStackNavigationProp>();
     const setMathGameStore = useMathGameStore(state => state.updateState);
@@ -48,7 +47,7 @@ const MathOptionsScrnPresentation = () => {
 
     function handleArrowBtnPress(
         arrowDirection: 'left' | 'right',
-        fieldToUpdate: keyof Pick<IMathGameInfoStates, "totalQs" | "timer">,
+        fieldToUpdate: keyof Pick<IMathGameInfoStates, "totalProblems" | "timer">,
         gameSettingValToUpdate: number,
         numToAdd: 10 | 60,
         minComparisonNum: TMininumUntimedQuestions | TMinQuizTimeSecs,
@@ -254,7 +253,7 @@ const MathOptionsScrnPresentation = () => {
                                     }}
                                     fontSize={TXT_FONT_SIZE}
                                 >
-                                    {totalQs} qs
+                                    {totalProblems} qs
                                 </PTxt>
                             </View>
                             <View
@@ -269,8 +268,8 @@ const MathOptionsScrnPresentation = () => {
                             >
 
                                 <Button
-                                    isDisabled={(totalQs <= 20) || isQuizTimed}
-                                    handleOnPress={handleArrowBtnPress('left', "totalQs", totalQs, 10, 20, MAX_TOTAL_QUESTIONS)}
+                                    isDisabled={(totalProblems <= 20) || isQuizTimed}
+                                    handleOnPress={handleArrowBtnPress('left', "totalProblems", totalProblems, 10, 20, MAX_TOTAL_QUESTIONS)}
                                     backgroundColor={currentThemeObj.second}
                                     dynamicStyles={{
                                         paddingHorizontal: 5,
@@ -278,7 +277,7 @@ const MathOptionsScrnPresentation = () => {
                                         display: "flex",
                                         justifyContent: "center",
                                         alignItems: "center",
-                                        opacity: ((totalQs <= 20) || isQuizTimed) ? .3 : 1,
+                                        opacity: ((totalProblems <= 20) || isQuizTimed) ? .3 : 1,
                                         width: 100,
                                         borderRadius: 15,
                                     }}
@@ -286,8 +285,8 @@ const MathOptionsScrnPresentation = () => {
                                     <Icon icon={faArrowLeft} />
                                 </Button>
                                 <Button
-                                    isDisabled={(totalQs >= MAX_TOTAL_QUESTIONS) || isQuizTimed}
-                                    handleOnPress={handleArrowBtnPress('right', "totalQs", totalQs, 10, 20, MAX_TOTAL_QUESTIONS)}
+                                    isDisabled={(totalProblems >= MAX_TOTAL_QUESTIONS) || isQuizTimed}
+                                    handleOnPress={handleArrowBtnPress('right', "totalProblems", totalProblems, 10, 20, MAX_TOTAL_QUESTIONS)}
                                     backgroundColor={currentThemeObj.second}
                                     dynamicStyles={{
                                         paddingHorizontal: 5,
@@ -295,7 +294,7 @@ const MathOptionsScrnPresentation = () => {
                                         display: "flex",
                                         justifyContent: "center",
                                         alignItems: "center",
-                                        opacity: ((totalQs >= MAX_TOTAL_QUESTIONS) || isQuizTimed) ? .3 : 1,
+                                        opacity: ((totalProblems >= MAX_TOTAL_QUESTIONS) || isQuizTimed) ? .3 : 1,
                                         width: 100,
                                         borderRadius: 15,
                                     }}
