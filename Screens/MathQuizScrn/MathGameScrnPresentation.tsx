@@ -381,16 +381,9 @@ const MathGameScrnPresentation = () => {
                             width: "71%"
                         }}
                     >
-                        {/* <View
-                            style={{
-                                width: "80%",
-                                height: "100%"
-                            }}
-                        > */}
                         <PTxt fontSize={NUM_AND_OPERATOR_FONT_SIZE}>
                             {userAnswer}
                         </PTxt>
-                        {/* </View> */}
                     </View>
                 </View>
             </View>
