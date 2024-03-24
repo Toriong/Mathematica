@@ -6,7 +6,7 @@ import { faAdd, faDivide, faMinus, faMultiply, faCheck, faCancel } from "@fortaw
 import { useMathGameStore } from '../../zustand';
 import { TDifficulty, TEquation, TOperator, TStrNum } from '../../zustandStoreTypes&Interfaces';
 import { getIsNum } from "../../utils/generalFns";
-import { useRef, useState, isValidElement, JSX, useMemo } from "react";
+import { useRef, useState, isValidElement, JSX, useMemo, useEffect } from "react";
 import { IAppColor, IComponentProps, TIndices, TUseStateReturnVal } from "../../globalTypes&Interfaces";
 import Button from "../../global_components/Button";
 import { useGetAppColors } from "../../custom_hooks/useGetAppColors";
@@ -197,6 +197,7 @@ const MathGameScrnPresentation = () => {
     }, [generateEquationAccumulator])
     const numsInMathEquation = mathEquation.filter(mathEqVal => !Number.isNaN(+mathEqVal)).sort((numA, numB) => parseInt(numB) - parseInt(numA))
     const [userAnswer, setUserAnswer] = useState('');
+    const [timeToAnswerQ, setTimeToAnswerQ] = useState(0)
     const [btnsSecHeight, setBtnsSecHeight] = useState(0)
     const [answerSecWidth, setAnswerSecWidth] = useState(0);
     const wasHeightSetForBtnSecRef = useRef(false);
@@ -204,17 +205,30 @@ const MathGameScrnPresentation = () => {
     const correctAnswer = wasSubmitBtnPressed ? computeEquation(mathEquation) : null;
     const isAnswerCorrect = wasSubmitBtnPressed ? parseInt(userAnswer || '0') === correctAnswer : false;
 
+    // NOTES:
+    // -update the interface for the problem 
+    // -within a useEffect, track the time 
+    // -use a ref to store the time
+    // -when do I get the time? 
+
+
     function handleSelectionBtnPress(btnTxt: TTxtForSelectionBtns) {
         return () => {
             if (btnTxt === 'submit') {
+                const timeToAnswerQfinal = new Date().getTime() - timeToAnswerQ;
+                console.log('timeToAnswerQfinal: ', timeToAnswerQfinal)
+
                 setTimeout(() => {
                     setMathGameStore(false, 'wasSubmitBtnPressed');
                     setUserAnswer('');
                     setMathGameStore(generateEquationAccumulator + 1, 'generateEquationAccumalor');
                 }, 1500);
                 setMathGameStore(true, 'wasSubmitBtnPressed');
-                const problemsUpdated = [...(previousProblems?.length ? previousProblems : []), { problem: mathEquation, userAnswer: userAnswer }]
+
+                const problemsUpdated = [...(previousProblems?.length ? previousProblems : []), { problem: mathEquation, userAnswer: userAnswer, timeToSolve: timeToAnswerQfinal }]
+
                 setMathGameStore(problemsUpdated, 'problems')
+                setTimeToAnswerQ(0)
                 return;
             }
 
@@ -236,6 +250,12 @@ const MathGameScrnPresentation = () => {
     // if easy difficulty, then generate one one to two digit numbers
 
     // GOAL: generate the equation
+
+    useEffect(() => {
+        if (!wasSubmitBtnPressed) {
+            setTimeToAnswerQ(new Date().getTime())
+        }
+    }, [wasSubmitBtnPressed])
 
     return (
         <Layout
@@ -361,9 +381,16 @@ const MathGameScrnPresentation = () => {
                             width: "71%"
                         }}
                     >
+                        {/* <View
+                            style={{
+                                width: "80%",
+                                height: "100%"
+                            }}
+                        > */}
                         <PTxt fontSize={NUM_AND_OPERATOR_FONT_SIZE}>
                             {userAnswer}
                         </PTxt>
+                        {/* </View> */}
                     </View>
                 </View>
             </View>

@@ -41,7 +41,6 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
     };
 
     function handleOnComplete() {
-        // save the quiz into the database for the target user
         navigate('ResultsScreen');
     };
 
@@ -54,7 +53,7 @@ const GameScrnTab = ({ navigate }: TStackNavigationProp) => {
                 display: 'flex',
                 height: 200,
             }}
-            Overlay={<TabOverlay />}
+            Overlay={wasSubmitBtnPressed ? <TabOverlay /> : null}
         >
             <View
                 style={{

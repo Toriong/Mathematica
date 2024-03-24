@@ -84,7 +84,8 @@ export type TFieldsFromMathGameInfoStates = Omit<IMathGameInfoStates, "isTimerOn
 
 export interface TUserAnswer {
     problem: TEquation
-    userAnswer: string
+    userAnswer: string,
+    timeToSolve: number
 }
 export interface IMathGameInfoStates extends IGameScrnInfo {
     difficulty: TDifficulty
@@ -98,7 +99,7 @@ export interface IMathGameInfoStates extends IGameScrnInfo {
 export interface IAnsweredMathQuestion {
     _id: string,
     equation: TEquation
-    userAnswer: number
+    userAnswer: number | null
 }
 export interface IMathQuizToSave extends TFieldsFromMathGameInfoStates {
     quizId: string
